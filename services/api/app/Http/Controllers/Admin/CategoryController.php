@@ -3,33 +3,78 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\ReorderCategoryRequest;
+use App\Http\Requests\Admin\StoreCategoryRequest;
+use App\Http\Requests\Admin\UpdateCategoryRequest;
+use App\Http\Resources\Admin\CategoryResource;
+use App\Models\Category;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class CategoryController extends Controller
 {
     public function index(): JsonResponse
     {
-        return $this->success([]);
+        $categories = Category::with('children.children')
+            ->whereNull('parent_id')
+            ->orderBy('sort_order')
+            ->get();
+
+        return $this->success(CategoryResource::collection($categories));
     }
 
-    public function store(Request $request): JsonResponse
+    public function store(StoreCategoryRequest $request): JsonResponse
     {
-        return $this->success([], 'Created.', 201);
+        $data = $request->validated();
+
+        if (empty($data['slug'])) {
+            $data['slug'] = Str::slug($data['name']['en']);
+        }
+
+        $category = Category::create($data);
+
+        return $this->success(new CategoryResource($category), 'Category created.', 201);
     }
 
-    public function show(string $id): JsonResponse
+    public function update(UpdateCategoryRequest $request, Category $category): JsonResponse
     {
-        return $this->success([]);
+        $data = $request->validated();
+
+        if (isset($data['name']) && empty($data['slug'])) {
+            $data['slug'] = Str::slug($data['name']['en']);
+        }
+
+        $category->update($data);
+
+        return $this->success(new CategoryResource($category->fresh('children')), 'Category updated.');
     }
 
-    public function update(Request $request, string $id): JsonResponse
+    public function destroy(Category $category): JsonResponse
     {
-        return $this->success([]);
+        $hasActiveProducts = $category->products()->whereNull('deleted_at')->exists();
+
+        if ($hasActiveProducts) {
+            return $this->error('Cannot delete category with active products.', 422);
+        }
+
+        $category->delete();
+
+        return $this->success(null, 'Category deleted.');
     }
 
-    public function destroy(string $id): JsonResponse
+    public function reorder(ReorderCategoryRequest $request, Category $category): JsonResponse
     {
-        return $this->success(null, 'Deleted.');
+        $order = $request->validated()['order'];
+
+        DB::transaction(function () use ($order) {
+            foreach ($order as $position => $id) {
+                Category::where('id', $id)->update(['sort_order' => $position]);
+            }
+        });
+
+        $category->load('children');
+
+        return $this->success(new CategoryResource($category), 'Children reordered.');
     }
 }

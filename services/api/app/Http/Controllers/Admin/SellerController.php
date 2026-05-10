@@ -2,34 +2,51 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\UserStatus;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\UpdateSellerStatusRequest;
+use App\Http\Resources\Admin\SellerDetailResource;
+use App\Http\Resources\Admin\SellerResource;
+use App\Notifications\StoreSuspendedNotification;
+use App\Repositories\Contracts\AdminSellerRepositoryInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class SellerController extends Controller
 {
-    public function index(): JsonResponse
+    public function __construct(private readonly AdminSellerRepositoryInterface $sellers) {}
+
+    public function index(Request $request): JsonResponse
     {
-        return $this->success([]);
+        $filters = $request->only(['status', 'search']);
+        $sellers = $this->sellers->paginate($filters);
+
+        return $this->paginated(SellerResource::collection($sellers));
     }
 
-    public function store(Request $request): JsonResponse
+    public function show(int $seller): JsonResponse
     {
-        return $this->success([], 'Created.', 201);
+        $seller = $this->sellers->findWithDetails($seller);
+
+        return $this->success(new SellerDetailResource($seller));
     }
 
-    public function show(string $id): JsonResponse
+    public function updateStatus(UpdateSellerStatusRequest $request, int $seller): JsonResponse
     {
-        return $this->success([]);
+        $status = $request->validated()['status'];
+        $seller = $this->sellers->updateStatus($seller, $status);
+
+        if ($status === UserStatus::Suspended->value && $seller->store) {
+            $seller->notify(new StoreSuspendedNotification($seller->store));
+        }
+
+        return $this->success(new SellerDetailResource($seller), 'Seller status updated.');
     }
 
-    public function update(Request $request, string $id): JsonResponse
+    public function destroy(int $seller): JsonResponse
     {
-        return $this->success([]);
-    }
+        $this->sellers->softDeleteWithStore($seller);
 
-    public function destroy(string $id): JsonResponse
-    {
-        return $this->success(null, 'Deleted.');
+        return $this->success(null, 'Seller deleted.');
     }
 }

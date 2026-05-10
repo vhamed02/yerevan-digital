@@ -4,16 +4,19 @@ namespace App\Models;
 
 use App\Enums\StoreStatus;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
+use OwenIt\Auditing\Auditable;
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 use Spatie\Translatable\HasTranslations;
 
-class Store extends Model
+class Store extends Model implements AuditableContract
 {
-    use HasTranslations, SoftDeletes;
+    use Auditable, HasFactory, HasTranslations, SoftDeletes;
 
     public array $translatable = ['name', 'description', 'meta_title', 'meta_description'];
 

@@ -29,16 +29,38 @@ Route::prefix('v1')->group(function () {
 
     Route::prefix('admin')->middleware(['auth:sanctum', EnsureUserIsAdmin::class])->group(function () {
         Route::get('dashboard/stats', [Admin\DashboardController::class, 'stats']);
-        Route::apiResource('sellers', Admin\SellerController::class);
-        Route::apiResource('stores', Admin\StoreController::class);
-        Route::post('stores/{store}/approve', [Admin\StoreController::class, 'approve']);
-        Route::post('stores/{store}/suspend', [Admin\StoreController::class, 'suspend']);
-        Route::post('stores/{store}/feature', [Admin\StoreController::class, 'feature']);
-        Route::apiResource('categories', Admin\CategoryController::class);
-        Route::apiResource('templates', Admin\TemplateController::class);
-        Route::apiResource('payment-gateways', Admin\PaymentGatewayController::class);
+
+        Route::get('sellers', [Admin\SellerController::class, 'index']);
+        Route::get('sellers/{seller}', [Admin\SellerController::class, 'show']);
+        Route::patch('sellers/{seller}/status', [Admin\SellerController::class, 'updateStatus']);
+        Route::delete('sellers/{seller}', [Admin\SellerController::class, 'destroy']);
+
+        Route::get('stores', [Admin\StoreController::class, 'index']);
+        Route::get('stores/{store}', [Admin\StoreController::class, 'show']);
+        Route::patch('stores/{store}/approve', [Admin\StoreController::class, 'approve']);
+        Route::patch('stores/{store}/suspend', [Admin\StoreController::class, 'suspend']);
+        Route::patch('stores/{store}/feature', [Admin\StoreController::class, 'feature']);
+        Route::delete('stores/{store}', [Admin\StoreController::class, 'destroy']);
+
+        Route::get('categories', [Admin\CategoryController::class, 'index']);
+        Route::post('categories', [Admin\CategoryController::class, 'store']);
+        Route::patch('categories/{category}', [Admin\CategoryController::class, 'update']);
+        Route::delete('categories/{category}', [Admin\CategoryController::class, 'destroy']);
+        Route::post('categories/{category}/reorder', [Admin\CategoryController::class, 'reorder']);
+
+        Route::get('templates', [Admin\TemplateController::class, 'index']);
+        Route::post('templates', [Admin\TemplateController::class, 'store']);
+        Route::patch('templates/{template}', [Admin\TemplateController::class, 'update']);
+        Route::post('templates/{template}/image', [Admin\TemplateController::class, 'uploadImage']);
+        Route::patch('templates/{template}/toggle', [Admin\TemplateController::class, 'toggle']);
+
+        Route::get('payment-gateways', [Admin\PaymentGatewayController::class, 'index']);
+        Route::patch('payment-gateways/{gateway}', [Admin\PaymentGatewayController::class, 'update']);
+        Route::patch('payment-gateways/{gateway}/toggle', [Admin\PaymentGatewayController::class, 'toggle']);
+
         Route::get('settings', [Admin\SettingController::class, 'index']);
         Route::patch('settings', [Admin\SettingController::class, 'update']);
+
         Route::post('media/upload', [Admin\MediaController::class, 'upload']);
     });
 

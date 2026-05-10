@@ -3,13 +3,16 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use OwenIt\Auditing\Auditable;
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 use Spatie\Translatable\HasTranslations;
 
-class StoreTemplate extends Model
+class StoreTemplate extends Model implements AuditableContract
 {
-    use HasTranslations;
+    use Auditable, HasFactory, HasTranslations;
 
     public array $translatable = ['name', 'description'];
 

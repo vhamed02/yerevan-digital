@@ -3,6 +3,7 @@
 namespace App\Traits;
 
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 trait ApiResponse
@@ -26,18 +27,23 @@ trait ApiResponse
         ], $code);
     }
 
-    protected function paginated(LengthAwarePaginator $resource): JsonResponse
+    protected function paginated(ResourceCollection $resource): JsonResponse
     {
+        /** @var LengthAwarePaginator $paginator */
+        $paginator = $resource->resource;
+
         return response()->json([
             'success' => true,
-            'data'    => $resource->items(),
-            'meta'    => [
-                'current_page' => $resource->currentPage(),
-                'last_page'    => $resource->lastPage(),
-                'per_page'     => $resource->perPage(),
-                'total'        => $resource->total(),
-                'from'         => $resource->firstItem(),
-                'to'           => $resource->lastItem(),
+            'data'    => [
+                'data' => $resource->resolve(),
+                'meta' => [
+                    'current_page' => $paginator->currentPage(),
+                    'last_page'    => $paginator->lastPage(),
+                    'per_page'     => $paginator->perPage(),
+                    'total'        => $paginator->total(),
+                    'from'         => $paginator->firstItem(),
+                    'to'           => $paginator->lastItem(),
+                ],
             ],
         ]);
     }
