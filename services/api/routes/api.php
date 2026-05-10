@@ -1,0 +1,82 @@
+<?php
+
+use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Admin;
+use App\Http\Controllers\Seller;
+use App\Http\Controllers\Store;
+use App\Http\Controllers\PublicStoreController;
+use App\Http\Controllers\StatsController;
+use App\Http\Middleware\EnsureUserIsAdmin;
+use App\Http\Middleware\EnsureUserIsSeller;
+use App\Http\Middleware\ResolveStore;
+use Illuminate\Support\Facades\Route;
+
+Route::prefix('v1')->group(function () {
+    Route::get('health', fn() => response()->json(['status' => 'ok', 'timestamp' => now()->toIso8601String()]));
+    Route::get('stats', [StatsController::class, 'index']);
+    Route::get('stores/featured', [PublicStoreController::class, 'featured']);
+
+    Route::prefix('auth')->group(function () {
+        Route::post('register', [AuthController::class, 'register']);
+        Route::post('login', [AuthController::class, 'login']);
+        Route::post('forgot-password', [AuthController::class, 'forgotPassword']);
+        Route::post('reset-password', [AuthController::class, 'resetPassword']);
+        Route::middleware('auth:sanctum')->group(function () {
+            Route::post('logout', [AuthController::class, 'logout']);
+            Route::get('me', [AuthController::class, 'me']);
+        });
+    });
+
+    Route::prefix('admin')->middleware(['auth:sanctum', EnsureUserIsAdmin::class])->group(function () {
+        Route::get('dashboard/stats', [Admin\DashboardController::class, 'stats']);
+        Route::apiResource('sellers', Admin\SellerController::class);
+        Route::apiResource('stores', Admin\StoreController::class);
+        Route::post('stores/{store}/approve', [Admin\StoreController::class, 'approve']);
+        Route::post('stores/{store}/suspend', [Admin\StoreController::class, 'suspend']);
+        Route::post('stores/{store}/feature', [Admin\StoreController::class, 'feature']);
+        Route::apiResource('categories', Admin\CategoryController::class);
+        Route::apiResource('templates', Admin\TemplateController::class);
+        Route::apiResource('payment-gateways', Admin\PaymentGatewayController::class);
+        Route::get('settings', [Admin\SettingController::class, 'index']);
+        Route::patch('settings', [Admin\SettingController::class, 'update']);
+        Route::post('media/upload', [Admin\MediaController::class, 'upload']);
+    });
+
+    Route::prefix('seller')->middleware(['auth:sanctum', EnsureUserIsSeller::class])->group(function () {
+        Route::get('store', [Seller\StoreController::class, 'show']);
+        Route::post('store', [Seller\StoreController::class, 'store']);
+        Route::patch('store', [Seller\StoreController::class, 'update']);
+        Route::post('store/logo', [Seller\StoreController::class, 'uploadLogo']);
+        Route::post('store/banner', [Seller\StoreController::class, 'uploadBanner']);
+        Route::get('store/stats', [Seller\StoreController::class, 'stats']);
+        Route::get('store/template', [Seller\TemplateController::class, 'show']);
+        Route::patch('store/template', [Seller\TemplateController::class, 'update']);
+        Route::get('store/template/config', [Seller\TemplateController::class, 'showConfig']);
+        Route::patch('store/template/config', [Seller\TemplateController::class, 'updateConfig']);
+        Route::apiResource('products', Seller\ProductController::class);
+        Route::post('products/{uuid}/images', [Seller\ProductController::class, 'uploadImages']);
+        Route::patch('products/{uuid}/images/reorder', [Seller\ProductController::class, 'reorderImages']);
+        Route::delete('products/{uuid}/images/{id}', [Seller\ProductController::class, 'deleteImage']);
+        Route::get('products/{uuid}/variants', [Seller\ProductVariantController::class, 'index']);
+        Route::post('products/{uuid}/variants', [Seller\ProductVariantController::class, 'store']);
+        Route::get('products/{uuid}/variants/{variant}', [Seller\ProductVariantController::class, 'show']);
+        Route::patch('products/{uuid}/variants/{variant}', [Seller\ProductVariantController::class, 'update']);
+        Route::delete('products/{uuid}/variants/{variant}', [Seller\ProductVariantController::class, 'destroy']);
+        Route::get('orders', [Seller\OrderController::class, 'index']);
+        Route::get('orders/{order}', [Seller\OrderController::class, 'show']);
+        Route::patch('orders/{order}', [Seller\OrderController::class, 'update']);
+        Route::get('payments', [Seller\PaymentController::class, 'index']);
+        Route::get('payments/{payment}', [Seller\PaymentController::class, 'show']);
+    });
+
+    Route::prefix('store')->middleware(ResolveStore::class)->group(function () {
+        Route::get('{slug}/info', [Store\StoreController::class, 'info']);
+        Route::get('{slug}/products', [Store\ProductController::class, 'index']);
+        Route::get('{slug}/products/{productSlug}', [Store\ProductController::class, 'show']);
+        Route::get('{slug}/categories', [Store\StoreController::class, 'categories']);
+        Route::post('{slug}/checkout', [Store\CheckoutController::class, 'checkout']);
+        Route::post('{slug}/payments/initiate', [Store\PaymentController::class, 'initiate']);
+        Route::post('{slug}/payments/callback/{gateway}', [Store\PaymentController::class, 'callback']);
+        Route::get('{slug}/payments/sandbox/pay', [Store\PaymentController::class, 'sandboxPay']);
+    });
+});
