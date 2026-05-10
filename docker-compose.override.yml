@@ -1,0 +1,32 @@
+services:
+  api:
+    environment:
+      APP_ENV: local
+      APP_DEBUG: "true"
+      MAIL_MAILER: smtp
+      MAIL_HOST: mailpit
+      MAIL_PORT: "1025"
+      MAIL_ENCRYPTION: "null"
+
+  web:
+    command: pnpm dev
+
+  mysql:
+    ports:
+      - "3306:3306"
+
+  mongodb:
+    ports:
+      - "27017:27017"
+
+  redis:
+    ports:
+      - "6379:6379"
+
+  mailpit:
+    image: axllent/mailpit:latest
+    ports:
+      - "8025:8025"
+      - "1025:1025"
+    networks:
+      - vendora-backend

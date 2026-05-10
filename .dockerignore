@@ -1,0 +1,12 @@
+.git
+.idea
+.vscode
+*.md
+.env
+.env.*
+!.env.example
+services/web/.next
+services/web/out
+services/api/vendor
+node_modules
+*.log

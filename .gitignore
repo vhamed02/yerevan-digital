@@ -1,0 +1,37 @@
+# Environment
+.env
+.env.local
+.env.*.local
+
+# PHP dependencies
+vendor/
+
+# Node dependencies
+node_modules/
+
+# Laravel storage
+services/api/storage/app/*
+services/api/storage/framework/cache/*
+services/api/storage/framework/sessions/*
+services/api/storage/framework/views/*
+services/api/storage/logs/*
+
+# Logs
+*.log
+
+# Next.js build output
+services/web/.next/
+services/web/out/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local Docker overrides
+docker-compose.local.yml
