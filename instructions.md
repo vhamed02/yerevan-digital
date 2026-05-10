@@ -33,6 +33,11 @@
 >
 > * After finishing each phase, give me a short summary:
     >   what was done, what was skipped (if any), and what I should test.
+> * Writing unit and feature tests for every feature you implement in the Laravel
+    >   app is mandatory, not optional. Tests must pass before you commit.
+    >   Unit tests must be fully isolated — no database, no external services,
+    >   no filesystem. Use mocks and fakes instead. Feature tests may interact with the database using RefreshDatabase trait. 
+
 ---
 
 ## 📐 TECH STACK

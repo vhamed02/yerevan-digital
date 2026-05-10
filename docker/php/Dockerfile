@@ -1,16 +1,8 @@
 FROM php:8.5-fpm-alpine
 
-RUN apk add --no-cache \
-        libpng-dev \
-        libjpeg-turbo-dev \
-        freetype-dev \
-        libzip-dev \
-        icu-dev \
-        openssl-dev \
-    && apk add --no-cache --virtual .build-deps \
-        autoconf g++ make linux-headers \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install -j$(nproc) \
+COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/bin/
+
+RUN install-php-extensions \
         pdo_mysql \
         gd \
         zip \
@@ -18,10 +10,8 @@ RUN apk add --no-cache \
         intl \
         opcache \
         exif \
-    && pecl install redis mongodb \
-    && docker-php-ext-enable redis mongodb \
-    && apk del .build-deps \
-    && rm -rf /tmp/pear /var/cache/apk/*
+        redis \
+        mongodb
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
