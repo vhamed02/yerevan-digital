@@ -150,17 +150,37 @@ class PaymentCallbackTest extends TestCase
         Notification::assertSentTo($this->store->owner, NewOrderNotification::class);
     }
 
-    public function test_callback_with_invalid_checksum_marks_transaction_failed(): void
+    public function test_callback_with_invalid_checksum_returns_400(): void
     {
         $payload = $this->idramCallbackPayload(['EDP_CHECKSUM' => 'INVALID_CHECKSUM']);
 
         $this->postJson(
             "/api/v1/store/{$this->store->slug}/payments/callback/idram",
             $payload
-        )->assertOk();
+        )->assertStatus(400);
 
         $this->assertEquals(TransactionStatus::Failed, $this->transaction->fresh()->status);
         $this->assertEquals(PaymentStatus::Pending, $this->order->fresh()->payment_status);
+    }
+
+    public function test_callback_for_already_paid_order_is_idempotent(): void
+    {
+        $this->order->update([
+            'payment_status' => PaymentStatus::Paid,
+            'status'         => OrderStatus::Processing,
+            'paid_at'        => now(),
+        ]);
+
+        $this->transaction->update(['status' => TransactionStatus::Success]);
+
+        $this->postJson(
+            "/api/v1/store/{$this->store->slug}/payments/callback/idram",
+            $this->idramCallbackPayload()
+        )
+            ->assertOk()
+            ->assertSee('OK');
+
+        $this->assertEquals(PaymentStatus::Paid, $this->order->fresh()->payment_status);
     }
 
     public function test_callback_with_missing_order_reference_returns_422(): void

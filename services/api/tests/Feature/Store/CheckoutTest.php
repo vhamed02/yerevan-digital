@@ -183,6 +183,17 @@ class CheckoutTest extends TestCase
         $this->assertEquals(10, $this->product->fresh()->stock);
     }
 
+    public function test_order_number_follows_vend_year_padded_format(): void
+    {
+        $response = $this->postJson("/api/v1/store/{$this->store->slug}/checkout", $this->validPayload())
+            ->assertCreated();
+
+        $orderNumber = Order::where('uuid', $response->json('data.uuid'))->value('order_number');
+
+        $this->assertMatchesRegularExpression('/^VEND-\d{4}-\d{5}$/', $orderNumber);
+        $this->assertStringStartsWith('VEND-' . now()->year . '-', $orderNumber);
+    }
+
     public function test_order_show_returns_order_for_valid_store_and_uuid(): void
     {
         $response = $this->postJson("/api/v1/store/{$this->store->slug}/checkout", $this->validPayload())

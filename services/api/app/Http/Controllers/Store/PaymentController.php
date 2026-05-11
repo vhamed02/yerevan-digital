@@ -117,6 +117,17 @@ class PaymentController extends Controller
             ->first();
 
         if (!$transaction) {
+            $alreadyPaid = Order::where('uuid', $orderUuid)
+                ->where('payment_status', PaymentStatus::Paid)
+                ->exists();
+
+            if ($alreadyPaid) {
+                if ($gateway === 'idram') {
+                    return response('OK', 200)->header('Content-Type', 'text/plain');
+                }
+                return $this->success(null, 'Payment already processed.');
+            }
+
             return $this->error('Transaction not found.', 404);
         }
 
@@ -149,6 +160,9 @@ class PaymentController extends Controller
         }
 
         if ($gateway === 'idram') {
+            if (!$verifyResponse->success) {
+                return response('FAIL', 400)->header('Content-Type', 'text/plain');
+            }
             return response('OK', 200)->header('Content-Type', 'text/plain');
         }
 
