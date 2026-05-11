@@ -1,18 +1,15 @@
-FROM node:22-alpine AS base
-RUN npm install -g pnpm
-
-FROM base AS deps
+FROM node:22-alpine AS deps
 WORKDIR /app
-COPY services/web/package.json services/web/pnpm-lock.yaml services/web/.npmrc ./
-RUN pnpm install --no-frozen-lockfile
+COPY services/web/package.json ./
+RUN npm install
 
-FROM base AS builder
+FROM node:22-alpine AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY services/web .
-RUN pnpm build
+RUN npm run build
 
-FROM base AS runner
+FROM node:22-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 RUN addgroup -g 1001 -S nodejs && adduser -S nextjs -u 1001
