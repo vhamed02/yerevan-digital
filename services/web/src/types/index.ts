@@ -348,3 +348,78 @@ export interface StoreGatewayConfig {
   is_sandbox: boolean
   config: Record<string, string>
 }
+
+export interface StoreTemplateConfig {
+  primary_color: string
+  secondary_color: string
+  font_heading: string
+  font_pair?: string
+  products_per_row?: number
+  show_hero_banner?: boolean
+  show_categories_bar?: boolean
+}
+
+export interface StorefrontStore {
+  id: number
+  slug: string
+  name: MultiLang
+  description?: MultiLang
+  logo_url?: string | null
+  banner_url?: string | null
+  phone?: string
+  email?: string
+  address?: string
+  social_instagram?: string
+  social_facebook?: string
+  meta_title?: MultiLang
+  meta_description?: MultiLang
+  category?: PublicCategory
+  active_template_key: string
+  template_config: StoreTemplateConfig
+}
+
+export interface StorefrontVariant {
+  id: number
+  attributes: Record<string, string>
+  price: number
+  stock: number
+  sku?: string
+  is_active: boolean
+}
+
+export interface StorefrontProduct {
+  uuid: string
+  slug: string
+  name: MultiLang
+  description_short?: MultiLang
+  description_full?: MultiLang
+  price: number
+  compare_price?: number
+  status: 'active' | 'draft' | 'archived'
+  is_featured: boolean
+  stock: number
+  manage_stock: boolean
+  images: ProductImage[]
+  variants?: StorefrontVariant[]
+  category?: PublicCategory
+  meta_title?: MultiLang
+  meta_description?: MultiLang
+}
+
+export interface StorefrontOrderItem {
+  product_name: MultiLang
+  variant_name?: string
+  quantity: number
+  price: number
+}
+
+export interface StorefrontOrder {
+  uuid: string
+  order_number: string
+  status: string
+  total: number
+  customer_name: string
+  customer_email: string
+  items: StorefrontOrderItem[]
+  created_at: string
+}
