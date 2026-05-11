@@ -1,4 +1,8 @@
+import createIntlMiddleware from 'next-intl/middleware'
 import { NextResponse, type NextRequest } from 'next/server'
+import { routing } from './i18n/routing'
+
+const intlMiddleware = createIntlMiddleware(routing)
 
 const ADMIN_PATHS = ['/admin']
 const SELLER_PATHS = ['/seller']
@@ -31,9 +35,9 @@ export function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL(destination, request.url))
   }
 
-  return NextResponse.next()
+  return intlMiddleware(request)
 }
 
 export const config = {
-  matcher: ['/admin/:path*', '/seller/:path*', '/auth/:path*'],
+  matcher: ['/((?!_next|_vercel|api|.*\\..*).*)'],
 }
