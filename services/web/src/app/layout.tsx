@@ -1,5 +1,7 @@
 import type { Metadata } from 'next'
 import { Plus_Jakarta_Sans, Inter, JetBrains_Mono } from 'next/font/google'
+import { NextIntlClientProvider } from 'next-intl'
+import { getLocale, getMessages } from 'next-intl/server'
 import './globals.css'
 
 const plusJakarta = Plus_Jakarta_Sans({
@@ -25,10 +27,17 @@ export const metadata: Metadata = {
   description: 'Armenian store builder platform',
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const locale = await getLocale()
+  const messages = await getMessages()
+
   return (
-    <html lang="hy" className={`${plusJakarta.variable} ${inter.variable} ${jetbrainsMono.variable}`}>
-      <body>{children}</body>
+    <html lang={locale} className={`${plusJakarta.variable} ${inter.variable} ${jetbrainsMono.variable}`}>
+      <body>
+        <NextIntlClientProvider locale={locale} messages={messages}>
+          {children}
+        </NextIntlClientProvider>
+      </body>
     </html>
   )
 }

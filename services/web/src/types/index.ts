@@ -97,3 +97,31 @@ export interface ApiError {
   message: string
   errors?: Record<string, string[]>
 }
+
+export interface MultiLang {
+  hy: string
+  en: string
+}
+
+export interface PublicCategory {
+  id: number
+  name: MultiLang
+  slug: string
+}
+
+export interface PublicStore {
+  id: number
+  name: MultiLang
+  slug: string
+  status: string
+  banner_url?: string | null
+  logo_url?: string | null
+  category?: PublicCategory | null
+  product_count: number
+}
+
+export interface PlatformStats {
+  stores_count: number
+  products_count: number
+  orders_count: number
+}
