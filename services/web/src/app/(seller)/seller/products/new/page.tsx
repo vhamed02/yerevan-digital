@@ -1,3 +1,17 @@
-export default function NewProductPage() {
-  return <div className="p-8"><h1 className="font-heading text-2xl font-bold">New Product</h1></div>
+import type { Metadata } from 'next'
+import ProductForm from '@/components/seller/ProductForm'
+import { serverGet } from '@/lib/server-api'
+import type { PublicCategory } from '@/types'
+
+export const dynamic = 'force-dynamic'
+
+export const metadata: Metadata = {
+  title: 'New Product — Vendora Seller',
+}
+
+export default async function NewProductPage() {
+  const data = await serverGet<{ data: PublicCategory[] }>('/categories', {
+    next: { revalidate: 3600 },
+  })
+  return <ProductForm categories={data?.data ?? []} />
 }

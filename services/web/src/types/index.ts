@@ -244,3 +244,107 @@ export interface AdminDashboardData {
   pending_stores: AdminStore[]
   recent_orders: AdminOrder[]
 }
+
+export interface SellerProduct {
+  uuid: string
+  name: MultiLang
+  slug: string
+  description_short?: MultiLang
+  description_full?: MultiLang
+  price: number
+  compare_price?: number
+  cost_price?: number
+  sku?: string
+  manage_stock: boolean
+  stock: number
+  allow_backorders: boolean
+  status: 'draft' | 'active' | 'archived'
+  is_featured: boolean
+  category?: PublicCategory
+  images: ProductImage[]
+  variants?: SellerVariant[]
+  meta_title?: MultiLang
+  meta_description?: MultiLang
+}
+
+export interface SellerVariant {
+  id?: number
+  attributes: Record<string, string>
+  price: number
+  stock: number
+  sku?: string
+  is_active: boolean
+}
+
+export interface SellerDashboardStats {
+  total_products: number
+  active_products: number
+  total_orders: number
+  orders_this_month: number
+  revenue_this_month: number
+  revenue_today: number
+}
+
+export interface SellerRevenueChartPoint {
+  date: string
+  revenue: number
+}
+
+export interface SellerDashboardData {
+  stats: SellerDashboardStats
+  revenue_chart: SellerRevenueChartPoint[]
+  orders_by_status: AdminOrderStatusPoint[]
+  recent_orders: Order[]
+}
+
+export interface SellerStore {
+  id: number
+  name: MultiLang
+  slug: string
+  status: 'pending' | 'active' | 'suspended'
+  description?: MultiLang
+  logo_url?: string
+  banner_url?: string
+  category_id?: number
+  category?: PublicCategory
+  phone?: string
+  email?: string
+  address?: string
+  social_instagram?: string
+  social_facebook?: string
+  meta_title?: MultiLang
+  meta_description?: MultiLang
+  design?: StoreDesignSettings
+  template_id?: number
+}
+
+export interface StoreDesignSettings {
+  template_id: number
+  primary_color: string
+  secondary_color: string
+  font_pair: string
+  products_per_row: number
+  show_hero_banner: boolean
+  show_categories_bar: boolean
+}
+
+export interface SellerTemplate {
+  id: number
+  key: string
+  name: string
+  description?: string
+  preview_url?: string
+  is_active: boolean
+}
+
+export interface StoreGatewayConfig {
+  id: number
+  payment_gateway_id: number
+  key: string
+  name: MultiLang
+  instructions?: MultiLang
+  required_fields?: Array<{ key: string; label_hy: string; label_en: string }>
+  is_active: boolean
+  is_sandbox: boolean
+  config: Record<string, string>
+}
