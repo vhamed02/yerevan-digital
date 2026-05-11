@@ -4,7 +4,7 @@ RUN npm install -g pnpm
 FROM base AS deps
 WORKDIR /app
 COPY services/web/package.json services/web/pnpm-lock.yaml services/web/.npmrc ./
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --no-frozen-lockfile
 
 FROM base AS builder
 WORKDIR /app
