@@ -114,6 +114,19 @@ return [
             // 'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', 'false'),
         ],
 
+        'mongodb' => [
+            'driver'   => 'mongodb',
+            'dsn'      => env('MONGODB_DSN', null),
+            'host'     => env('MONGODB_HOST', '127.0.0.1'),
+            'port'     => env('MONGODB_PORT', 27017),
+            'database' => env('MONGODB_DATABASE', 'vendora_docs'),
+            'username' => env('MONGODB_USERNAME', ''),
+            'password' => env('MONGODB_PASSWORD', ''),
+            'options'  => [
+                'authSource' => env('MONGODB_AUTH_SOURCE', 'admin'),
+            ],
+        ],
+
     ],
 
     /*

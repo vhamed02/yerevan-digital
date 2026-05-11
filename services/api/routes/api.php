@@ -70,25 +70,39 @@ Route::prefix('v1')->group(function () {
         Route::patch('store', [Seller\StoreController::class, 'update']);
         Route::post('store/logo', [Seller\StoreController::class, 'uploadLogo']);
         Route::post('store/banner', [Seller\StoreController::class, 'uploadBanner']);
+        Route::post('store/favicon', [Seller\StoreController::class, 'uploadFavicon']);
         Route::get('store/stats', [Seller\StoreController::class, 'stats']);
-        Route::get('store/template', [Seller\TemplateController::class, 'show']);
-        Route::patch('store/template', [Seller\TemplateController::class, 'update']);
+
+        Route::get('store/template/available', [Seller\TemplateController::class, 'available']);
+        Route::patch('store/template/active', [Seller\TemplateController::class, 'updateActive']);
         Route::get('store/template/config', [Seller\TemplateController::class, 'showConfig']);
         Route::patch('store/template/config', [Seller\TemplateController::class, 'updateConfig']);
-        Route::apiResource('products', Seller\ProductController::class);
+
+        Route::get('products', [Seller\ProductController::class, 'index']);
+        Route::post('products', [Seller\ProductController::class, 'store']);
+        Route::get('products/{uuid}', [Seller\ProductController::class, 'show']);
+        Route::patch('products/{uuid}', [Seller\ProductController::class, 'update']);
+        Route::delete('products/{uuid}', [Seller\ProductController::class, 'destroy']);
+        Route::patch('products/{uuid}/status', [Seller\ProductController::class, 'updateStatus']);
         Route::post('products/{uuid}/images', [Seller\ProductController::class, 'uploadImages']);
         Route::patch('products/{uuid}/images/reorder', [Seller\ProductController::class, 'reorderImages']);
-        Route::delete('products/{uuid}/images/{id}', [Seller\ProductController::class, 'deleteImage']);
+        Route::delete('products/{uuid}/images/{imageId}', [Seller\ProductController::class, 'deleteImage']);
+
         Route::get('products/{uuid}/variants', [Seller\ProductVariantController::class, 'index']);
         Route::post('products/{uuid}/variants', [Seller\ProductVariantController::class, 'store']);
         Route::get('products/{uuid}/variants/{variant}', [Seller\ProductVariantController::class, 'show']);
         Route::patch('products/{uuid}/variants/{variant}', [Seller\ProductVariantController::class, 'update']);
         Route::delete('products/{uuid}/variants/{variant}', [Seller\ProductVariantController::class, 'destroy']);
+
+        Route::get('orders/export', [Seller\OrderController::class, 'export']);
         Route::get('orders', [Seller\OrderController::class, 'index']);
-        Route::get('orders/{order}', [Seller\OrderController::class, 'show']);
-        Route::patch('orders/{order}', [Seller\OrderController::class, 'update']);
-        Route::get('payments', [Seller\PaymentController::class, 'index']);
-        Route::get('payments/{payment}', [Seller\PaymentController::class, 'show']);
+        Route::get('orders/{uuid}', [Seller\OrderController::class, 'show']);
+        Route::patch('orders/{uuid}/status', [Seller\OrderController::class, 'updateStatus']);
+
+        Route::get('payments/available', [Seller\PaymentController::class, 'available']);
+        Route::get('payments/configured', [Seller\PaymentController::class, 'configured']);
+        Route::post('payments/configure', [Seller\PaymentController::class, 'configure']);
+        Route::patch('payments/{gatewayId}/toggle', [Seller\PaymentController::class, 'toggle']);
     });
 
     Route::prefix('store')->middleware(ResolveStore::class)->group(function () {
