@@ -14,6 +14,10 @@ use App\Repositories\Contracts\AdminSellerRepositoryInterface;
 use App\Repositories\Contracts\AdminStoreRepositoryInterface;
 use App\Repositories\Eloquent\AdminSellerRepository;
 use App\Repositories\Eloquent\AdminStoreRepository;
+use App\Services\PaymentGateway\Gateways\ConverseBankGateway;
+use App\Services\PaymentGateway\Gateways\IdramGateway;
+use App\Services\PaymentGateway\Gateways\InnecobankGateway;
+use App\Services\PaymentGateway\PaymentGatewayRegistry;
 use GuzzleHttp\Client;
 use Illuminate\Auth\Notifications\ResetPassword as ResetPasswordNotification;
 use Illuminate\Support\Facades\Mail;
@@ -25,6 +29,14 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->bind(AdminSellerRepositoryInterface::class, AdminSellerRepository::class);
         $this->app->bind(AdminStoreRepositoryInterface::class, AdminStoreRepository::class);
+
+        $this->app->singleton(PaymentGatewayRegistry::class, function () {
+            $registry = new PaymentGatewayRegistry();
+            $registry->register('idram', new IdramGateway());
+            $registry->register('innecobank', new InnecobankGateway());
+            $registry->register('converse_bank', new ConverseBankGateway());
+            return $registry;
+        });
     }
 
     public function boot(): void

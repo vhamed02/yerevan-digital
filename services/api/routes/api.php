@@ -105,6 +105,8 @@ Route::prefix('v1')->group(function () {
         Route::patch('payments/{gatewayId}/toggle', [Seller\PaymentController::class, 'toggle']);
     });
 
+    Route::get('store/payments/sandbox/pay', [Store\PaymentController::class, 'sandboxPay']);
+
     Route::prefix('store')->middleware(ResolveStore::class)->group(function () {
         Route::get('{slug}/info', [Store\StoreController::class, 'info']);
         Route::get('{slug}/products', [Store\ProductController::class, 'index']);
@@ -113,6 +115,5 @@ Route::prefix('v1')->group(function () {
         Route::post('{slug}/checkout', [Store\CheckoutController::class, 'checkout']);
         Route::post('{slug}/payments/initiate', [Store\PaymentController::class, 'initiate']);
         Route::post('{slug}/payments/callback/{gateway}', [Store\PaymentController::class, 'callback']);
-        Route::get('{slug}/payments/sandbox/pay', [Store\PaymentController::class, 'sandboxPay']);
     });
 });

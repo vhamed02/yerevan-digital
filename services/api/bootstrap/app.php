@@ -25,6 +25,10 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->appendToGroup('api', SetLocale::class);
+
+        $middleware->validateCsrfTokens(except: [
+            'api/v1/store/*/payments/callback/*',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         (new ApiExceptionHandler())->register($exceptions);
