@@ -1,5 +1,8 @@
 services:
   api:
+    volumes:
+      - ./services/api:/var/www/html
+      - storage_data:/var/www/html/storage
     environment:
       APP_ENV: local
       APP_DEBUG: "true"
@@ -8,8 +11,22 @@ services:
       MAIL_PORT: "1025"
       MAIL_ENCRYPTION: "null"
 
+  queue:
+    volumes:
+      - ./services/api:/var/www/html
+      - storage_data:/var/www/html/storage
+
+  scheduler:
+    volumes:
+      - ./services/api:/var/www/html
+      - storage_data:/var/www/html/storage
+
   web:
-    command: pnpm dev
+    volumes:
+      - ./services/web:/app
+      - /app/node_modules
+      - /app/.next
+    command: npm run dev
 
   mysql:
     ports:
