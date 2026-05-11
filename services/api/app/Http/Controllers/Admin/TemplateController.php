@@ -44,10 +44,7 @@ class TemplateController extends Controller
             'image' => ['required', 'image', 'mimes:jpeg,png,webp,gif', 'max:10240'],
         ]);
 
-        $variants = $this->imageService->generateVariants(
-            $request->file('image')->getRealPath(),
-            'public'
-        );
+        $variants = $this->imageService->process($request->file('image'), 'admin');
 
         $template->update(['preview_image' => $variants['original']]);
 

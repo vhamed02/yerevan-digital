@@ -150,7 +150,7 @@ class ProductController extends Controller
         $uploaded = [];
 
         foreach ($request->file('images') as $index => $file) {
-            $variants = $this->imageService->storeUpload($file, "products/{$uuid}");
+            $variants = $this->imageService->process($file, 'products', (string) $store->id);
 
             $image = $product->images()->create([
                 'path_original'  => $variants['original'],

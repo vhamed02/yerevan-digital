@@ -37,6 +37,7 @@
     >   app is mandatory, not optional. Tests must pass before you commit.
     >   Unit tests must be fully isolated — no database, no external services,
     >   no filesystem. Use mocks and fakes instead. Feature tests may interact with the database using RefreshDatabase trait. 
+> * DO NOT mention claude in commit messages!
 
 ---
 

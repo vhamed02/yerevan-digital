@@ -17,10 +17,7 @@ class MediaController extends Controller
             'image' => ['required', 'image', 'mimes:jpeg,png,webp,gif', 'max:10240'],
         ]);
 
-        $variants = $this->imageService->generateVariants(
-            $request->file('image')->getRealPath(),
-            'public'
-        );
+        $variants = $this->imageService->process($request->file('image'), 'admin');
 
         return $this->success($variants, 'Uploaded.', 201);
     }

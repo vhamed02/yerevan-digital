@@ -1,0 +1,112 @@
+<?php
+
+namespace Tests\Feature;
+
+use App\Services\ImageService;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
+use Tests\TestCase;
+
+class ImageServiceTest extends TestCase
+{
+    private ImageService $service;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        Storage::fake('public');
+        $this->service = new ImageService();
+    }
+
+    public function test_process_creates_four_webp_variants(): void
+    {
+        $file   = UploadedFile::fake()->image('test.jpg', 800, 600);
+        $result = $this->service->process($file, 'products', '1');
+
+        $this->assertArrayHasKey('uuid', $result);
+        $this->assertArrayHasKey('original', $result);
+        $this->assertArrayHasKey('thumbnail', $result);
+        $this->assertArrayHasKey('medium', $result);
+        $this->assertArrayHasKey('large', $result);
+
+        $uuid = $result['uuid'];
+
+        Storage::disk('public')->assertExists("images/products/1/{$uuid}/original.webp");
+        Storage::disk('public')->assertExists("images/products/1/{$uuid}/thumbnail.webp");
+        Storage::disk('public')->assertExists("images/products/1/{$uuid}/medium.webp");
+        Storage::disk('public')->assertExists("images/products/1/{$uuid}/large.webp");
+    }
+
+    public function test_process_returns_webp_mime(): void
+    {
+        $file   = UploadedFile::fake()->image('photo.png', 400, 300);
+        $result = $this->service->process($file, 'misc');
+
+        $this->assertEquals('image/webp', $result['mime']);
+    }
+
+    public function test_process_returns_original_dimensions(): void
+    {
+        $file   = UploadedFile::fake()->image('photo.jpg', 800, 600);
+        $result = $this->service->process($file, 'misc');
+
+        $this->assertEquals(800, $result['width']);
+        $this->assertEquals(600, $result['height']);
+    }
+
+    public function test_process_returns_file_size(): void
+    {
+        $file   = UploadedFile::fake()->image('photo.jpg', 100, 100);
+        $result = $this->service->process($file, 'misc');
+
+        $this->assertGreaterThan(0, $result['size']);
+    }
+
+    public function test_process_builds_path_with_store_id(): void
+    {
+        $file   = UploadedFile::fake()->image('store.jpg', 200, 200);
+        $result = $this->service->process($file, 'stores', '42');
+        $uuid   = $result['uuid'];
+
+        Storage::disk('public')->assertExists("images/stores/42/{$uuid}/original.webp");
+    }
+
+    public function test_process_builds_path_without_store_id(): void
+    {
+        $file   = UploadedFile::fake()->image('cat.jpg', 200, 200);
+        $result = $this->service->process($file, 'categories');
+        $uuid   = $result['uuid'];
+
+        Storage::disk('public')->assertExists("images/categories/{$uuid}/original.webp");
+    }
+
+    public function test_delete_removes_image_directory(): void
+    {
+        $file   = UploadedFile::fake()->image('del.jpg', 100, 100);
+        $result = $this->service->process($file, 'products', '5');
+        $uuid   = $result['uuid'];
+
+        Storage::disk('public')->assertExists("images/products/5/{$uuid}/original.webp");
+
+        $this->service->delete($uuid, 'products', '5');
+
+        Storage::disk('public')->assertMissing("images/products/5/{$uuid}/original.webp");
+    }
+
+    public function test_process_rejects_unsupported_mime_type(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        $file = UploadedFile::fake()->create('file.pdf', 100, 'application/pdf');
+        $this->service->process($file, 'misc');
+    }
+
+    public function test_urls_contain_storage_prefix(): void
+    {
+        $file   = UploadedFile::fake()->image('img.jpg', 200, 150);
+        $result = $this->service->process($file, 'misc');
+
+        $this->assertStringContainsString('/storage/', $result['original']);
+        $this->assertStringContainsString('/storage/', $result['thumbnail']);
+    }
+}

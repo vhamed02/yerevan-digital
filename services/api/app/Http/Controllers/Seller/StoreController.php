@@ -76,7 +76,7 @@ class StoreController extends Controller
             return $this->error('You have not created a store yet.', 404);
         }
 
-        $variants = $this->imageService->storeUpload($request->file('image'), 'store/logos');
+        $variants = $this->imageService->process($request->file('image'), 'stores', (string) $store->id);
         $store->update(['logo' => $variants['original']]);
         Cache::forget("store:slug:{$store->slug}");
 
@@ -92,7 +92,7 @@ class StoreController extends Controller
             return $this->error('You have not created a store yet.', 404);
         }
 
-        $variants = $this->imageService->storeUpload($request->file('image'), 'store/banners');
+        $variants = $this->imageService->process($request->file('image'), 'stores', (string) $store->id);
         $store->update(['banner' => $variants['original']]);
         Cache::forget("store:slug:{$store->slug}");
 
@@ -108,7 +108,7 @@ class StoreController extends Controller
             return $this->error('You have not created a store yet.', 404);
         }
 
-        $variants = $this->imageService->storeUpload($request->file('image'), 'store/favicons');
+        $variants = $this->imageService->process($request->file('image'), 'stores', (string) $store->id);
         $store->update(['favicon' => $variants['thumbnail']]);
         Cache::forget("store:slug:{$store->slug}");
 
