@@ -1,11 +1,10 @@
 import Providers from '@/components/providers'
+import AdminLayoutClient from '@/components/admin/AdminLayoutClient'
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
     <Providers>
-      <div className="flex min-h-screen">
-        <main className="flex-1 bg-surface-secondary">{children}</main>
-      </div>
+      <AdminLayoutClient>{children}</AdminLayoutClient>
     </Providers>
   )
 }

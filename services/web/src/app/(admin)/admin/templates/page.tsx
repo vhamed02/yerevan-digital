@@ -1,3 +1,15 @@
-export default function TemplatesPage() {
-  return <div className="p-8"><h1 className="font-heading text-2xl font-bold">Templates</h1></div>
+import type { Metadata } from 'next'
+import TemplatesAdminClient from '@/components/admin/TemplatesAdminClient'
+import { serverAuthGet } from '@/lib/server-api'
+import type { AdminTemplate } from '@/types'
+
+export const dynamic = 'force-dynamic'
+
+export const metadata: Metadata = {
+  title: 'Templates — Vendora Admin',
+}
+
+export default async function TemplatesPage() {
+  const data = await serverAuthGet<{ data: AdminTemplate[] }>('/admin/templates')
+  return <TemplatesAdminClient initialTemplates={data?.data ?? []} />
 }
