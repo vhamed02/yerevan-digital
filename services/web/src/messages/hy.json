@@ -1,0 +1,87 @@
+{
+  "common": {
+    "save": "Պահպանել",
+    "cancel": "Չեղարկել",
+    "delete": "Ջնջել",
+    "edit": "Խմբագրել",
+    "loading": "Բեռնվում է...",
+    "search": "Որոնել",
+    "filter": "Զտել",
+    "all": "Բոլոր",
+    "yes": "Այո",
+    "no": "Ոչ",
+    "confirm": "Հաստատել",
+    "back": "Վերադառնալ",
+    "next": "Հաջորդ",
+    "submit": "Ուղարկել",
+    "create": "Ստեղծել",
+    "update": "Թարմացնել",
+    "close": "Փակել",
+    "view": "Դիտել",
+    "actions": "Գործողություններ",
+    "status": "Կարգավիճակ",
+    "date": "Ամսաթիվ",
+    "amount": "Գումար",
+    "total": "Ընդամենը"
+  },
+  "nav": {
+    "stores": "Խանութներ",
+    "login": "Մուտք",
+    "register": "Գրանցվել",
+    "logout": "Ելք",
+    "dashboard": "Վահանակ"
+  },
+  "auth": {
+    "login": "Մուտք Գործել",
+    "register": "Գրանցվել",
+    "email": "Էլ. փոստ",
+    "password": "Գաղտնաբառ",
+    "forgot_password": "Մոռացե՞լ եք գաղտնաբառը",
+    "store_name": "Խանութի Անուն",
+    "store_slug": "Խանութի Հասցե"
+  },
+  "seller": {
+    "dashboard": "Վահանակ",
+    "products": "Ապրանքներ",
+    "orders": "Պատվերներ",
+    "payments": "Վճարումներ",
+    "store_design": "Ձևավորում",
+    "settings": "Կարգավորումներ",
+    "add_product": "Ավելացնել Ապրանք",
+    "store_status_pending": "Ձեր խանութը սպասում է հաստատման",
+    "store_status_suspended": "Ձեր խանութը դադարեցված է"
+  },
+  "products": {
+    "name": "Անուն",
+    "price": "Գին",
+    "stock": "Պաշար",
+    "category": "Կատեգորիա",
+    "status": "Կարգավիճակ",
+    "draft": "Նախագիծ",
+    "active": "Ակտիվ",
+    "archived": "Արխիվ",
+    "in_stock": "Առկա է",
+    "out_of_stock": "Պաշար չկա",
+    "low_stock": "Քիչ պաշար"
+  },
+  "orders": {
+    "order_number": "Պատվերի Համար",
+    "customer": "Հաճախորդ",
+    "pending": "Սպասվում",
+    "processing": "Մշակվում",
+    "shipped": "Ուղարկված",
+    "delivered": "Հանձնված",
+    "cancelled": "Չեղարկված"
+  },
+  "store": {
+    "add_to_cart": "Ավելացնել Զամբյուղ",
+    "buy_now": "Գնել Հիմա",
+    "cart": "Զամբյուղ",
+    "checkout": "Վճարել",
+    "quantity": "Քանակ",
+    "in_stock": "Առկա է",
+    "out_of_stock": "Պաշար Չկա",
+    "order_placed": "Պատվերն Ընդունված Է",
+    "order_number": "Պատվերի Համար"
+  }
+}

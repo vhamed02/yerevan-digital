@@ -1,0 +1,3 @@
+export default function ForgotPasswordPage() {
+  return <main className="flex min-h-screen items-center justify-center"><p>Forgot Password</p></main>
+}

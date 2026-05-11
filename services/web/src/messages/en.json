@@ -1,0 +1,87 @@
+{
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "loading": "Loading...",
+    "search": "Search",
+    "filter": "Filter",
+    "all": "All",
+    "yes": "Yes",
+    "no": "No",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "submit": "Submit",
+    "create": "Create",
+    "update": "Update",
+    "close": "Close",
+    "view": "View",
+    "actions": "Actions",
+    "status": "Status",
+    "date": "Date",
+    "amount": "Amount",
+    "total": "Total"
+  },
+  "nav": {
+    "stores": "Stores",
+    "login": "Login",
+    "register": "Register",
+    "logout": "Logout",
+    "dashboard": "Dashboard"
+  },
+  "auth": {
+    "login": "Sign In",
+    "register": "Sign Up",
+    "email": "Email",
+    "password": "Password",
+    "forgot_password": "Forgot your password?",
+    "store_name": "Store Name",
+    "store_slug": "Store URL"
+  },
+  "seller": {
+    "dashboard": "Dashboard",
+    "products": "Products",
+    "orders": "Orders",
+    "payments": "Payments",
+    "store_design": "Design",
+    "settings": "Settings",
+    "add_product": "Add Product",
+    "store_status_pending": "Your store is pending approval",
+    "store_status_suspended": "Your store has been suspended"
+  },
+  "products": {
+    "name": "Name",
+    "price": "Price",
+    "stock": "Stock",
+    "category": "Category",
+    "status": "Status",
+    "draft": "Draft",
+    "active": "Active",
+    "archived": "Archived",
+    "in_stock": "In Stock",
+    "out_of_stock": "Out of Stock",
+    "low_stock": "Low Stock"
+  },
+  "orders": {
+    "order_number": "Order Number",
+    "customer": "Customer",
+    "pending": "Pending",
+    "processing": "Processing",
+    "shipped": "Shipped",
+    "delivered": "Delivered",
+    "cancelled": "Cancelled"
+  },
+  "store": {
+    "add_to_cart": "Add to Cart",
+    "buy_now": "Buy Now",
+    "cart": "Cart",
+    "checkout": "Checkout",
+    "quantity": "Quantity",
+    "in_stock": "In Stock",
+    "out_of_stock": "Out of Stock",
+    "order_placed": "Order Placed",
+    "order_number": "Order Number"
+  }
+}
