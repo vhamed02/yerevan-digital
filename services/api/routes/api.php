@@ -9,12 +9,20 @@ use App\Http\Controllers\StatsController;
 use App\Http\Middleware\EnsureUserIsAdmin;
 use App\Http\Middleware\EnsureUserIsSeller;
 use App\Http\Middleware\ResolveStore;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Support\Facades\Route;
+
+RateLimiter::for('api', fn($request) => Limit::perMinute(100)->by($request->ip()));
+RateLimiter::for('auth', fn($request) => Limit::perMinute(5)->by($request->ip()));
+RateLimiter::for('checkout', fn($request) => Limit::perMinute(10)->by($request->ip()));
+RateLimiter::for('slug-check', fn($request) => Limit::perMinute(20)->by($request->ip()));
 
 Route::prefix('v1')->group(function () {
     Route::get('health', fn() => response()->json(['status' => 'ok', 'timestamp' => now()->toIso8601String()]));
     Route::get('stats', [StatsController::class, 'index']);
     Route::get('stores/featured', [PublicStoreController::class, 'featured']);
+    Route::get('stores/check-slug', [PublicStoreController::class, 'checkSlug'])->middleware('throttle:slug-check');
 
     Route::prefix('auth')->group(function () {
         Route::post('register', [AuthController::class, 'register']);
@@ -112,7 +120,8 @@ Route::prefix('v1')->group(function () {
         Route::get('{slug}/products', [Store\ProductController::class, 'index']);
         Route::get('{slug}/products/{productSlug}', [Store\ProductController::class, 'show']);
         Route::get('{slug}/categories', [Store\StoreController::class, 'categories']);
-        Route::post('{slug}/checkout', [Store\CheckoutController::class, 'checkout']);
+        Route::get('{slug}/orders/{uuid}', [Store\StoreController::class, 'showOrder']);
+        Route::post('{slug}/checkout', [Store\CheckoutController::class, 'checkout'])->middleware('throttle:checkout');
         Route::post('{slug}/payments/initiate', [Store\PaymentController::class, 'initiate']);
         Route::post('{slug}/payments/callback/{gateway}', [Store\PaymentController::class, 'callback']);
     });

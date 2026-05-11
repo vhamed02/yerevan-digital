@@ -19,7 +19,7 @@ class StoreFactory extends Factory
         return [
             'user_id'      => User::factory(),
             'name'         => ['hy' => $name, 'en' => $name],
-            'slug'         => Str::slug($name) . '-' . Str::random(4),
+            'slug'         => Str::slug($name) . '-' . strtolower(Str::random(4)),
             'description'  => ['hy' => fake()->sentence(), 'en' => fake()->sentence()],
             'status'       => StoreStatus::Active,
             'currency'     => 'AMD',

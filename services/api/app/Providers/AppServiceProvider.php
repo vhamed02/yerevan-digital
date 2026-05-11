@@ -4,10 +4,12 @@ namespace App\Providers;
 
 use App\Mail\Transport\BrevoTransport;
 use App\Models\Order;
+use App\Models\Product;
 use App\Models\Store;
 use App\Models\User;
 use App\Notifications\ResetPassword;
 use App\Observers\OrderObserver;
+use App\Observers\ProductObserver;
 use App\Observers\StoreObserver;
 use App\Observers\UserObserver;
 use App\Repositories\Contracts\AdminSellerRepositoryInterface;
@@ -53,5 +55,6 @@ class AppServiceProvider extends ServiceProvider
         User::observe(UserObserver::class);
         Store::observe(StoreObserver::class);
         Order::observe(OrderObserver::class);
+        Product::observe(ProductObserver::class);
     }
 }

@@ -24,12 +24,15 @@ class PaymentController extends Controller
     {
         $request->validate([
             'order_uuid'  => ['required', 'string'],
-            'gateway_key' => ['required', 'string'],
         ]);
 
         $store       = $request->attributes->get('currentStore');
-        $gatewayKey  = $request->input('gateway_key');
+        $gatewayKey  = $request->input('gateway_key') ?? $request->input('payment_method');
         $orderUuid   = $request->input('order_uuid');
+
+        if (!$gatewayKey) {
+            return $this->error('Payment gateway is required.', 422);
+        }
 
         $order = Order::where('store_id', $store->id)
             ->where('uuid', $orderUuid)
@@ -142,7 +145,7 @@ class PaymentController extends Controller
                 'payment_method' => $gateway,
             ]);
 
-            $order->store->user->notify(new NewOrderNotification($order->fresh()));
+            $order->store->owner->notify(new NewOrderNotification($order->fresh()));
         }
 
         if ($gateway === 'idram') {
