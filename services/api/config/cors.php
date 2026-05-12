@@ -12,6 +12,7 @@ return [
     ],
     'allowed_origins_patterns' => [
         '#^https?://(.*\.)?vendora\.am$#',
+        '#^https?://(.*\.)?radif\.org$#',
     ],
     'allowed_headers'          => ['*'],
     'exposed_headers'          => [],
