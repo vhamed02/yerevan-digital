@@ -1,44 +1,37 @@
+import createIntlMiddleware from 'next-intl/middleware'
 import { NextResponse, type NextRequest } from 'next/server'
+import { routing } from './i18n/routing'
+
+const intlMiddleware = createIntlMiddleware(routing)
 
 const ADMIN_PATHS = ['/admin']
 const SELLER_PATHS = ['/seller']
 const AUTH_PATHS = ['/auth/login', '/auth/register', '/auth/forgot-password']
-const LOCALES = ['hy', 'en']
-const DEFAULT_LOCALE = 'hy'
 
-function resolveLocale(request: NextRequest): string {
-  const cookie = request.cookies.get('NEXT_LOCALE')?.value
-  if (cookie && LOCALES.includes(cookie)) return cookie
-  const accept = request.headers.get('accept-language') ?? ''
-  return accept.toLowerCase().includes('hy') ? 'hy' : DEFAULT_LOCALE
+function stripLocale(pathname: string): string {
+  return pathname.replace(/^\/(en|hy)/, '') || '/'
 }
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
+  const bare = stripLocale(pathname)
 
   const token = request.cookies.get('vendora_token')?.value
   const role = request.cookies.get('vendora_role')?.value
 
-  const isAdminPath = ADMIN_PATHS.some((p) => pathname.startsWith(p))
-  const isSellerPath = SELLER_PATHS.some((p) => pathname.startsWith(p))
-  const isAuthPath = AUTH_PATHS.some((p) => pathname.startsWith(p))
-
-  if (isAdminPath && (!token || role !== 'super-admin')) {
+  if (ADMIN_PATHS.some((p) => bare.startsWith(p)) && (!token || role !== 'super-admin')) {
     return NextResponse.redirect(new URL('/auth/login', request.url))
   }
 
-  if (isSellerPath && (!token || role !== 'seller')) {
+  if (SELLER_PATHS.some((p) => bare.startsWith(p)) && (!token || role !== 'seller')) {
     return NextResponse.redirect(new URL('/auth/login', request.url))
   }
 
-  if (isAuthPath && token) {
+  if (AUTH_PATHS.some((p) => bare.startsWith(p)) && token) {
     return NextResponse.redirect(new URL(role === 'super-admin' ? '/admin' : '/seller', request.url))
   }
 
-  const locale = resolveLocale(request)
-  const requestHeaders = new Headers(request.headers)
-  requestHeaders.set('X-NEXT-INTL-LOCALE', locale)
-  return NextResponse.next({ request: { headers: requestHeaders } })
+  return intlMiddleware(request)
 }
 
 export const config = {
