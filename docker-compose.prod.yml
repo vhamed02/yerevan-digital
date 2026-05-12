@@ -54,6 +54,9 @@ services:
     build:
       context: .
       dockerfile: docker/node/Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+        NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL}
     environment:
       NODE_ENV: production
     command: ["node", "server.js"]
