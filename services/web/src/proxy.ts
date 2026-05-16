@@ -8,7 +8,7 @@ const ADMIN_PATHS = ['/admin']
 const SELLER_PATHS = ['/seller']
 const AUTH_PATHS = ['/auth/login', '/auth/register', '/auth/forgot-password']
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   const localeMatch = pathname.match(/^\/(en|hy)(\/|$)/)
