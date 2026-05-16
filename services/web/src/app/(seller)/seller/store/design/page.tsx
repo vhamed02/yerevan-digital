@@ -10,15 +10,15 @@ export const metadata: Metadata = {
 }
 
 export default async function StoreDesignPage() {
-  const [templatesData, designData] = await Promise.all([
-    serverAuthGet<{ data: SellerTemplate[] }>('/seller/templates'),
-    serverAuthGet<{ data: StoreDesignSettings }>('/seller/store/design'),
+  const [templates, design] = await Promise.all([
+    serverAuthGet<SellerTemplate[]>('/seller/templates'),
+    serverAuthGet<StoreDesignSettings>('/seller/store/design'),
   ])
 
   return (
     <StoreDesignClient
-      templates={templatesData?.data ?? []}
-      initialDesign={designData?.data ?? null}
+      templates={templates ?? []}
+      initialDesign={design ?? null}
     />
   )
 }

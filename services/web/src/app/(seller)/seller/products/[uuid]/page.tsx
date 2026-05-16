@@ -8,17 +8,17 @@ export const dynamic = 'force-dynamic'
 
 export async function generateMetadata({ params }: { params: Promise<{ uuid: string }> }): Promise<Metadata> {
   const { uuid } = await params
-  const product = await serverAuthGet<{ data: SellerProduct }>(`/seller/products/${uuid}`)
-  const name = product?.data.name.hy || product?.data.name.en || 'Edit Product'
+  const product = await serverAuthGet<SellerProduct>(`/seller/products/${uuid}`)
+  const name = product?.name.hy || product?.name.en || 'Edit Product'
   return { title: `Edit: ${name} — Vendora Seller` }
 }
 
 export default async function ProductDetailPage({ params }: { params: Promise<{ uuid: string }> }) {
   const { uuid } = await params
-  const [productData, categoriesData] = await Promise.all([
-    serverAuthGet<{ data: SellerProduct }>(`/seller/products/${uuid}`),
-    serverGet<{ data: PublicCategory[] }>('/categories', { next: { revalidate: 3600 } }),
+  const [product, categories] = await Promise.all([
+    serverAuthGet<SellerProduct>(`/seller/products/${uuid}`),
+    serverGet<PublicCategory[]>('/categories', { next: { revalidate: 3600 } }),
   ])
-  if (!productData?.data) notFound()
-  return <ProductForm product={productData.data} categories={categoriesData?.data ?? []} />
+  if (!product) notFound()
+  return <ProductForm product={product} categories={categories ?? []} />
 }

@@ -17,14 +17,14 @@ export const metadata: Metadata = {
 export default async function SellerDashboardPage() {
   const [dashboardData, storeData] = await Promise.all([
     serverAuthGet<SellerDashboardData>('/seller/dashboard'),
-    serverAuthGet<{ data: Store }>('/seller/store'),
+    serverAuthGet<Store>('/seller/store'),
   ])
 
   const stats = dashboardData?.stats
   const revenueChart = dashboardData?.revenue_chart ?? []
   const ordersByStatus = dashboardData?.orders_by_status ?? []
   const recentOrders = dashboardData?.recent_orders ?? []
-  const store = storeData?.data
+  const store = storeData
 
   return (
     <div className="flex flex-col gap-6">
