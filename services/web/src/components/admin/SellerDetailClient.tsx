@@ -105,7 +105,7 @@ export default function SellerDetailClient({ seller }: SellerDetailClientProps) 
               <StatCard
                 icon={TrendingUp}
                 label="Revenue"
-                value={`${seller.total_revenue.toLocaleString()} ֏`}
+                value={`${(seller.total_revenue ?? 0).toLocaleString()} ֏`}
                 color="success"
               />
             </div>

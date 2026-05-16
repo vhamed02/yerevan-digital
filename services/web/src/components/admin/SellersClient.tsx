@@ -89,13 +89,13 @@ export default function SellersClient({ initialData, initialMeta }: SellersClien
     {
       accessorKey: 'product_count',
       header: 'Products',
-      cell: ({ row }) => <span className="text-sm">{row.original.product_count}</span>,
+      cell: ({ row }) => <span className="text-sm">{row.original.product_count ?? 0}</span>,
     },
     {
       accessorKey: 'total_revenue',
       header: 'Revenue',
       cell: ({ row }) => (
-        <span className="text-sm">{row.original.total_revenue.toLocaleString()} ֏</span>
+        <span className="text-sm">{(row.original.total_revenue ?? 0).toLocaleString()} ֏</span>
       ),
     },
     {

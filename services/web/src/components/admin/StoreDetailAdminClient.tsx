@@ -87,7 +87,7 @@ export default function StoreDetailAdminClient({ store }: StoreDetailAdminClient
           <StatCard
             icon={TrendingUp}
             label="Revenue"
-            value={`${store.revenue.toLocaleString()} ֏`}
+            value={`${(store.revenue ?? 0).toLocaleString()} ֏`}
             color="success"
           />
         </div>
