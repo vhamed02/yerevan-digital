@@ -46,7 +46,7 @@ const useAuthStore = create<AuthState>()(
 
       updateStore: (partial) =>
         set((state) => ({
-          sellerStore: state.sellerStore ? { ...state.sellerStore, ...partial } : null,
+          sellerStore: { ...(state.sellerStore ?? {}), ...partial } as Store,
         })),
     }),
     {
