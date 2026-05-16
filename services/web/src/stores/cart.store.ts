@@ -62,7 +62,7 @@ function buildCartStore(storeSlug: string) {
                   variantName,
                   price,
                   quantity,
-                  image: product.images[0]?.thumbnail,
+                  image: product.images?.[0]?.thumbnail,
                 },
               ],
             }
