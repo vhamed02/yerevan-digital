@@ -131,12 +131,13 @@ export interface AdminSeller {
   name: string
   email: string
   phone?: string
+  locale?: string
   avatar?: string
   status: 'active' | 'suspended'
   store_count: number
   product_count: number
   total_revenue: number
-  joined_at: string
+  created_at: string
   last_login_at?: string
   store?: AdminStore
 }

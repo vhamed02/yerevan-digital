@@ -59,6 +59,17 @@ class SellerController extends Controller
         return $this->success(new SellerDetailResource($seller), 'Seller status updated.');
     }
 
+    public function updatePassword(Request $request, int $seller): JsonResponse
+    {
+        $data = $request->validate([
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ]);
+
+        $this->sellers->updatePassword($seller, $data['password']);
+
+        return $this->success(null, 'Password updated.');
+    }
+
     public function destroy(int $seller): JsonResponse
     {
         $this->sellers->softDeleteWithStore($seller);

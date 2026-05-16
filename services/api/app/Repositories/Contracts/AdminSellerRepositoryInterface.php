@@ -15,5 +15,7 @@ interface AdminSellerRepositoryInterface
 
     public function updateStatus(int $id, string $status): Model;
 
+    public function updatePassword(int $id, string $password): void;
+
     public function softDeleteWithStore(int $id): void;
 }

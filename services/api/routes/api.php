@@ -46,6 +46,7 @@ Route::prefix('v1')->group(function () {
         Route::post('sellers', [Admin\SellerController::class, 'store']);
         Route::get('sellers/{seller}', [Admin\SellerController::class, 'show']);
         Route::patch('sellers/{seller}/status', [Admin\SellerController::class, 'updateStatus']);
+        Route::put('sellers/{seller}/password', [Admin\SellerController::class, 'updatePassword']);
         Route::delete('sellers/{seller}', [Admin\SellerController::class, 'destroy']);
 
         Route::get('stores', [Admin\StoreController::class, 'index']);

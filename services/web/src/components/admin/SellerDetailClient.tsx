@@ -3,16 +3,137 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { ChevronLeft, Package, ShoppingCart, TrendingUp } from 'lucide-react'
+import { ChevronLeft, Package, ShoppingCart, TrendingUp, Mail, Phone, Globe, Calendar, Clock, KeyRound } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { StatusBadge } from '@/components/ui/StatusBadge'
 import StatCard from './StatCard'
 import SuspendDialog from './SuspendDialog'
 import DeleteDialog from './DeleteDialog'
+import api from '@/lib/api'
+import { toast } from 'sonner'
 import type { AdminSeller } from '@/types'
 
 interface SellerDetailClientProps {
   seller: AdminSeller
+}
+
+function SellerDetailsCard({ seller }: { seller: AdminSeller }) {
+  const rows: { label: string; icon: React.ReactNode; value: React.ReactNode }[] = [
+    {
+      label: 'Email',
+      icon: <Mail className="h-4 w-4" />,
+      value: <a href={`mailto:${seller.email}`} className="text-brand-500 hover:underline">{seller.email}</a>,
+    },
+    ...(seller.phone ? [{
+      label: 'Phone',
+      icon: <Phone className="h-4 w-4" />,
+      value: seller.phone,
+    }] : []),
+    ...(seller.locale ? [{
+      label: 'Locale',
+      icon: <Globe className="h-4 w-4" />,
+      value: seller.locale.toUpperCase(),
+    }] : []),
+    {
+      label: 'Status',
+      icon: <span className="h-4 w-4" />,
+      value: <StatusBadge status={seller.status} />,
+    },
+    {
+      label: 'Joined',
+      icon: <Calendar className="h-4 w-4" />,
+      value: new Date(seller.created_at).toLocaleString(),
+    },
+    ...(seller.last_login_at ? [{
+      label: 'Last login',
+      icon: <Clock className="h-4 w-4" />,
+      value: new Date(seller.last_login_at).toLocaleString(),
+    }] : []),
+  ]
+
+  return (
+    <div className="rounded-xl border border-border bg-surface p-5">
+      <p className="mb-4 text-sm font-semibold text-content-primary">Seller Details</p>
+      <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {rows.map(({ label, icon, value }) => (
+          <div key={label} className="flex items-start gap-3">
+            <span className="mt-0.5 text-content-muted">{icon}</span>
+            <div>
+              <dt className="text-xs text-content-muted">{label}</dt>
+              <dd className="mt-0.5 text-sm text-content-primary">{value}</dd>
+            </div>
+          </div>
+        ))}
+      </dl>
+    </div>
+  )
+}
+
+function ChangePasswordCard({ sellerId }: { sellerId: number }) {
+  const [password, setPassword] = useState('')
+  const [confirm, setConfirm] = useState('')
+  const [loading, setLoading] = useState(false)
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (password !== confirm) {
+      toast.error('Passwords do not match')
+      return
+    }
+    setLoading(true)
+    try {
+      await api.put(`/admin/sellers/${sellerId}/password`, {
+        password,
+        password_confirmation: confirm,
+      })
+      toast.success('Password updated')
+      setPassword('')
+      setConfirm('')
+    } catch (err: unknown) {
+      const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message
+      toast.error(msg ?? 'Failed to update password')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className="rounded-xl border border-border bg-surface p-5">
+      <div className="mb-4 flex items-center gap-2">
+        <KeyRound className="h-4 w-4 text-content-muted" />
+        <p className="text-sm font-semibold text-content-primary">Change Password</p>
+      </div>
+      <form onSubmit={handleSubmit} className="flex flex-wrap items-end gap-3">
+        <div className="flex flex-col gap-1">
+          <label className="text-xs text-content-muted">New password</label>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            minLength={8}
+            required
+            placeholder="Min 8 characters"
+            className="h-9 w-56 rounded-lg border border-border bg-surface px-3 text-sm text-content-primary placeholder:text-content-muted focus:outline-none focus:ring-2 focus:ring-brand-500"
+          />
+        </div>
+        <div className="flex flex-col gap-1">
+          <label className="text-xs text-content-muted">Confirm password</label>
+          <input
+            type="password"
+            value={confirm}
+            onChange={(e) => setConfirm(e.target.value)}
+            minLength={8}
+            required
+            placeholder="Repeat password"
+            className="h-9 w-56 rounded-lg border border-border bg-surface px-3 text-sm text-content-primary placeholder:text-content-muted focus:outline-none focus:ring-2 focus:ring-brand-500"
+          />
+        </div>
+        <Button type="submit" size="sm" disabled={loading}>
+          {loading ? 'Saving…' : 'Set Password'}
+        </Button>
+      </form>
+    </div>
+  )
 }
 
 export default function SellerDetailClient({ seller }: SellerDetailClientProps) {
@@ -52,7 +173,7 @@ export default function SellerDetailClient({ seller }: SellerDetailClientProps) 
                   <div className="flex justify-between">
                     <dt className="text-content-muted">Joined</dt>
                     <dd className="text-content-primary">
-                      {new Date(seller.joined_at).toLocaleDateString()}
+                      {new Date(seller.created_at).toLocaleDateString()}
                     </dd>
                   </div>
                   {seller.last_login_at && (
@@ -111,6 +232,10 @@ export default function SellerDetailClient({ seller }: SellerDetailClientProps) 
             </div>
           </div>
         </div>
+
+        <SellerDetailsCard seller={seller} />
+
+        <ChangePasswordCard sellerId={seller.id} />
 
         <div className="rounded-xl border-2 border-status-error bg-red-50 p-5">
           <p className="mb-4 text-sm font-semibold text-status-error">Danger Zone</p>

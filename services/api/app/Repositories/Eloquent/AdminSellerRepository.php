@@ -52,6 +52,11 @@ class AdminSellerRepository implements AdminSellerRepositoryInterface
         return $seller->fresh(['store']);
     }
 
+    public function updatePassword(int $id, string $password): void
+    {
+        User::where('role', UserRole::Seller)->findOrFail($id)->update(['password' => $password]);
+    }
+
     public function softDeleteWithStore(int $id): void
     {
         $seller = User::where('role', UserRole::Seller)->findOrFail($id);
