@@ -8,6 +8,7 @@ LOCK_FILE="/tmp/vendora-deploy.lock"
 COMPOSE="docker compose -f docker-compose.yml -f docker-compose.prod.yml"
 
 mkdir -p "$LOG_DIR"
+chmod +x "$REPO_DIR/scripts/deploy.sh"
 exec >> "$LOG_FILE" 2>&1
 
 # Prevent concurrent deploys
