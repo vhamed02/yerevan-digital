@@ -22,6 +22,9 @@ echo " Deploy started:  $(date -Iseconds)"
 echo " Commit before:   $(git rev-parse --short HEAD)"
 echo "========================================"
 
+# hooks.json has the secret injected locally — tell git to ignore that change
+git update-index --assume-unchanged scripts/hooks.json
+
 git pull origin main
 
 NEW_COMMIT=$(git rev-parse HEAD)
