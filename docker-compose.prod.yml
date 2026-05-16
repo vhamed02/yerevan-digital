@@ -59,6 +59,7 @@ services:
         NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL}
     environment:
       NODE_ENV: production
+      SERVER_API_URL: http://nginx
     command: ["node", "server.js"]
     networks:
       - vendora-frontend
