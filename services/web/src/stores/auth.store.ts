@@ -51,7 +51,7 @@ const useAuthStore = create<AuthState>()(
     }),
     {
       name: 'vendora-auth',
-      partialize: (state) => ({ user: state.user, token: state.token, sellerStore: state.sellerStore }),
+      partialize: (state) => ({ user: state.user, token: state.token, sellerStore: state.sellerStore, isAuthenticated: state.isAuthenticated }),
       onRehydrateStorage: () => (state) => {
         state?.setHasHydrated(true)
       },
