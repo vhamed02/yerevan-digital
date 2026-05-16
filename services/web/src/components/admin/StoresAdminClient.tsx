@@ -4,13 +4,14 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { MoreVertical, Check, X } from 'lucide-react'
+import { MoreVertical, Check, X, Plus } from 'lucide-react'
 import { toast } from 'sonner'
 import type { ColumnDef } from '@tanstack/react-table'
 import AdminTable from './AdminTable'
 import ApproveStoreDialog from './ApproveStoreDialog'
 import SuspendDialog from './SuspendDialog'
 import DeleteDialog from './DeleteDialog'
+import CreateStorePanel from './CreateStorePanel'
 import { StatusBadge } from '@/components/ui/StatusBadge'
 import { Button } from '@/components/ui/Button'
 import api from '@/lib/api'
@@ -36,6 +37,7 @@ export default function StoresAdminClient({ initialData, initialMeta }: StoresAd
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const queryClient = useQueryClient()
+  const [createOpen, setCreateOpen] = useState(false)
   const [approveTarget, setApproveTarget] = useState<AdminStore | null>(null)
   const [suspendTarget, setSuspendTarget] = useState<AdminStore | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<AdminStore | null>(null)
@@ -253,7 +255,13 @@ export default function StoresAdminClient({ initialData, initialMeta }: StoresAd
   return (
     <>
       <div className="flex flex-col gap-6">
-        <h1 className="font-heading text-2xl font-bold text-content-primary">Stores</h1>
+        <div className="flex items-center justify-between">
+          <h1 className="font-heading text-2xl font-bold text-content-primary">Stores</h1>
+          <Button size="sm" onClick={() => setCreateOpen(true)}>
+            <Plus className="h-4 w-4" />
+            New Store
+          </Button>
+        </div>
 
         <Tabs.Root
           value={status}
@@ -292,6 +300,7 @@ export default function StoresAdminClient({ initialData, initialMeta }: StoresAd
         </Tabs.Root>
       </div>
 
+      <CreateStorePanel open={createOpen} onOpenChange={setCreateOpen} />
       <ApproveStoreDialog
         storeId={approveTarget?.id ?? null}
         storeName={approveTarget?.name.hy || approveTarget?.name.en || ''}

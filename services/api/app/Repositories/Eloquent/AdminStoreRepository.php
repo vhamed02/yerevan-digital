@@ -23,6 +23,20 @@ class AdminStoreRepository implements AdminStoreRepositoryInterface
             ->paginate($perPage);
     }
 
+    public function create(array $data): Model
+    {
+        return Store::create([
+            'user_id'             => $data['seller_id'],
+            'name'                => $data['name'],
+            'slug'                => $data['slug'],
+            'status'              => $data['status'] ?? StoreStatus::Active,
+            'active_template_key' => $data['active_template_key'] ?? 'minimal',
+            'primary_color'       => $data['primary_color'] ?? '#6366F1',
+            'currency'            => $data['currency'] ?? 'AMD',
+            'description'         => $data['description'] ?? null,
+        ]);
+    }
+
     private function resolve(string $identifier): Store
     {
         $query = Store::query();

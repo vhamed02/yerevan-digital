@@ -24,6 +24,26 @@ class StoreController extends Controller
         return $this->paginated(StoreResource::collection($stores));
     }
 
+    public function store(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'seller_id'           => ['required', 'integer', 'exists:users,id'],
+            'name.hy'             => ['required', 'string', 'max:200'],
+            'name.en'             => ['required', 'string', 'max:200'],
+            'slug'                => ['required', 'string', 'max:100', 'unique:stores,slug', 'regex:/^[a-z0-9-]+$/'],
+            'status'              => ['sometimes', 'in:pending,active,suspended'],
+            'active_template_key' => ['sometimes', 'string', 'max:50'],
+            'primary_color'       => ['sometimes', 'string', 'max:20'],
+            'currency'            => ['sometimes', 'string', 'max:10'],
+            'description.hy'      => ['sometimes', 'nullable', 'string'],
+            'description.en'      => ['sometimes', 'nullable', 'string'],
+        ]);
+
+        $store = $this->stores->create($data);
+
+        return $this->success(new StoreResource($store->load('owner')), 'Store created.', 201);
+    }
+
     public function show(string $store): JsonResponse
     {
         $store = $this->stores->findBySlugWithDetails($store);

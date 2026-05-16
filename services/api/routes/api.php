@@ -48,6 +48,7 @@ Route::prefix('v1')->group(function () {
         Route::delete('sellers/{seller}', [Admin\SellerController::class, 'destroy']);
 
         Route::get('stores', [Admin\StoreController::class, 'index']);
+        Route::post('stores', [Admin\StoreController::class, 'store']);
         Route::get('stores/{store}', [Admin\StoreController::class, 'show']);
         Route::patch('stores/{store}/approve', [Admin\StoreController::class, 'approve']);
         Route::patch('stores/{store}/suspend', [Admin\StoreController::class, 'suspend']);

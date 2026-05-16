@@ -9,6 +9,8 @@ interface AdminStoreRepositoryInterface
 {
     public function paginate(array $filters, int $perPage = 15): LengthAwarePaginator;
 
+    public function create(array $data): Model;
+
     public function findBySlugWithDetails(string $slug): Model;
 
     public function approve(string $slug): Model;
