@@ -41,9 +41,10 @@ BUILD_ARGS="--build-arg CACHEBUST=$(git rev-parse HEAD)"
 $COMPOSE build $BUILD_ARGS web api
 $COMPOSE up -d --no-deps web api
 
-echo "Waiting for API to be ready..."
-for i in $(seq 1 15); do
-  if $COMPOSE exec -T api php -r "exit(0);" 2>/dev/null; then
+echo "Waiting for PHP-FPM on port 9000..."
+for i in $(seq 1 30); do
+  if $COMPOSE exec -T api sh -c 'ss -tlnp 2>/dev/null | grep -q ":9000"' 2>/dev/null; then
+    echo "PHP-FPM ready (attempt $i)."
     break
   fi
   sleep 2
@@ -54,6 +55,9 @@ echo "Cache cleared."
 
 $COMPOSE exec -T api php artisan migrate --force
 echo "Migration done."
+
+$COMPOSE exec -T nginx nginx -s reload
+echo "Nginx reloaded."
 
 echo " Deploy finished: $(date -Iseconds)"
 echo "========================================"
