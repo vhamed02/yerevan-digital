@@ -1,7 +1,7 @@
 'use client'
 
 import { useLocale } from 'next-intl'
-import { useRouter, usePathname } from '@/i18n/navigation'
+import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 
 const LOCALES = [
@@ -15,11 +15,12 @@ interface LanguageSwitcherProps {
 
 function LanguageSwitcher({ className }: LanguageSwitcherProps) {
   const locale = useLocale()
-  const router = useRouter()
   const pathname = usePathname()
 
   const switchLocale = (next: string) => {
-    router.replace(pathname, { locale: next })
+    if (next === locale) return
+    const newPath = next === 'hy' ? pathname : `/${next}${pathname}`
+    window.location.href = newPath
   }
 
   return (
@@ -29,7 +30,7 @@ function LanguageSwitcher({ className }: LanguageSwitcherProps) {
           key={l.code}
           onClick={() => switchLocale(l.code)}
           className={cn(
-            'flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium transition-colors',
+            'flex cursor-pointer items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium transition-colors',
             locale === l.code
               ? 'bg-brand-500 text-white'
               : 'text-content-secondary hover:text-content-primary'
