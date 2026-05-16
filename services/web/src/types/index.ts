@@ -8,11 +8,11 @@ export interface User {
 
 export interface Store {
   id: number
-  name: string
+  name: MultiLang
   slug: string
   status: 'pending' | 'active' | 'suspended'
   logo?: string
-  description?: string
+  description?: MultiLang
   template_id?: number
 }
 

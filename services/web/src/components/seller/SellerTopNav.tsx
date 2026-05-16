@@ -19,6 +19,7 @@ import {
   User,
 } from 'lucide-react'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
+import { useLocale } from 'next-intl'
 import { cn } from '@/lib/utils'
 import useAuthStore from '@/stores/auth.store'
 
@@ -38,7 +39,9 @@ interface SellerTopNavProps {
 export default function SellerTopNav({ onMenuClick }: SellerTopNavProps) {
   const pathname = usePathname()
   const router = useRouter()
+  const locale = useLocale()
   const { user, sellerStore, logout } = useAuthStore()
+  const storeName = sellerStore ? (sellerStore.name[locale as 'hy' | 'en'] || sellerStore.name.hy || sellerStore.name.en) : ''
 
   function isActive(item: (typeof navItems)[number]) {
     if (item.exact) return pathname === item.href
@@ -62,7 +65,7 @@ export default function SellerTopNav({ onMenuClick }: SellerTopNavProps) {
         {sellerStore && (
           <DropdownMenu.Root>
             <DropdownMenu.Trigger className="flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-sm font-medium text-content-primary hover:bg-surface-secondary transition-colors">
-              <span className="max-w-[120px] truncate">{sellerStore.name}</span>
+              <span className="max-w-[120px] truncate">{storeName}</span>
               <ChevronDown className="h-3.5 w-3.5 text-content-muted" />
             </DropdownMenu.Trigger>
             <DropdownMenu.Portal>
@@ -71,7 +74,7 @@ export default function SellerTopNav({ onMenuClick }: SellerTopNavProps) {
                 sideOffset={6}
               >
                 <DropdownMenu.Item className="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-content-primary hover:bg-surface-secondary outline-none">
-                  <span className="font-medium">{sellerStore.name}</span>
+                  <span className="font-medium">{storeName}</span>
                 </DropdownMenu.Item>
               </DropdownMenu.Content>
             </DropdownMenu.Portal>
@@ -163,7 +166,9 @@ interface SellerMobileNavProps {
 export function SellerMobileNav({ open, onClose }: SellerMobileNavProps) {
   const pathname = usePathname()
   const router = useRouter()
+  const locale = useLocale()
   const { user, sellerStore, logout } = useAuthStore()
+  const storeName = sellerStore ? (sellerStore.name[locale as 'hy' | 'en'] || sellerStore.name.hy || sellerStore.name.en) : ''
 
   function isActive(item: (typeof navItems)[number]) {
     if (item.exact) return pathname === item.href
@@ -197,7 +202,7 @@ export function SellerMobileNav({ open, onClose }: SellerMobileNavProps) {
         {sellerStore && (
           <div className="border-b border-border px-5 py-3">
             <p className="text-xs text-content-muted">Current store</p>
-            <p className="text-sm font-medium text-content-primary">{sellerStore.name}</p>
+            <p className="text-sm font-medium text-content-primary">{storeName}</p>
           </div>
         )}
         <nav className="flex flex-col gap-1 px-3 py-3">
