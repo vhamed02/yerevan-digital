@@ -12,8 +12,8 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>
 }): Promise<Metadata> {
   const { slug } = await params
-  const data = await serverGet<{ data: StorefrontStore }>(`/store/${slug}/info`)
-  const name = data?.data ? data.data.name.hy || data.data.name.en : ''
+  const data = await serverGet<StorefrontStore>(`/store/${slug}/info`)
+  const name = data ? data.name.hy || data.name.en : ''
   return { title: `Checkout — ${name} | Vendora` }
 }
 
@@ -23,10 +23,10 @@ export default async function CheckoutPage({
   params: Promise<{ slug: string }>
 }) {
   const { slug } = await params
-  const storeData = await serverGet<{ data: StorefrontStore }>(`/store/${slug}/info`)
-  if (!storeData?.data) notFound()
+  const storeData = await serverGet<StorefrontStore>(`/store/${slug}/info`)
+  if (!storeData) notFound()
 
-  const Template = await loadTemplate(storeData.data.active_template_key)
+  const Template = await loadTemplate(storeData.active_template_key)
 
   return <Template.CheckoutForm storeSlug={slug} />
 }

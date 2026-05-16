@@ -12,8 +12,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>
 }): Promise<Metadata> {
   const { slug } = await params
-  const data = await serverGet<{ data: StorefrontStore }>(`/store/${slug}/info`)
-  const store = data?.data
+  const store = await serverGet<StorefrontStore>(`/store/${slug}/info`)
   if (!store) return {}
   const name = store.name.hy || store.name.en
   return {
@@ -39,14 +38,14 @@ export default async function StorefrontPage({
   const previewTemplateKey = sp.template as string | undefined
 
   const [storeData, productsData, featuredData, categoriesData] = await Promise.all([
-    serverGet<{ data: StorefrontStore }>(`/store/${slug}/info`),
-    serverGet<{ data: StorefrontProduct[] }>(`/store/${slug}/products?limit=12`),
-    serverGet<{ data: StorefrontProduct[] }>(`/store/${slug}/products?featured=1&limit=8`),
-    serverGet<{ data: PublicCategory[] }>(`/store/${slug}/categories`),
+    serverGet<StorefrontStore>(`/store/${slug}/info`),
+    serverGet<{ data: StorefrontProduct[]; meta: { current_page: number; last_page: number; total: number } }>(`/store/${slug}/products?limit=12`),
+    serverGet<{ data: StorefrontProduct[]; meta: { current_page: number; last_page: number; total: number } }>(`/store/${slug}/products?featured=1&limit=8`),
+    serverGet<PublicCategory[]>(`/store/${slug}/categories`),
   ])
 
-  if (!storeData?.data) notFound()
-  const store = storeData.data
+  if (!storeData) notFound()
+  const store = storeData
 
   const templateKey =
     isPreview && previewTemplateKey ? previewTemplateKey : store.active_template_key
@@ -57,7 +56,7 @@ export default async function StorefrontPage({
       store={store}
       featuredProducts={featuredData?.data ?? []}
       products={productsData?.data ?? []}
-      categories={categoriesData?.data ?? []}
+      categories={categoriesData ?? []}
       slug={slug}
       isPreview={isPreview}
     />

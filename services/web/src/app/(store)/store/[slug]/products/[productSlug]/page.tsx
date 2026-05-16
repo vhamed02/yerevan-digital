@@ -12,10 +12,9 @@ export async function generateMetadata({
   params: Promise<{ slug: string; productSlug: string }>
 }): Promise<Metadata> {
   const { slug, productSlug } = await params
-  const data = await serverGet<{ data: StorefrontProduct }>(
+  const product = await serverGet<StorefrontProduct>(
     `/store/${slug}/products/${productSlug}`
   )
-  const product = data?.data
   if (!product) return {}
   const name = product.name.hy || product.name.en
   return {
@@ -40,14 +39,14 @@ export default async function ProductPage({
   const isPreview = sp.preview === 'true'
 
   const [storeData, productData] = await Promise.all([
-    serverGet<{ data: StorefrontStore }>(`/store/${slug}/info`),
-    serverGet<{ data: StorefrontProduct }>(`/store/${slug}/products/${productSlug}`),
+    serverGet<StorefrontStore>(`/store/${slug}/info`),
+    serverGet<StorefrontProduct>(`/store/${slug}/products/${productSlug}`),
   ])
 
-  if (!storeData?.data || !productData?.data) notFound()
+  if (!storeData || !productData) notFound()
 
-  const store = storeData.data
-  const product = productData.data
+  const store = storeData
+  const product = productData
   const Template = await loadTemplate(store.active_template_key)
 
   return (

@@ -16,8 +16,7 @@ export default async function OrderConfirmationPage({
   params: Promise<{ slug: string; uuid: string }>
 }) {
   const { slug, uuid } = await params
-  const data = await serverGet<{ data: StorefrontOrder }>(`/store/${slug}/orders/${uuid}`)
-  const order = data?.data ?? null
+  const order = await serverGet<StorefrontOrder>(`/store/${slug}/orders/${uuid}`) ?? null
 
   return <OrderConfirmationClient order={order} storeSlug={slug} />
 }

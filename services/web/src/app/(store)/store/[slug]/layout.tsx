@@ -13,18 +13,18 @@ export default async function StoreSlugLayout({
   const { slug } = await params
 
   const [storeData, categoriesData] = await Promise.all([
-    serverGet<{ data: StorefrontStore }>(`/store/${slug}/info`),
-    serverGet<{ data: PublicCategory[] }>(`/store/${slug}/categories`, {
+    serverGet<StorefrontStore>(`/store/${slug}/info`),
+    serverGet<PublicCategory[]>(`/store/${slug}/categories`, {
       next: { revalidate: 3600 },
     }),
   ])
 
-  if (!storeData?.data) notFound()
+  if (!storeData) notFound()
 
   return (
     <StoreLayoutClient
-      store={storeData.data}
-      categories={categoriesData?.data ?? []}
+      store={storeData}
+      categories={categoriesData ?? []}
     >
       {children}
     </StoreLayoutClient>

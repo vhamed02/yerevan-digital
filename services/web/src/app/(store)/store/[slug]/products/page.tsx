@@ -13,8 +13,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>
 }): Promise<Metadata> {
   const { slug } = await params
-  const data = await serverGet<{ data: StorefrontStore }>(`/store/${slug}/info`)
-  const store = data?.data
+  const store = await serverGet<StorefrontStore>(`/store/${slug}/info`)
   if (!store) return {}
   const name = store.name.hy || store.name.en
   return { title: `Products — ${name} | Vendora` }
@@ -43,18 +42,18 @@ export default async function StoreProductsPage({
   })
 
   const [storeData, productsData, categoriesData] = await Promise.all([
-    serverGet<{ data: StorefrontStore }>(`/store/${slug}/info`),
+    serverGet<StorefrontStore>(`/store/${slug}/info`),
     serverGet<{
       data: StorefrontProduct[]
       meta: { current_page: number; last_page: number; total: number }
     }>(`/store/${slug}/products?${queryParams}`),
-    serverGet<{ data: PublicCategory[] }>(`/store/${slug}/categories`),
+    serverGet<PublicCategory[]>(`/store/${slug}/categories`),
   ])
 
-  if (!storeData?.data) notFound()
-  const store = storeData.data
+  if (!storeData) notFound()
+  const store = storeData
   const products = productsData?.data ?? []
-  const categories = categoriesData?.data ?? []
+  const categories = categoriesData ?? []
   const meta = productsData?.meta
 
   const Template = await loadTemplate(store.active_template_key)
