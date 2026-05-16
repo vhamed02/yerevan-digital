@@ -3,11 +3,12 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { Pencil, Globe, FileText } from 'lucide-react'
+import { Pencil, Globe, FileText, Plus, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Textarea } from '@/components/ui/Textarea'
 import SlidePanel from './SlidePanel'
+import { ConfirmModal } from '@/components/ui/Modal'
 import api from '@/lib/api'
 import type { Page } from '@/types'
 import * as Tabs from '@radix-ui/react-tabs'
@@ -35,9 +36,16 @@ const SLUG_LABELS: Record<string, string> = {
   privacy: 'Privacy Policy',
 }
 
+const PROTECTED_SLUGS = ['about', 'contact', 'terms', 'privacy']
+
 export default function PagesAdminClient({ initialPages }: PagesAdminClientProps) {
   const queryClient = useQueryClient()
   const [editTarget, setEditTarget] = useState<Page | null>(null)
+  const [deleteTarget, setDeleteTarget] = useState<Page | null>(null)
+  const [creating, setCreating] = useState(false)
+  const [newSlug, setNewSlug] = useState('')
+  const [newTitleHy, setNewTitleHy] = useState('')
+  const [newTitleEn, setNewTitleEn] = useState('')
   const [tab, setTab] = useState<'hy' | 'en'>('hy')
   const [preview, setPreview] = useState(false)
   const [form, setForm] = useState<PageFormData>({
@@ -55,6 +63,30 @@ export default function PagesAdminClient({ initialPages }: PagesAdminClientProps
     },
     initialData: initialPages,
     staleTime: 60000,
+  })
+
+  const createMutation = useMutation({
+    mutationFn: () => api.post('/admin/pages', {
+      slug: newSlug,
+      title: { hy: newTitleHy, en: newTitleEn },
+    }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-pages'] })
+      toast.success('Page created')
+      setCreating(false)
+      setNewSlug(''); setNewTitleHy(''); setNewTitleEn('')
+    },
+    onError: () => toast.error('Failed to create page'),
+  })
+
+  const deleteMutation = useMutation({
+    mutationFn: (slug: string) => api.delete(`/admin/pages/${slug}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-pages'] })
+      toast.success('Page deleted')
+      setDeleteTarget(null)
+    },
+    onError: () => toast.error('Failed to delete page'),
   })
 
   const saveMutation = useMutation({
@@ -95,7 +127,13 @@ export default function PagesAdminClient({ initialPages }: PagesAdminClientProps
   return (
     <>
       <div className="flex flex-col gap-6">
-        <h1 className="font-heading text-2xl font-bold text-content-primary">Pages</h1>
+        <div className="flex items-center justify-between">
+          <h1 className="font-heading text-2xl font-bold text-content-primary">Pages</h1>
+          <Button size="sm" onClick={() => setCreating(true)}>
+            <Plus className="h-3.5 w-3.5" />
+            New Page
+          </Button>
+        </div>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           {pages.map((page) => (
@@ -109,7 +147,7 @@ export default function PagesAdminClient({ initialPages }: PagesAdminClientProps
                 </div>
                 <div>
                   <p className="font-medium text-content-primary">
-                    {SLUG_LABELS[page.slug] ?? page.slug}
+                    {SLUG_LABELS[page.slug] ?? page.title?.en ?? page.slug}
                   </p>
                   <p className="flex items-center gap-1 text-xs text-content-muted">
                     <Globe className="h-3 w-3" />
@@ -117,14 +155,76 @@ export default function PagesAdminClient({ initialPages }: PagesAdminClientProps
                   </p>
                 </div>
               </div>
-              <Button variant="outline" size="sm" onClick={() => openEdit(page)}>
-                <Pencil className="h-3.5 w-3.5" />
-                Edit
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button variant="outline" size="sm" onClick={() => openEdit(page)}>
+                  <Pencil className="h-3.5 w-3.5" />
+                  Edit
+                </Button>
+                {!PROTECTED_SLUGS.includes(page.slug) && (
+                  <button
+                    onClick={() => setDeleteTarget(page)}
+                    className="rounded p-1.5 text-content-muted hover:text-status-error transition-colors"
+                    aria-label="Delete page"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </button>
+                )}
+              </div>
             </div>
           ))}
         </div>
       </div>
+
+      <SlidePanel
+        open={creating}
+        onOpenChange={(open) => !open && setCreating(false)}
+        title="New Page"
+        description="Create a new content page accessible at /your-slug."
+      >
+        <form
+          className="flex flex-col gap-4"
+          onSubmit={(e) => { e.preventDefault(); createMutation.mutate() }}
+        >
+          <Input
+            label="Slug (URL)"
+            value={newSlug}
+            onChange={(e) => setNewSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '-'))}
+            placeholder="my-page"
+            required
+          />
+          <Input
+            label="Title (Armenian)"
+            value={newTitleHy}
+            onChange={(e) => setNewTitleHy(e.target.value)}
+            required
+          />
+          <Input
+            label="Title (English)"
+            value={newTitleEn}
+            onChange={(e) => setNewTitleEn(e.target.value)}
+            required
+          />
+          <div className="flex justify-end gap-3 pt-2">
+            <Button type="button" variant="outline" onClick={() => setCreating(false)} disabled={createMutation.isPending}>
+              Cancel
+            </Button>
+            <Button type="submit" loading={createMutation.isPending}>
+              Create
+            </Button>
+          </div>
+        </form>
+      </SlidePanel>
+
+      <ConfirmModal
+        open={deleteTarget !== null}
+        onOpenChange={(open) => !open && setDeleteTarget(null)}
+        title="Delete Page"
+        message={`Delete "/${deleteTarget?.slug}"? This cannot be undone.`}
+        confirmLabel="Delete"
+        destructive
+        loading={deleteMutation.isPending}
+        onConfirm={() => deleteTarget && deleteMutation.mutate(deleteTarget.slug)}
+      />
 
       <SlidePanel
         open={editTarget !== null}

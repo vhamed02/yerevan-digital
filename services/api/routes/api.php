@@ -73,8 +73,10 @@ Route::prefix('v1')->group(function () {
         Route::patch('settings', [Admin\SettingController::class, 'update']);
 
         Route::get('pages', [Admin\PageController::class, 'index']);
+        Route::post('pages', [Admin\PageController::class, 'store']);
         Route::get('pages/{slug}', [Admin\PageController::class, 'show']);
         Route::put('pages/{slug}', [Admin\PageController::class, 'update']);
+        Route::delete('pages/{slug}', [Admin\PageController::class, 'destroy']);
 
         Route::post('media/upload', [Admin\MediaController::class, 'upload']);
     });
