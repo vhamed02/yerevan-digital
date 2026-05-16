@@ -17,8 +17,8 @@ use Illuminate\Support\Str;
 class OrderController extends Controller
 {
     private const ALLOWED_TRANSITIONS = [
-        'pending'    => ['cancelled'],
-        'paid'       => ['processing'],
+        'pending'    => ['paid', 'processing', 'cancelled'],
+        'paid'       => ['processing', 'cancelled'],
         'processing' => ['shipped', 'cancelled'],
         'shipped'    => ['delivered'],
         'delivered'  => [],
