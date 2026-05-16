@@ -35,6 +35,25 @@ class PublicStoreController extends Controller
         return $this->success($stores);
     }
 
+    public function categories(): JsonResponse
+    {
+        $categories = \App\Models\Category::active()
+            ->orderBy('sort_order')
+            ->orderBy('id')
+            ->get(['id', 'name', 'slug', 'parent_id', 'icon'])
+            ->map(fn($c) => [
+                'id'        => $c->id,
+                'name'      => $c->getTranslations('name'),
+                'slug'      => $c->slug,
+                'parent_id' => $c->parent_id,
+                'icon'      => $c->icon,
+            ])
+            ->values()
+            ->all();
+
+        return $this->success($categories);
+    }
+
     public function checkSlug(Request $request): JsonResponse
     {
         $request->validate([

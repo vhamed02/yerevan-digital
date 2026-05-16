@@ -27,6 +27,7 @@ Route::prefix('v1')->group(function () {
     Route::get('pages/{slug}', [PageController::class, 'show']);
     Route::get('stores/featured', [PublicStoreController::class, 'featured']);
     Route::get('stores/check-slug', [PublicStoreController::class, 'checkSlug'])->middleware('throttle:slug-check');
+    Route::get('categories', [PublicStoreController::class, 'categories']);
 
     Route::prefix('auth')->group(function () {
         Route::post('register', [AuthController::class, 'register']);

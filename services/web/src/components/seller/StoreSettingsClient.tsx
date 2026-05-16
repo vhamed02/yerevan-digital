@@ -9,6 +9,7 @@ import { Textarea } from '@/components/ui/Textarea'
 import { Tabs } from '@/components/ui/Tabs'
 import { FileUpload } from '@/components/ui/FileUpload'
 import { ConfirmModal } from '@/components/ui/Modal'
+import { SearchableSelect } from '@/components/ui/SearchableSelect'
 import api from '@/lib/api'
 import type { SellerStore, PublicCategory } from '@/types'
 
@@ -89,19 +90,14 @@ export default function StoreSettingsClient({ initialStore, categories }: StoreS
         onChange={(e) => setStore((s) => ({ ...s, slug: e.target.value }))}
         prefix={<span className="text-xs">store/</span>}
       />
-      <div>
-        <label className="mb-1.5 block text-sm font-medium text-content-primary">Category</label>
-        <select
-          className="h-10 w-full rounded-md border border-border bg-surface px-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
-          value={store.category_id ?? ''}
-          onChange={(e) => setStore((s) => ({ ...s, category_id: parseInt(e.target.value) || undefined }))}
-        >
-          <option value="">Select category</option>
-          {categories.map((c) => (
-            <option key={c.id} value={c.id}>{c.name.hy || c.name.en}</option>
-          ))}
-        </select>
-      </div>
+      <SearchableSelect
+        label="Category"
+        value={store.category_id ? String(store.category_id) : ''}
+        onValueChange={(v) => setStore((s) => ({ ...s, category_id: v ? parseInt(v) : undefined }))}
+        options={categories.map((c) => ({ value: String(c.id), label: c.name.hy || c.name.en }))}
+        placeholder="Select category"
+        searchPlaceholder="Search categories..."
+      />
       <div className="grid grid-cols-2 gap-3">
         <Textarea
           label="Description (Armenian)"

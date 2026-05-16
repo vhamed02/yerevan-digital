@@ -11,14 +11,14 @@ export const metadata: Metadata = {
 
 export default async function StoreSettingsPage() {
   const [storeData, categoriesData] = await Promise.all([
-    serverAuthGet<{ data: SellerStore }>('/seller/store'),
-    serverGet<{ data: PublicCategory[] }>('/categories', { next: { revalidate: 3600 } }),
+    serverAuthGet<SellerStore>('/seller/store'),
+    serverGet<PublicCategory[]>('/categories', { next: { revalidate: 3600 } }),
   ])
 
   return (
     <StoreSettingsClient
-      initialStore={storeData?.data ?? null}
-      categories={categoriesData?.data ?? []}
+      initialStore={storeData ?? null}
+      categories={categoriesData ?? []}
     />
   )
 }
