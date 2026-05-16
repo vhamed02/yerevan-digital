@@ -75,7 +75,7 @@ else
   echo " Nothing to rebuild."
 fi
 
-if [ "$REBUILD_API" = true ] || [ "$RUN_MIGRATE" = true ]; then
+if [ "$REBUILD_API" = true ]; then
   echo "Waiting for API to be ready..."
   for i in $(seq 1 15); do
     if $COMPOSE exec -T api php -r "exit(0);" 2>/dev/null; then
@@ -83,9 +83,10 @@ if [ "$REBUILD_API" = true ] || [ "$RUN_MIGRATE" = true ]; then
     fi
     sleep 2
   done
-  $COMPOSE exec -T api php artisan migrate --force
-  echo "Migration done."
 fi
+
+$COMPOSE exec -T api php artisan migrate --force
+echo "Migration done."
 
 echo " Deploy finished: $(date -Iseconds)"
 echo "========================================"
