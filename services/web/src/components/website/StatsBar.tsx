@@ -16,9 +16,7 @@ function useCountUp(target: number, enabled: boolean, duration = 2000) {
       const progress = Math.min(elapsed / duration, 1)
       const ease = 1 - Math.pow(1 - progress, 3)
       setCount(Math.floor(ease * target))
-      if (progress < 1) {
-        frameRef.current = requestAnimationFrame(tick)
-      }
+      if (progress < 1) frameRef.current = requestAnimationFrame(tick)
     }
     frameRef.current = requestAnimationFrame(tick)
     return () => cancelAnimationFrame(frameRef.current)
@@ -42,26 +40,33 @@ function StatItem({ label, value, suffix = '' }: { label: string; value: number;
   }, [])
 
   return (
-    <div ref={ref} className="flex flex-col items-center gap-1 text-center">
-      <span className="font-heading text-4xl font-bold text-white sm:text-5xl">
+    <div ref={ref} className="flex flex-col items-center gap-2 text-center">
+      <span className="font-heading text-5xl font-extrabold tracking-tight text-white sm:text-6xl">
         {count.toLocaleString()}{suffix}
       </span>
-      <span className="text-sm font-medium text-white/70">{label}</span>
+      <span className="text-sm font-medium uppercase tracking-widest text-white/35">{label}</span>
     </div>
   )
 }
 
-interface StatsBarProps {
-  stats: PlatformStats
-}
-
-export default function StatsBar({ stats }: StatsBarProps) {
+export default function StatsBar({ stats }: { stats: PlatformStats }) {
   const t = useTranslations('stats')
 
   return (
-    <section className="bg-brand-700 py-16">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 gap-10 sm:grid-cols-3">
+    <section className="relative overflow-hidden bg-surface-dark py-20">
+      {/* Grid texture */}
+      <div
+        className="absolute inset-0 opacity-[0.03]"
+        style={{
+          backgroundImage: 'linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(to right, rgba(255,255,255,0.5) 1px, transparent 1px)',
+          backgroundSize: '60px 60px',
+        }}
+      />
+      {/* Center glow */}
+      <div className="absolute left-1/2 top-1/2 h-64 w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand-500/10 blur-3xl" />
+
+      <div className="relative mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 gap-12 sm:grid-cols-3">
           <StatItem label={t('stores')} value={stats.stores_count} suffix="+" />
           <StatItem label={t('products')} value={stats.products_count} suffix="+" />
           <StatItem label={t('orders')} value={stats.orders_count} suffix="+" />

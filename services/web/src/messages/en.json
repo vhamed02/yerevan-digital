@@ -89,37 +89,51 @@
     "title": "Build Your",
     "title_highlight": "Online Store",
     "title_end": "Today",
-    "subtitle": "Join hundreds of Armenian businesses selling online with Vendora",
+    "subtitle": "Join hundreds of Armenian businesses selling online with Vendora. No coding, no hassle.",
     "cta_primary": "Start for Free",
     "cta_secondary": "Browse Stores",
     "badge_stores": "320+ Stores",
     "badge_products": "12K+ Products",
-    "badge_happy": "98% Happy"
+    "badge_revenue": "↑ 18% this month",
+    "trust_free": "Free to start",
+    "trust_no_card": "No credit card",
+    "trust_fast": "Live in 2 minutes"
   },
   "features": {
+    "label": "Features",
     "heading": "Everything you need to sell online",
-    "subheading": "Built specifically for Armenian entrepreneurs",
+    "subheading": "Built specifically for Armenian entrepreneurs — from payments to product management, all in one place.",
     "templates_title": "Beautiful Templates",
-    "templates_desc": "Switch your store design anytime, no coding required. Multiple themes to match your brand.",
+    "templates_desc": "Switch your store design anytime. Multiple themes to match your brand, no coding required.",
     "payments_title": "Armenian Payments",
-    "payments_desc": "Accept Idram and local bank payments. Built for Armenian businesses from day one.",
+    "payments_desc": "Accept Idram and local bank transfers. Built for Armenian businesses from day one.",
     "dashboard_title": "Simple Dashboard",
-    "dashboard_desc": "Track orders, revenue, and products with a clean, easy-to-use dashboard."
+    "dashboard_desc": "Track orders, revenue, and products with a clean, easy-to-use dashboard.",
+    "products_title": "Product Management",
+    "products_desc": "Add products in seconds. Upload images, set AMD prices, manage stock and categories.",
+    "multilang_title": "Armenian & English",
+    "multilang_desc": "Your store speaks both languages. Armenian first, with full English support built in.",
+    "custom_title": "Your Own Store URL",
+    "custom_desc": "Get a clean, shareable link like vendora.shop/yourstore. Easy to share anywhere."
   },
   "howItWorks": {
-    "heading": "How It Works",
-    "subheading": "Three simple steps to launch your store",
-    "step1_title": "Register & Create Store",
+    "label": "How It Works",
+    "heading": "Up and running in minutes",
+    "subheading": "Three simple steps to launch your Armenian online store.",
+    "step1_title": "Create Your Store",
     "step1_desc": "Fill a simple form, pick your store URL, and get started in under 2 minutes.",
     "step2_title": "Add Your Products",
-    "step2_desc": "Upload photos, set prices in AMD ֏, organize by categories.",
+    "step2_desc": "Upload photos, set prices in AMD ֏, and organize by categories.",
     "step3_title": "Start Selling",
-    "step3_desc": "Share your store link, receive orders, and get paid via Idram."
+    "step3_desc": "Share your link, receive orders, and get paid via Idram instantly."
   },
   "cta": {
+    "label": "Get Started Today",
     "heading": "Ready to start selling?",
-    "subheading": "It only takes 2 minutes",
-    "button": "Create Your Free Store"
+    "subheading": "Join hundreds of Armenian businesses already growing with Vendora.",
+    "button": "Create Your Free Store",
+    "secondary": "Browse active stores",
+    "fine_print": "Free plan available. No credit card required."
   },
   "footer": {
     "tagline": "Your Armenian Store Builder",
