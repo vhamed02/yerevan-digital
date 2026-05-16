@@ -9,6 +9,8 @@ interface AdminSellerRepositoryInterface
 {
     public function paginate(array $filters, int $perPage = 15): LengthAwarePaginator;
 
+    public function create(array $data): Model;
+
     public function findWithDetails(int $id): Model;
 
     public function updateStatus(int $id, string $status): Model;

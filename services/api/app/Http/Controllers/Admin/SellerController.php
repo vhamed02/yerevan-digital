@@ -24,6 +24,22 @@ class SellerController extends Controller
         return $this->paginated(SellerResource::collection($sellers));
     }
 
+    public function store(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'name'     => ['required', 'string', 'max:255'],
+            'email'    => ['required', 'email', 'unique:users,email'],
+            'password' => ['required', 'string', 'min:8'],
+            'phone'    => ['sometimes', 'nullable', 'string', 'max:50'],
+            'status'   => ['sometimes', 'in:active,pending'],
+            'locale'   => ['sometimes', 'in:hy,en'],
+        ]);
+
+        $seller = $this->sellers->create($data);
+
+        return $this->success(new SellerResource($seller), 'Seller created.', 201);
+    }
+
     public function show(int $seller): JsonResponse
     {
         $seller = $this->sellers->findWithDetails($seller);

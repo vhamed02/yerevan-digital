@@ -43,6 +43,7 @@ Route::prefix('v1')->group(function () {
         Route::get('dashboard/stats', [Admin\DashboardController::class, 'stats']);
 
         Route::get('sellers', [Admin\SellerController::class, 'index']);
+        Route::post('sellers', [Admin\SellerController::class, 'store']);
         Route::get('sellers/{seller}', [Admin\SellerController::class, 'show']);
         Route::patch('sellers/{seller}/status', [Admin\SellerController::class, 'updateStatus']);
         Route::delete('sellers/{seller}', [Admin\SellerController::class, 'destroy']);

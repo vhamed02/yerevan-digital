@@ -25,6 +25,19 @@ class AdminSellerRepository implements AdminSellerRepositoryInterface
             ->paginate($perPage);
     }
 
+    public function create(array $data): Model
+    {
+        return User::create([
+            'name'     => $data['name'],
+            'email'    => $data['email'],
+            'phone'    => $data['phone'] ?? null,
+            'password' => $data['password'],
+            'role'     => UserRole::Seller,
+            'status'   => $data['status'] ?? UserStatus::Active,
+            'locale'   => $data['locale'] ?? 'hy',
+        ]);
+    }
+
     public function findWithDetails(int $id): Model
     {
         return User::where('role', UserRole::Seller)

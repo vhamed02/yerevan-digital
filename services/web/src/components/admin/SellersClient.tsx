@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useQuery } from '@tanstack/react-query'
-import { MoreVertical, Download } from 'lucide-react'
+import { MoreVertical, Download, Plus } from 'lucide-react'
 import type { ColumnDef } from '@tanstack/react-table'
 import AdminTable from './AdminTable'
 import SuspendDialog from './SuspendDialog'
@@ -185,7 +185,15 @@ export default function SellersClient({ initialData, initialMeta }: SellersClien
   return (
     <>
       <div className="flex flex-col gap-6">
-        <h1 className="font-heading text-2xl font-bold text-content-primary">Sellers</h1>
+        <div className="flex items-center justify-between">
+          <h1 className="font-heading text-2xl font-bold text-content-primary">Sellers</h1>
+          <Link href="/admin/sellers/new">
+            <Button size="sm">
+              <Plus className="h-4 w-4" />
+              New Seller
+            </Button>
+          </Link>
+        </div>
         <div className="rounded-xl border border-border bg-surface p-5">
           <AdminTable
             columns={columns}
