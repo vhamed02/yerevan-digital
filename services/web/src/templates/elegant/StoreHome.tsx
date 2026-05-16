@@ -71,7 +71,7 @@ export function StoreHome({
                   className={`flex items-center gap-6 ${i % 2 === 1 ? 'flex-row-reverse' : ''}`}
                 >
                   <div className="relative h-64 w-48 flex-shrink-0 overflow-hidden bg-stone-100 sm:h-72">
-                    {product.images[0] ? (
+                    {product.images?.[0] ? (
                       <Image
                         src={product.images[0].large}
                         alt={product.name.hy || product.name.en}

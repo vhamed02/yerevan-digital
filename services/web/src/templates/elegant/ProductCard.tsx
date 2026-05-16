@@ -10,7 +10,7 @@ export function ProductCard({ product, storeSlug, isPreview }: ProductCardProps)
   const [added, setAdded] = useState(false)
   const { addItem } = useStoreCart(storeSlug)
   const name = product.name.hy || product.name.en
-  const image = product.images[0]
+  const image = product.images?.[0]
 
   function handleAdd(e: React.MouseEvent) {
     e.preventDefault()

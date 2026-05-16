@@ -50,7 +50,7 @@ export function ProductDetail({ product, storeSlug, isPreview }: ProductDetailPr
       <div className="grid grid-cols-1 gap-10 lg:grid-cols-2">
         <div className="flex flex-col gap-3">
           <div className="relative aspect-square w-full overflow-hidden rounded-xl border border-gray-100 bg-gray-50">
-            {product.images[activeImageIdx] ? (
+            {product.images?.[activeImageIdx] ? (
               <Image
                 src={product.images[activeImageIdx].large}
                 alt={name}
@@ -64,9 +64,9 @@ export function ProductDetail({ product, storeSlug, isPreview }: ProductDetailPr
               </div>
             )}
           </div>
-          {product.images.length > 1 && (
+          {(product.images?.length ?? 0) > 1 && (
             <div className="flex gap-2 overflow-x-auto pb-1">
-              {product.images.map((img, i) => (
+              {product.images?.map((img, i) => (
                 <button
                   key={img.uuid}
                   onClick={() => setActiveImageIdx(i)}
