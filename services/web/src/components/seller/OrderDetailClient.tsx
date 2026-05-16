@@ -47,28 +47,22 @@ export default function OrderDetailClient({ order }: OrderDetailClientProps) {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
-                {order.items.map((item) => (
-                  <tr key={item.id}>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-2">
-                        {item.product.images?.[0] && (
-                          <img
-                            src={item.product.images[0].thumbnail}
-                            alt=""
-                            className="h-9 w-9 rounded-md object-cover border border-border"
-                          />
-                        )}
-                        <span className="font-medium text-content-primary">{item.product.name}</span>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 text-content-secondary">
-                      {item.variant ? `${item.variant.name}: ${item.variant.value}` : '—'}
-                    </td>
-                    <td className="px-4 py-3">{item.quantity}</td>
-                    <td className="px-4 py-3">{item.price.toLocaleString()}</td>
-                    <td className="px-4 py-3 font-medium">{(item.price * item.quantity).toLocaleString()}</td>
-                  </tr>
-                ))}
+                {order.items.map((item) => {
+                  const name = item.product_name?.hy || item.product_name?.en || '—'
+                  const variantName = item.variant_name?.hy || item.variant_name?.en
+                  return (
+                    <tr key={item.id}>
+                      <td className="px-4 py-3">
+                        <span className="font-medium text-content-primary">{name}</span>
+                        {item.sku && <span className="ml-2 text-xs text-content-muted">{item.sku}</span>}
+                      </td>
+                      <td className="px-4 py-3 text-content-secondary">{variantName || '—'}</td>
+                      <td className="px-4 py-3">{item.quantity}</td>
+                      <td className="px-4 py-3">{item.unit_price.toLocaleString()}</td>
+                      <td className="px-4 py-3 font-medium">{item.total_price.toLocaleString()}</td>
+                    </tr>
+                  )
+                })}
               </tbody>
             </table>
           </div>

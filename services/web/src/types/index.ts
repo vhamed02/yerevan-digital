@@ -66,10 +66,12 @@ export interface Order {
 
 export interface OrderItem {
   id: number
-  product: Product
-  variant?: Variant
+  product_name: MultiLang
+  variant_name?: MultiLang
+  sku?: string
   quantity: number
-  price: number
+  unit_price: number
+  total_price: number
 }
 
 export interface CartItem {
