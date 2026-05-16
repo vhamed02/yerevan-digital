@@ -27,7 +27,9 @@ class PublicStoreController extends Controller
                     'logo_url'      => $store->logo ? asset("storage/{$store->logo}") : null,
                     'banner_url'    => $store->banner ? asset("storage/{$store->banner}") : null,
                     'product_count' => $store->products_count,
-                ]);
+                ])
+                ->values()
+                ->all();
         });
 
         return $this->success($stores);

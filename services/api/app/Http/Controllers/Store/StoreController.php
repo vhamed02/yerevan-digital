@@ -51,7 +51,9 @@ class StoreController extends Controller
                     'name'          => $cat->getTranslations('name'),
                     'slug'          => $cat->slug,
                     'product_count' => $cat->product_count,
-                ]);
+                ])
+                ->values()
+                ->all();
         });
 
         return $this->success($categories);
