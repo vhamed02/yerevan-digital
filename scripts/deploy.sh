@@ -42,10 +42,7 @@ fi
 REBUILD_WEB=false
 REBUILD_API=false
 
-if [ -z "$CHANGED" ]; then
-  REBUILD_WEB=true
-  REBUILD_API=true
-else
+if [ -n "$CHANGED" ]; then
   echo "$CHANGED" | grep -qE "^services/web/|^docker/node/" && REBUILD_WEB=true || true
   echo "$CHANGED" | grep -qE "^services/api/|^docker/php/" && REBUILD_API=true || true
 fi
