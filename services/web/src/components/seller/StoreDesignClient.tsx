@@ -75,7 +75,7 @@ export default function StoreDesignClient({ templates, initialDesign }: StoreDes
     onError: () => toast.error('Failed to save design'),
   })
 
-  const storeSlug = sellerStore?.slug ?? 'preview'
+  const storeSlug = sellerStore?.slug
 
   return (
     <>
@@ -209,7 +209,13 @@ export default function StoreDesignClient({ templates, initialDesign }: StoreDes
         </div>
 
         <div className="flex flex-1 flex-col overflow-hidden">
-          <StorePreviewFrame storeSlug={storeSlug} previewParams={previewParams} />
+          {storeSlug ? (
+            <StorePreviewFrame storeSlug={storeSlug} previewParams={previewParams} />
+          ) : (
+            <div className="flex flex-1 items-center justify-center bg-surface-secondary text-sm text-content-muted">
+              Store not found. Set up your store first.
+            </div>
+          )}
         </div>
       </div>
 

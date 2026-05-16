@@ -74,7 +74,7 @@ export default function OrdersListClient({ initialData, initialMeta }: OrdersLis
       id: 'items',
       header: 'Items',
       cell: ({ row }) => (
-        <span className="text-sm text-content-secondary">{row.original.items.length}</span>
+        <span className="text-sm text-content-secondary">{row.original.items?.length ?? '—'}</span>
       ),
     },
     {
