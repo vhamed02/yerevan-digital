@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin;
 use App\Http\Controllers\Seller;
 use App\Http\Controllers\Store;
 use App\Http\Controllers\HealthController;
+use App\Http\Controllers\PageController;
 use App\Http\Controllers\PublicStoreController;
 use App\Http\Controllers\StatsController;
 use App\Http\Middleware\EnsureUserIsAdmin;
@@ -22,6 +23,7 @@ RateLimiter::for('slug-check', fn($request) => Limit::perMinute(20)->by($request
 Route::prefix('v1')->group(function () {
     Route::get('health', [HealthController::class, 'check']);
     Route::get('stats', [StatsController::class, 'index']);
+    Route::get('pages/{slug}', [PageController::class, 'show']);
     Route::get('stores/featured', [PublicStoreController::class, 'featured']);
     Route::get('stores/check-slug', [PublicStoreController::class, 'checkSlug'])->middleware('throttle:slug-check');
 
@@ -69,6 +71,10 @@ Route::prefix('v1')->group(function () {
 
         Route::get('settings', [Admin\SettingController::class, 'index']);
         Route::patch('settings', [Admin\SettingController::class, 'update']);
+
+        Route::get('pages', [Admin\PageController::class, 'index']);
+        Route::get('pages/{slug}', [Admin\PageController::class, 'show']);
+        Route::put('pages/{slug}', [Admin\PageController::class, 'update']);
 
         Route::post('media/upload', [Admin\MediaController::class, 'upload']);
     });

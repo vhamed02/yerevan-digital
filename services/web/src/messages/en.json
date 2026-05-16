@@ -26,6 +26,8 @@
   },
   "nav": {
     "stores": "Stores",
+    "about": "About Us",
+    "contact": "Contact",
     "login": "Login",
     "register": "Register",
     "logout": "Logout",

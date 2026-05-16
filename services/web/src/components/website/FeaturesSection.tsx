@@ -40,7 +40,7 @@ const FEATURES = [
     iconBg: 'bg-pink-100',
     iconColor: 'text-pink-600',
     accent: 'group-hover:border-pink-200',
-    span: '',
+    span: 'md:col-span-2',
   },
   {
     key: 'custom',

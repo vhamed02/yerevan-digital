@@ -14,6 +14,7 @@ import {
   LogOut,
   Store as StoreIcon,
   X,
+  FileText,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import useAuthStore from '@/stores/auth.store'
@@ -27,6 +28,7 @@ const navItems = [
   { href: '/admin/categories', label: 'Categories', icon: Tag },
   { href: '/admin/templates', label: 'Templates', icon: Palette },
   { href: '/admin/payments', label: 'Payments', icon: CreditCard },
+  { href: '/admin/pages', label: 'Pages', icon: FileText },
   { href: '/admin/settings', label: 'Settings', icon: Settings },
 ]
 

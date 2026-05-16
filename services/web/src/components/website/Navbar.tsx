@@ -50,6 +50,18 @@ export default function Navbar() {
           >
             {t('stores')}
           </Link>
+          <Link
+            href="/about"
+            className="rounded-md px-3 py-2 text-sm font-medium text-content-primary/65 hover:bg-surface-secondary hover:text-content-primary transition-colors"
+          >
+            {t('about')}
+          </Link>
+          <Link
+            href="/contact"
+            className="rounded-md px-3 py-2 text-sm font-medium text-content-primary/65 hover:bg-surface-secondary hover:text-content-primary transition-colors"
+          >
+            {t('contact')}
+          </Link>
         </nav>
 
         <div className="hidden items-center gap-2 md:flex">
@@ -92,6 +104,20 @@ export default function Navbar() {
               onClick={() => setMobileOpen(false)}
             >
               {t('stores')}
+            </Link>
+            <Link
+              href="/about"
+              className="rounded-md px-3 py-2.5 text-sm font-medium text-content-primary/70 hover:bg-surface-secondary hover:text-content-primary"
+              onClick={() => setMobileOpen(false)}
+            >
+              {t('about')}
+            </Link>
+            <Link
+              href="/contact"
+              className="rounded-md px-3 py-2.5 text-sm font-medium text-content-primary/70 hover:bg-surface-secondary hover:text-content-primary"
+              onClick={() => setMobileOpen(false)}
+            >
+              {t('contact')}
             </Link>
             {isAuthenticated ? (
               <>

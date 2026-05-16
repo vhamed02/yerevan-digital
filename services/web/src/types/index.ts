@@ -423,3 +423,15 @@ export interface StorefrontOrder {
   items: StorefrontOrderItem[]
   created_at: string
 }
+
+
+export interface Page {
+  id: number
+  slug: string
+  title: MultiLang
+  content: MultiLang
+  meta_title?: MultiLang
+  meta_description?: MultiLang
+  is_published: boolean
+  updated_at: string
+}

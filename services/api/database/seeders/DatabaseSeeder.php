@@ -14,6 +14,7 @@ class DatabaseSeeder extends Seeder
             PaymentGatewaySeeder::class,
             CategorySeeder::class,
             StoreTemplateSeeder::class,
+            PagesSeeder::class,
         ]);
     }
 }
