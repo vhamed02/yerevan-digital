@@ -6,9 +6,9 @@ RUN npm install
 FROM node:22-alpine AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
+COPY services/web .
 ARG CACHEBUST=1
 RUN echo "$CACHEBUST" > /dev/null
-COPY services/web .
 ARG NEXT_PUBLIC_API_URL
 ARG NEXT_PUBLIC_APP_URL
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL

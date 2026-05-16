@@ -2,6 +2,15 @@
 set -euo pipefail
 
 REPO_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+
+# Pull first, then re-exec so the rest of the script runs from the freshly-pulled version
+if [ -z "${_DEPLOY_PULLED:-}" ]; then
+  git -C "$REPO_DIR" update-index --assume-unchanged scripts/hooks.json
+  git -C "$REPO_DIR" pull origin main
+  export _DEPLOY_PULLED=1
+  exec bash "$REPO_DIR/scripts/deploy.sh"
+fi
+
 LOG_DIR="/var/log/vendora"
 LOG_FILE="$LOG_DIR/deploy.log"
 LOCK_FILE="/tmp/vendora-deploy.lock"
@@ -14,7 +23,7 @@ exec >> "$LOG_FILE" 2>&1
 # Kill any running deploy and take over
 if [ -f "$LOCK_FILE" ]; then
   OLD_PID=$(cat "$LOCK_FILE" 2>/dev/null || true)
-  if [ -n "$OLD_PID" ] && kill -0 "$OLD_PID" 2>/dev/null; then
+  if [ -n "$OLD_PID" ] && [ "$OLD_PID" != "$$" ] && kill -0 "$OLD_PID" 2>/dev/null; then
     echo "[$(date -Iseconds)] Killing previous deploy (PID $OLD_PID) — new commit arrived."
     kill -- -"$OLD_PID" 2>/dev/null || kill "$OLD_PID" 2>/dev/null || true
     sleep 1
@@ -24,9 +33,6 @@ echo $$ > "$LOCK_FILE"
 trap 'rm -f "$LOCK_FILE"' EXIT
 
 cd "$REPO_DIR"
-
-git update-index --assume-unchanged scripts/hooks.json
-git pull origin main
 
 NEW_SHORT=$(git rev-parse --short HEAD)
 
@@ -43,7 +49,7 @@ $COMPOSE up -d --no-deps web api
 
 echo "Waiting for PHP-FPM on port 9000..."
 for i in $(seq 1 30); do
-  if $COMPOSE exec -T api sh -c 'grep -q ":2328 " /proc/net/tcp /proc/net/tcp6 2>/dev/null'; then
+  if $COMPOSE exec -T api sh -c 'grep -q ":2328 " /proc/net/tcp /proc/net/tcp6 2>/dev/null || test -S /run/php-fpm/php-fpm.sock 2>/dev/null || test -S /var/run/php-fpm.sock 2>/dev/null'; then
     echo "PHP-FPM ready (attempt $i)."
     break
   fi
@@ -59,5 +65,5 @@ echo "Migration done."
 $COMPOSE exec -T nginx nginx -s reload
 echo "Nginx reloaded."
 
-echo -e "\033[1;30;102m Deploy finished: $(date -Iseconds) \033[0m"
+printf '\033[1;30;102m Deploy finished: %s \033[0m\n' "$(date -Iseconds)"
 echo "========================================"
