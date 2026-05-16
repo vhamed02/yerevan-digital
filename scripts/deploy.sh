@@ -5,6 +5,7 @@ REPO_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 LOG_DIR="/var/log/vendora"
 LOG_FILE="$LOG_DIR/deploy.log"
 LOCK_FILE="/tmp/vendora-deploy.lock"
+LAST_BUILD_FILE="/tmp/vendora-last-build-commit"
 COMPOSE="docker compose -f docker-compose.yml -f docker-compose.prod.yml"
 
 mkdir -p "$LOG_DIR"
@@ -28,13 +29,19 @@ cd "$REPO_DIR"
 echo ""
 echo "========================================"
 echo " Deploy started:  $(date -Iseconds)"
-echo " Commit before:   $(git rev-parse --short HEAD)"
-echo "========================================"
+
+# Read the last commit that was successfully built (survives kills)
+# Fall back to current HEAD only if the file doesn't exist (first ever deploy)
+if [ -f "$LAST_BUILD_FILE" ]; then
+  PREV_COMMIT=$(cat "$LAST_BUILD_FILE")
+else
+  PREV_COMMIT=$(git rev-parse HEAD)
+fi
+
+echo " Last built:      $(git rev-parse --short "$PREV_COMMIT" 2>/dev/null || echo unknown)"
 
 # hooks.json has the secret injected locally — tell git to ignore that change
 git update-index --assume-unchanged scripts/hooks.json
-
-PREV_COMMIT=$(git rev-parse HEAD)
 
 git pull origin main
 
@@ -42,8 +49,9 @@ NEW_COMMIT=$(git rev-parse HEAD)
 NEW_SHORT=$(git rev-parse --short HEAD)
 
 echo " Commit after:    $NEW_SHORT"
+echo "========================================"
 
-# Diff across ALL commits pulled (not just the last one)
+# Diff between last successfully built commit and current HEAD
 CHANGED=""
 if [ "$PREV_COMMIT" != "$NEW_COMMIT" ]; then
   CHANGED=$(git diff --name-only "$PREV_COMMIT" "$NEW_COMMIT" 2>/dev/null || echo "")
@@ -95,6 +103,9 @@ fi
 
 $COMPOSE exec -T api php artisan migrate --force
 echo "Migration done."
+
+# Record successful build commit — this is the baseline for next deploy's diff
+echo "$NEW_COMMIT" > "$LAST_BUILD_FILE"
 
 echo " Deploy finished: $(date -Iseconds)"
 echo "========================================"
