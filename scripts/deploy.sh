@@ -57,6 +57,7 @@ for i in $(seq 1 30); do
 done
 
 $COMPOSE exec -T api php artisan optimize:clear
+$COMPOSE exec -T api php artisan cache:clear
 echo "Cache cleared."
 
 $COMPOSE exec -T api php artisan migrate --force
