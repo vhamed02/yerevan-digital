@@ -58,7 +58,7 @@ export default function PendingApprovalBanner({ stores }: PendingApprovalBannerP
                   {store.name.hy || store.name.en}
                 </p>
                 <p className="text-xs text-content-muted">
-                  {store.seller.name} · registered {store.registered_days_ago ?? 0} day
+                  {store.seller?.name} · registered {store.registered_days_ago ?? 0} day
                   {(store.registered_days_ago ?? 0) !== 1 ? 's' : ''} ago
                 </p>
               </div>
