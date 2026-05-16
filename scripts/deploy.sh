@@ -43,16 +43,23 @@ fi
 
 REBUILD_WEB=false
 REBUILD_API=false
+RUN_MIGRATE=false
 
 if [ -n "$CHANGED" ]; then
-  echo "$CHANGED" | grep -qE "^services/web/|^docker/node/" && REBUILD_WEB=true || true
-  echo "$CHANGED" | grep -qE "^services/api/|^docker/php/" && REBUILD_API=true || true
+  if echo "$CHANGED" | grep -qE "^services/web/|^docker/node/"; then
+    REBUILD_WEB=true
+  fi
+  if echo "$CHANGED" | grep -qE "^services/api/|^docker/php/"; then
+    REBUILD_API=true
+  fi
+  if echo "$CHANGED" | grep -q "^services/api/database/migrations/"; then
+    RUN_MIGRATE=true
+  fi
 fi
 
-echo " Rebuild web: $REBUILD_WEB  |  Rebuild api: $REBUILD_API"
+echo " Rebuild web: $REBUILD_WEB  |  Rebuild api: $REBUILD_API  |  Migrate: $RUN_MIGRATE"
 echo "----------------------------------------"
 
-# Pass commit SHA as build arg to bust Docker layer cache on source COPY
 BUILD_ARGS="--build-arg CACHEBUST=$NEW_COMMIT"
 
 if [ "$REBUILD_WEB" = true ] && [ "$REBUILD_API" = true ]; then
@@ -68,8 +75,7 @@ else
   echo " Nothing to rebuild."
 fi
 
-# Migrate whenever API is rebuilt
-if [ "$REBUILD_API" = true ]; then
+if [ "$REBUILD_API" = true ] || [ "$RUN_MIGRATE" = true ]; then
   echo "Waiting for API to be ready..."
   for i in $(seq 1 15); do
     if $COMPOSE exec -T api php -r "exit(0);" 2>/dev/null; then
