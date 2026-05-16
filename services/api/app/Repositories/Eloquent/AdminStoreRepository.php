@@ -23,8 +23,17 @@ class AdminStoreRepository implements AdminStoreRepositoryInterface
             ->paginate($perPage);
     }
 
+    private function resolve(string $identifier): Store
+    {
+        $query = Store::query();
+        return is_numeric($identifier)
+            ? $query->findOrFail((int) $identifier)
+            : $query->where('slug', $identifier)->firstOrFail();
+    }
+
     public function findBySlugWithDetails(string $slug): Model
     {
+        $store = $this->resolve($slug);
         return Store::with([
             'owner',
             'paymentGateways.gateway',
@@ -32,34 +41,32 @@ class AdminStoreRepository implements AdminStoreRepositoryInterface
             ->withCount('orders')
             ->withSum('orders', 'total')
             ->withCount('products')
-            ->where('slug', $slug)
-            ->firstOrFail();
+            ->findOrFail($store->id);
     }
 
     public function approve(string $slug): Model
     {
-        $store = Store::where('slug', $slug)->firstOrFail();
+        $store = $this->resolve($slug);
         $store->update(['status' => StoreStatus::Active]);
         return $store->fresh('owner');
     }
 
     public function suspend(string $slug, ?string $reason = null): Model
     {
-        $store = Store::where('slug', $slug)->firstOrFail();
+        $store = $this->resolve($slug);
         $store->update(['status' => StoreStatus::Suspended]);
         return $store->fresh('owner');
     }
 
     public function toggleFeatured(string $slug): Model
     {
-        $store = Store::where('slug', $slug)->firstOrFail();
+        $store = $this->resolve($slug);
         $store->update(['is_featured' => !$store->is_featured]);
         return $store->fresh();
     }
 
     public function softDelete(string $slug): void
     {
-        $store = Store::where('slug', $slug)->firstOrFail();
-        $store->delete();
+        $this->resolve($slug)->delete();
     }
 }

@@ -43,7 +43,7 @@ $COMPOSE up -d --no-deps web api
 
 echo "Waiting for PHP-FPM on port 9000..."
 for i in $(seq 1 30); do
-  if $COMPOSE exec -T api sh -c 'ss -tlnp 2>/dev/null | grep -q ":9000"' 2>/dev/null; then
+  if $COMPOSE exec -T api sh -c 'grep -q "00002328" /proc/net/tcp /proc/net/tcp6 2>/dev/null'; then
     echo "PHP-FPM ready (attempt $i)."
     break
   fi
