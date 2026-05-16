@@ -1,5 +1,6 @@
 <?php
 
+// v2
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Admin;
 use App\Http\Controllers\Seller;
