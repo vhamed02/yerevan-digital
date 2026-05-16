@@ -215,8 +215,28 @@ export default function CategoriesAdminClient({ initialCategories }: CategoriesA
   })
 
   const reorderMutation = useMutation({
-    mutationFn: ({ id, targetId }: { id: number; targetId: number }) =>
-      api.post('/admin/categories/reorder', { id, after_id: targetId }),
+    mutationFn: ({ draggedId, overId }: { draggedId: number; overId: number }) => {
+      const findCat = (list: AdminCategory[], id: number): AdminCategory | null => {
+        for (const c of list) {
+          if (c.id === id) return c
+          const found = findCat(c.children ?? [], id)
+          if (found) return found
+        }
+        return null
+      }
+
+      const dragged = findCat(categories, draggedId)
+      const siblings = dragged?.parent_id
+        ? (findCat(categories, dragged.parent_id)?.children ?? [])
+        : categories.filter((c) => !c.parent_id)
+
+      const ids = siblings.map((c) => c.id).filter((id) => id !== draggedId)
+      const toIdx = ids.indexOf(overId)
+      if (toIdx === -1) ids.push(draggedId)
+      else ids.splice(toIdx, 0, draggedId)
+
+      return api.put('/admin/categories/sort', { order: ids })
+    },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin-categories'] }),
     onError: () => toast.error('Failed to reorder'),
   })
@@ -235,7 +255,7 @@ export default function CategoriesAdminClient({ initialCategories }: CategoriesA
 
   function handleDrop(targetId: number) {
     if (dragId !== null && dragId !== targetId) {
-      reorderMutation.mutate({ id: dragId, targetId })
+      reorderMutation.mutate({ draggedId: dragId, overId: targetId })
     }
     setDragId(null)
     setDragOver(null)

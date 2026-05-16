@@ -59,6 +59,7 @@ Route::prefix('v1')->group(function () {
 
         Route::get('categories', [Admin\CategoryController::class, 'index']);
         Route::post('categories', [Admin\CategoryController::class, 'store']);
+        Route::put('categories/sort', [Admin\CategoryController::class, 'sort']);
         Route::patch('categories/{category}', [Admin\CategoryController::class, 'update']);
         Route::delete('categories/{category}', [Admin\CategoryController::class, 'destroy']);
         Route::post('categories/{category}/reorder', [Admin\CategoryController::class, 'reorder']);

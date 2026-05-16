@@ -10,6 +10,6 @@ export const metadata: Metadata = {
 }
 
 export default async function CategoriesPage() {
-  const data = await serverAuthGet<{ data: AdminCategory[] }>('/admin/categories')
-  return <CategoriesAdminClient initialCategories={data?.data ?? []} />
+  const categories = await serverAuthGet<AdminCategory[]>('/admin/categories')
+  return <CategoriesAdminClient initialCategories={categories ?? []} />
 }

@@ -16,7 +16,9 @@ class CategoryController extends Controller
 {
     public function index(): JsonResponse
     {
-        $categories = Category::with('children.children')
+        $categories = Category::withCount('products as product_count')
+            ->with(['children' => fn($q) => $q->withCount('products as product_count')
+                ->with(['children' => fn($q) => $q->withCount('products as product_count')])])
             ->whereNull('parent_id')
             ->orderBy('sort_order')
             ->get();
@@ -61,6 +63,22 @@ class CategoryController extends Controller
         $category->delete();
 
         return $this->success(null, 'Category deleted.');
+    }
+
+    public function sort(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'order'   => ['required', 'array'],
+            'order.*' => ['integer', 'exists:categories,id'],
+        ]);
+
+        DB::transaction(function () use ($data) {
+            foreach ($data['order'] as $position => $id) {
+                Category::where('id', $id)->update(['sort_order' => $position]);
+            }
+        });
+
+        return $this->success(null, 'Categories sorted.');
     }
 
     public function reorder(ReorderCategoryRequest $request, Category $category): JsonResponse
