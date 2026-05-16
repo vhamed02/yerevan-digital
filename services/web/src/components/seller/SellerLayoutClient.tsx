@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation'
 import SellerTopNav, { SellerMobileNav } from './SellerTopNav'
 import StoreSetupWizard from './StoreSetupWizard'
 import useAuthStore from '@/stores/auth.store'
-import type { PublicCategory } from '@/types'
+import api from '@/lib/api'
+import type { PublicCategory, Store } from '@/types'
 
 interface SellerLayoutClientProps {
   children: React.ReactNode
@@ -14,17 +15,32 @@ interface SellerLayoutClientProps {
 
 export default function SellerLayoutClient({ children, categories }: SellerLayoutClientProps) {
   const [mobileOpen, setMobileOpen] = useState(false)
-  const { user, isAuthenticated, sellerStore, _hasHydrated } = useAuthStore()
+  const [storeChecked, setStoreChecked] = useState(false)
+  const { user, isAuthenticated, sellerStore, updateStore, _hasHydrated } = useAuthStore()
   const router = useRouter()
 
   useEffect(() => {
     if (!_hasHydrated) return
     if (!isAuthenticated || !user || user.role !== 'seller') {
       router.replace('/auth/login')
+      return
     }
-  }, [_hasHydrated, isAuthenticated, user, router])
+    if (sellerStore) {
+      setStoreChecked(true)
+      return
+    }
+    // sellerStore is null in localStorage — verify against the API in case
+    // the store was created but the client state wasn't updated
+    api.get<Store>('/seller/store').then((res) => {
+      if (res.data?.id) updateStore(res.data)
+    }).catch(() => {
+      // 404 = store genuinely doesn't exist yet, show wizard
+    }).finally(() => {
+      setStoreChecked(true)
+    })
+  }, [_hasHydrated, isAuthenticated, user, sellerStore, updateStore, router])
 
-  if (!_hasHydrated || !isAuthenticated || !user || user.role !== 'seller') {
+  if (!_hasHydrated || !isAuthenticated || !user || user.role !== 'seller' || !storeChecked) {
     return null
   }
 
