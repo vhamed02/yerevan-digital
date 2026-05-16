@@ -51,7 +51,7 @@ export default function OrderDetailClient({ order }: OrderDetailClientProps) {
                   <tr key={item.id}>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
-                        {item.product.images[0] && (
+                        {item.product.images?.[0] && (
                           <img
                             src={item.product.images[0].thumbnail}
                             alt=""

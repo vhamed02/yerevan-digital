@@ -121,7 +121,7 @@ export default function ProductsListClient({ initialData, initialMeta, categorie
       header: 'Product',
       cell: ({ row }) => (
         <div className="flex items-center gap-3">
-          {row.original.images[0] ? (
+          {row.original.images?.[0] ? (
             <img
               src={row.original.images[0].thumbnail}
               alt=""

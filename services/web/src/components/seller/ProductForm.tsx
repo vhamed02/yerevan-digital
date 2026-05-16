@@ -60,7 +60,7 @@ export default function ProductForm({ product, categories }: ProductFormProps) {
   const [descFullHy, setDescFullHy] = useState(product?.description_full?.hy ?? '')
   const [descFullEn, setDescFullEn] = useState(product?.description_full?.en ?? '')
   const [images, setImages] = useState<ProductImageItem[]>(
-    product?.images.map((img) => ({ id: img.uuid, url: img.medium })) ?? []
+    product?.images?.map((img) => ({ id: img.uuid, url: img.medium })) ?? []
   )
   const [variants, setVariants] = useState<SellerVariant[]>(product?.variants ?? [])
   const [comparePrice, setComparePrice] = useState<number | null>(product?.compare_price ?? null)

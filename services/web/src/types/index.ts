@@ -31,7 +31,7 @@ export interface Product {
   stock: number
   status: 'draft' | 'active' | 'archived'
   category?: Category
-  images: ProductImage[]
+  images: ProductImage[] | null
   variants?: Variant[]
   description?: string
 }
@@ -261,7 +261,7 @@ export interface SellerProduct {
   status: 'draft' | 'active' | 'archived'
   is_featured: boolean
   category?: PublicCategory
-  images: ProductImage[]
+  images: ProductImage[] | null
   variants?: SellerVariant[]
   meta_title?: MultiLang
   meta_description?: MultiLang
@@ -399,7 +399,7 @@ export interface StorefrontProduct {
   is_featured: boolean
   stock: number
   manage_stock: boolean
-  images: ProductImage[]
+  images: ProductImage[] | null
   variants?: StorefrontVariant[]
   category?: PublicCategory
   meta_title?: MultiLang
