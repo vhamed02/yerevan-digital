@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import type { PlatformStats } from '@/types'
 
 function useCountUp(target: number, enabled: boolean, duration = 2000) {
@@ -55,13 +56,15 @@ interface StatsBarProps {
 }
 
 export default function StatsBar({ stats }: StatsBarProps) {
+  const t = useTranslations('stats')
+
   return (
     <section className="bg-brand-700 py-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-10 sm:grid-cols-3">
-          <StatItem label="Registered Stores" value={stats.stores_count} suffix="+" />
-          <StatItem label="Products Listed" value={stats.products_count} suffix="+" />
-          <StatItem label="Orders Completed" value={stats.orders_count} suffix="+" />
+          <StatItem label={t('stores')} value={stats.stores_count} suffix="+" />
+          <StatItem label={t('products')} value={stats.products_count} suffix="+" />
+          <StatItem label={t('orders')} value={stats.orders_count} suffix="+" />
         </div>
       </div>
     </section>

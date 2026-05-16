@@ -10,6 +10,8 @@ interface AuthState {
   token: string | null
   sellerStore: Store | null
   isAuthenticated: boolean
+  _hasHydrated: boolean
+  setHasHydrated: (v: boolean) => void
   login: (data: { user: User; token: string; store?: Store }) => void
   logout: () => void
   updateUser: (partial: Partial<User>) => void
@@ -23,6 +25,9 @@ const useAuthStore = create<AuthState>()(
       token: null,
       sellerStore: null,
       isAuthenticated: false,
+      _hasHydrated: false,
+
+      setHasHydrated: (v) => set({ _hasHydrated: v }),
 
       login: ({ user, token, store }) => {
         Cookies.set('vendora_token', token, { expires: 30 })
@@ -47,6 +52,9 @@ const useAuthStore = create<AuthState>()(
     {
       name: 'vendora-auth',
       partialize: (state) => ({ user: state.user, token: state.token, sellerStore: state.sellerStore }),
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true)
+      },
     }
   )
 )

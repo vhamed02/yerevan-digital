@@ -1,8 +1,11 @@
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/Button'
 
 export default function HeroSection() {
+  const t = useTranslations('hero')
+
   return (
     <section className="relative flex min-h-screen items-center overflow-hidden bg-gradient-to-br from-brand-600 via-brand-700 to-brand-900">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.08),transparent_60%)]" />
@@ -11,42 +14,54 @@ export default function HeroSection() {
         <div className="flex flex-1 flex-col gap-8 text-center lg:text-left">
           <div className="flex flex-col gap-4">
             <span className="inline-flex self-center rounded-full bg-white/10 px-4 py-1.5 text-sm font-medium text-white lg:self-start">
-              🇦🇲 Made for Armenian businesses
+              {t('badge')}
             </span>
             <h1 className="font-heading text-4xl font-bold leading-tight text-white sm:text-5xl lg:text-6xl">
-              Ստեղծեք Ձեր<br />
-              <span className="text-white/80">Առցանց Խանութը</span><br />
-              Հիմա
+              {t('title')}<br />
+              <span className="text-white/80">{t('title_highlight')}</span><br />
+              {t('title_end')}
             </h1>
             <p className="text-lg text-white/70 lg:max-w-lg">
-              Join hundreds of Armenian businesses selling online with Vendora
+              {t('subtitle')}
             </p>
           </div>
 
           <div className="flex flex-col gap-3 sm:flex-row sm:justify-center lg:justify-start">
             <Link href="/auth/register">
               <Button size="lg" className="w-full bg-white text-brand-700 hover:bg-white/90 sm:w-auto">
-                Start for Free
+                {t('cta_primary')}
                 <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
             <Link href="/stores">
               <Button size="lg" variant="ghost" className="w-full border border-white/30 text-white hover:bg-white/10 sm:w-auto">
-                Browse Stores
+                {t('cta_secondary')}
               </Button>
             </Link>
           </div>
         </div>
 
         <div className="relative flex flex-1 items-center justify-center">
-          <StorefrontIllustration />
+          <StorefrontIllustration
+            storesLabel={t('badge_stores')}
+            productsLabel={t('badge_products')}
+            happyLabel={t('badge_happy')}
+          />
         </div>
       </div>
     </section>
   )
 }
 
-function StorefrontIllustration() {
+function StorefrontIllustration({
+  storesLabel,
+  productsLabel,
+  happyLabel,
+}: {
+  storesLabel: string
+  productsLabel: string
+  happyLabel: string
+}) {
   return (
     <div className="relative h-80 w-80 sm:h-96 sm:w-96">
       <svg viewBox="0 0 400 360" className="h-full w-full drop-shadow-2xl" aria-hidden="true">
@@ -64,15 +79,15 @@ function StorefrontIllustration() {
 
       <div className="absolute -right-4 top-8 flex items-center gap-2 rounded-xl bg-white/20 px-3 py-2 text-sm font-semibold text-white backdrop-blur-sm">
         <span className="text-base">🏪</span>
-        320+ Stores
+        {storesLabel}
       </div>
       <div className="absolute -left-4 top-1/3 flex items-center gap-2 rounded-xl bg-white/20 px-3 py-2 text-sm font-semibold text-white backdrop-blur-sm">
         <span className="text-base">📦</span>
-        12K+ Products
+        {productsLabel}
       </div>
       <div className="absolute -right-2 bottom-12 flex items-center gap-2 rounded-xl bg-white/20 px-3 py-2 text-sm font-semibold text-white backdrop-blur-sm">
         <span className="text-base">⭐</span>
-        98% Happy
+        {happyLabel}
       </div>
     </div>
   )

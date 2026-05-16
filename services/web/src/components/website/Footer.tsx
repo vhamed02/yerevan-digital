@@ -1,8 +1,11 @@
 import Link from 'next/link'
 import { Store, ExternalLink } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher'
 
 export default function Footer() {
+  const t = useTranslations('footer')
+
   return (
     <footer className="border-t border-border bg-surface-secondary">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
@@ -12,17 +15,17 @@ export default function Footer() {
               <Store className="h-5 w-5 text-brand-500" />
               Vendora
             </Link>
-            <p className="text-sm text-content-muted">Your Armenian Store Builder</p>
+            <p className="text-sm text-content-muted">{t('tagline')}</p>
           </div>
 
           <div className="flex flex-col gap-3">
-            <p className="text-xs font-semibold uppercase tracking-wider text-content-muted">Links</p>
+            <p className="text-xs font-semibold uppercase tracking-wider text-content-muted">{t('links_label')}</p>
             <nav className="flex flex-col gap-2">
               {[
-                { label: 'About', href: '/about' },
-                { label: 'Contact', href: '/contact' },
-                { label: 'Terms of Use', href: '/terms' },
-                { label: 'Privacy Policy', href: '/privacy' },
+                { label: t('about'), href: '/about' },
+                { label: t('contact'), href: '/contact' },
+                { label: t('terms'), href: '/terms' },
+                { label: t('privacy'), href: '/privacy' },
               ].map((link) => (
                 <Link
                   key={link.href}
@@ -39,7 +42,7 @@ export default function Footer() {
           </div>
 
           <div className="flex flex-col gap-3">
-            <p className="text-xs font-semibold uppercase tracking-wider text-content-muted">Social</p>
+            <p className="text-xs font-semibold uppercase tracking-wider text-content-muted">{t('social_label')}</p>
             <div className="flex flex-col gap-2">
               <a
                 href="https://instagram.com/vendora.am"
@@ -64,7 +67,7 @@ export default function Footer() {
         </div>
 
         <div className="mt-10 border-t border-border pt-6 text-center text-sm text-content-muted">
-          © 2026 Vendora. All rights reserved.
+          {t('copyright')}
         </div>
       </div>
     </footer>

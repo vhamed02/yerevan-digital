@@ -8,16 +8,17 @@ import useAuthStore from '@/stores/auth.store'
 
 export default function AdminLayoutClient({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const { user, isAuthenticated } = useAuthStore()
+  const { user, isAuthenticated, _hasHydrated } = useAuthStore()
   const router = useRouter()
 
   useEffect(() => {
+    if (!_hasHydrated) return
     if (!isAuthenticated || !user || user.role !== 'super-admin') {
       router.replace('/auth/login')
     }
-  }, [isAuthenticated, user, router])
+  }, [_hasHydrated, isAuthenticated, user, router])
 
-  if (!isAuthenticated || !user || user.role !== 'super-admin') {
+  if (!_hasHydrated || !isAuthenticated || !user || user.role !== 'super-admin') {
     return null
   }
 

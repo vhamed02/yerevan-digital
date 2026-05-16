@@ -14,16 +14,17 @@ interface SellerLayoutClientProps {
 
 export default function SellerLayoutClient({ children, categories }: SellerLayoutClientProps) {
   const [mobileOpen, setMobileOpen] = useState(false)
-  const { user, isAuthenticated, sellerStore } = useAuthStore()
+  const { user, isAuthenticated, sellerStore, _hasHydrated } = useAuthStore()
   const router = useRouter()
 
   useEffect(() => {
+    if (!_hasHydrated) return
     if (!isAuthenticated || !user || user.role !== 'seller') {
       router.replace('/auth/login')
     }
-  }, [isAuthenticated, user, router])
+  }, [_hasHydrated, isAuthenticated, user, router])
 
-  if (!isAuthenticated || !user || user.role !== 'seller') {
+  if (!_hasHydrated || !isAuthenticated || !user || user.role !== 'seller') {
     return null
   }
 

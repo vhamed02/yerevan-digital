@@ -1,31 +1,35 @@
-const steps = [
-  {
-    number: '01',
-    icon: '🏪',
-    title: 'Register & Create Store',
-    description: 'Fill a simple form, pick your store URL, and get started in under 2 minutes.',
-  },
-  {
-    number: '02',
-    icon: '📦',
-    title: 'Add Your Products',
-    description: 'Upload photos, set prices in AMD ֏, organize by categories.',
-  },
-  {
-    number: '03',
-    icon: '💸',
-    title: 'Start Selling',
-    description: 'Share your store link, receive orders, and get paid via Idram.',
-  },
-]
+import { useTranslations } from 'next-intl'
 
 export default function HowItWorks() {
+  const t = useTranslations('howItWorks')
+
+  const steps = [
+    {
+      number: '01',
+      icon: '🏪',
+      title: t('step1_title'),
+      description: t('step1_desc'),
+    },
+    {
+      number: '02',
+      icon: '📦',
+      title: t('step2_title'),
+      description: t('step2_desc'),
+    },
+    {
+      number: '03',
+      icon: '💸',
+      title: t('step3_title'),
+      description: t('step3_desc'),
+    },
+  ]
+
   return (
     <section className="bg-surface py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-12 text-center">
-          <h2 className="font-heading text-3xl font-bold text-content-primary sm:text-4xl">How It Works</h2>
-          <p className="mt-3 text-content-secondary">Three simple steps to launch your store</p>
+          <h2 className="font-heading text-3xl font-bold text-content-primary sm:text-4xl">{t('heading')}</h2>
+          <p className="mt-3 text-content-secondary">{t('subheading')}</p>
         </div>
 
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-3">
