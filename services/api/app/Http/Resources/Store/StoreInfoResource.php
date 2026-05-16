@@ -48,6 +48,7 @@ class StoreInfoResource extends JsonResource
                     ->map(fn($g) => $g->gateway?->name)
                     ->filter()
                     ->values()
+                    ->all()
             ),
         ];
     }
