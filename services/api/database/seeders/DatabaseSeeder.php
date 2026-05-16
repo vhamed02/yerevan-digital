@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
             CategorySeeder::class,
             StoreTemplateSeeder::class,
             PagesSeeder::class,
+            DemoSeeder::class,
         ]);
     }
 }
