@@ -27,7 +27,7 @@ class AdminSellerRepository implements AdminSellerRepositoryInterface
 
     public function create(array $data): Model
     {
-        return User::create([
+        $user = User::create([
             'name'     => $data['name'],
             'email'    => $data['email'],
             'phone'    => $data['phone'] ?? null,
@@ -36,6 +36,10 @@ class AdminSellerRepository implements AdminSellerRepositoryInterface
             'status'   => $data['status'] ?? UserStatus::Active,
             'locale'   => $data['locale'] ?? 'hy',
         ]);
+
+        $user->assignRole('seller');
+
+        return $user;
     }
 
     public function findWithDetails(int $id): Model
