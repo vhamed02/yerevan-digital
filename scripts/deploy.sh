@@ -30,12 +30,12 @@ echo ""
 echo "========================================"
 echo " Deploy started:  $(date -Iseconds)"
 
-# Read the last commit that was successfully built (survives kills)
-# Fall back to current HEAD only if the file doesn't exist (first ever deploy)
+# Read the last commit that was successfully built (survives kills).
+# If no history file exists, use empty string to force a full rebuild.
 if [ -f "$LAST_BUILD_FILE" ]; then
   PREV_COMMIT=$(cat "$LAST_BUILD_FILE")
 else
-  PREV_COMMIT=$(git rev-parse HEAD)
+  PREV_COMMIT=""
 fi
 
 echo " Last built:      $(git rev-parse --short "$PREV_COMMIT" 2>/dev/null || echo unknown)"
@@ -51,25 +51,28 @@ NEW_SHORT=$(git rev-parse --short HEAD)
 echo " Commit after:    $NEW_SHORT"
 echo "========================================"
 
-# Diff between last successfully built commit and current HEAD
-CHANGED=""
-if [ "$PREV_COMMIT" != "$NEW_COMMIT" ]; then
-  CHANGED=$(git diff --name-only "$PREV_COMMIT" "$NEW_COMMIT" 2>/dev/null || echo "")
-fi
-
+# Diff between last successfully built commit and current HEAD.
+# Empty PREV_COMMIT means no history — force full rebuild.
 REBUILD_WEB=false
 REBUILD_API=false
 RUN_MIGRATE=false
 
-if [ -n "$CHANGED" ]; then
-  if echo "$CHANGED" | grep -qE "^services/web/|^docker/node/"; then
-    REBUILD_WEB=true
-  fi
-  if echo "$CHANGED" | grep -qE "^services/api/|^docker/php/"; then
-    REBUILD_API=true
-  fi
-  if echo "$CHANGED" | grep -q "^services/api/database/migrations/"; then
-    RUN_MIGRATE=true
+if [ -z "$PREV_COMMIT" ]; then
+  echo " No build history — forcing full rebuild."
+  REBUILD_WEB=true
+  REBUILD_API=true
+elif [ "$PREV_COMMIT" != "$NEW_COMMIT" ]; then
+  CHANGED=$(git diff --name-only "$PREV_COMMIT" "$NEW_COMMIT" 2>/dev/null || echo "")
+  if [ -n "$CHANGED" ]; then
+    if echo "$CHANGED" | grep -qE "^services/web/|^docker/node/"; then
+      REBUILD_WEB=true
+    fi
+    if echo "$CHANGED" | grep -qE "^services/api/|^docker/php/"; then
+      REBUILD_API=true
+    fi
+    if echo "$CHANGED" | grep -q "^services/api/database/migrations/"; then
+      RUN_MIGRATE=true
+    fi
   fi
 fi
 
