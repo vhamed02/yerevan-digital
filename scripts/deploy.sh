@@ -11,9 +11,17 @@ mkdir -p "$LOG_DIR"
 chmod +x "$REPO_DIR/scripts/deploy.sh"
 exec >> "$LOG_FILE" 2>&1
 
-# Prevent concurrent deploys
-exec 200>"$LOCK_FILE"
-flock -n 200 || { echo "[$(date -Iseconds)] Deploy already running, skipping."; exit 0; }
+# Kill any running deploy and take over
+if [ -f "$LOCK_FILE" ]; then
+  OLD_PID=$(cat "$LOCK_FILE" 2>/dev/null || true)
+  if [ -n "$OLD_PID" ] && kill -0 "$OLD_PID" 2>/dev/null; then
+    echo "[$(date -Iseconds)] Killing previous deploy (PID $OLD_PID) — new commit arrived."
+    kill -- -"$OLD_PID" 2>/dev/null || kill "$OLD_PID" 2>/dev/null || true
+    sleep 1
+  fi
+fi
+echo $$ > "$LOCK_FILE"
+trap 'rm -f "$LOCK_FILE"' EXIT
 
 cd "$REPO_DIR"
 
