@@ -9,7 +9,7 @@ import { Store, CheckCircle, ArrowRight, ArrowLeft } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { FileUpload } from '@/components/ui/FileUpload'
-import { Select } from '@/components/ui/Select'
+import { SearchableSelect } from '@/components/ui/SearchableSelect'
 import api from '@/lib/api'
 import useAuthStore from '@/stores/auth.store'
 import type { PublicCategory, Store as StoreType } from '@/types'
@@ -185,13 +185,17 @@ export default function StoreSetupWizard({ categories }: StoreSetupWizardProps) 
                   }
                 />
               </div>
-              <Select
+              <SearchableSelect
                 label="Category"
                 value={watch('category_id')}
                 onValueChange={(v) => setValue('category_id', v)}
                 options={categories.map((c) => ({ value: String(c.id), label: c.name.hy || c.name.en }))}
-                error={errors.category_id?.message}
+                placeholder="Select category"
+                searchPlaceholder="Search categories..."
               />
+              {errors.category_id?.message && (
+                <p className="text-xs text-status-error">{errors.category_id.message}</p>
+              )}
               <div className="flex flex-col gap-1.5">
                 <label className="text-sm font-medium text-content-primary">Description (optional)</label>
                 <div className="flex gap-2">
