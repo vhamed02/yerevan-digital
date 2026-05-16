@@ -49,6 +49,9 @@ for i in $(seq 1 15); do
   sleep 2
 done
 
+$COMPOSE exec -T api php artisan optimize:clear
+echo "Cache cleared."
+
 $COMPOSE exec -T api php artisan migrate --force
 echo "Migration done."
 
