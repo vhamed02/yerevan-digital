@@ -93,18 +93,20 @@ export default function StoreDetailAdminClient({ store }: StoreDetailAdminClient
         </div>
 
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-          <div className="rounded-xl border border-border bg-surface p-5">
-            <p className="mb-3 text-sm font-semibold text-content-primary">Seller</p>
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="font-medium text-content-primary">{store.seller.name}</p>
-                <p className="text-sm text-content-muted">{store.seller.email}</p>
+          {store.seller && (
+            <div className="rounded-xl border border-border bg-surface p-5">
+              <p className="mb-3 text-sm font-semibold text-content-primary">Seller</p>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-medium text-content-primary">{store.seller.name}</p>
+                  <p className="text-sm text-content-muted">{store.seller.email}</p>
+                </div>
+                <Link href={`/admin/sellers/${store.seller.id}`}>
+                  <Button variant="outline" size="sm">View Seller</Button>
+                </Link>
               </div>
-              <Link href={`/admin/sellers/${store.seller.id}`}>
-                <Button variant="outline" size="sm">View Seller</Button>
-              </Link>
             </div>
-          </div>
+          )}
 
           {store.payment_gateways.length > 0 && (
             <div className="rounded-xl border border-border bg-surface p-5">

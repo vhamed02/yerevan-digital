@@ -48,8 +48,8 @@ export default function PaymentsAdminClient({ initialGateways }: PaymentsAdminCl
   const { data: gateways } = useQuery({
     queryKey: ['admin-payment-gateways'],
     queryFn: async () => {
-      const res = await api.get<{ data: AdminPaymentGateway[] }>('/admin/payment-gateways')
-      return res.data.data
+      const res = await api.get<AdminPaymentGateway[]>('/admin/payment-gateways')
+      return res.data
     },
     initialData: initialGateways,
     staleTime: 60000,

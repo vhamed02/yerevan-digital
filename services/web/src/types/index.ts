@@ -150,7 +150,7 @@ export interface AdminStore {
   logo_url?: string
   banner_url?: string
   description?: MultiLang
-  seller: AdminSeller
+  seller?: AdminSeller
   template?: AdminTemplate
   category?: PublicCategory
   product_count: number

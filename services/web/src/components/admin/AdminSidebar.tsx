@@ -119,7 +119,7 @@ export default function AdminSidebar({ mobileOpen, onMobileClose }: AdminSidebar
 
   return (
     <>
-      <aside className="fixed bottom-0 right-0 top-0 z-30 hidden lg:block">{content}</aside>
+      <aside className="fixed bottom-0 left-0 top-0 z-30 hidden lg:block">{content}</aside>
 
       {mobileOpen && (
         <div className="fixed inset-0 z-40 lg:hidden">
@@ -128,7 +128,7 @@ export default function AdminSidebar({ mobileOpen, onMobileClose }: AdminSidebar
             onClick={onMobileClose}
             aria-hidden="true"
           />
-          <aside className="absolute bottom-0 right-0 top-0">{content}</aside>
+          <aside className="absolute bottom-0 left-0 top-0">{content}</aside>
         </div>
       )}
     </>

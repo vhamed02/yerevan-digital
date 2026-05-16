@@ -176,8 +176,8 @@ export default function CategoriesAdminClient({ initialCategories }: CategoriesA
   const { data: categories } = useQuery({
     queryKey: ['admin-categories'],
     queryFn: async () => {
-      const res = await api.get<{ data: AdminCategory[] }>('/admin/categories')
-      return res.data.data
+      const res = await api.get<AdminCategory[]>('/admin/categories')
+      return res.data
     },
     initialData: initialCategories,
     staleTime: 60000,

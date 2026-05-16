@@ -105,11 +105,11 @@ export default function StoreSetupWizard({ categories }: StoreSetupWizardProps) 
       if (logo) formData.append('logo', logo)
       if (banner) formData.append('banner', banner)
 
-      const res = await api.post<{ data: StoreType }>('/seller/store', formData, {
+      const res = await api.post<StoreType>('/seller/store', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       })
 
-      const newStore = res.data.data
+      const newStore = res.data
       updateStore({
         id: newStore.id,
         name: newStore.name,

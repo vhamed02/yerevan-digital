@@ -105,14 +105,17 @@ export default function StoresAdminClient({ initialData, initialMeta }: StoresAd
     {
       id: 'seller',
       header: 'Seller',
-      cell: ({ row }) => (
-        <Link
-          href={`/admin/sellers/${row.original.seller.id}`}
-          className="text-sm text-brand-500 hover:underline"
-        >
-          {row.original.seller.name}
-        </Link>
-      ),
+      cell: ({ row }) =>
+        row.original.seller ? (
+          <Link
+            href={`/admin/sellers/${row.original.seller.id}`}
+            className="text-sm text-brand-500 hover:underline"
+          >
+            {row.original.seller.name}
+          </Link>
+        ) : (
+          <span className="text-sm text-content-muted">—</span>
+        ),
     },
     {
       accessorKey: 'template',

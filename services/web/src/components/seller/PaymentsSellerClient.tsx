@@ -17,8 +17,8 @@ export default function PaymentsSellerClient({ initialGateways }: PaymentsSeller
   const { data: gateways } = useQuery({
     queryKey: ['seller-gateways'],
     queryFn: async () => {
-      const res = await api.get<{ data: StoreGatewayConfig[] }>('/seller/payment-gateways')
-      return res.data.data
+      const res = await api.get<StoreGatewayConfig[]>('/seller/payment-gateways')
+      return res.data
     },
     initialData: initialGateways,
     staleTime: 60000,

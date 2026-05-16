@@ -18,8 +18,8 @@ export default function TemplatesAdminClient({ initialTemplates }: TemplatesAdmi
   const { data: templates } = useQuery({
     queryKey: ['admin-templates'],
     queryFn: async () => {
-      const res = await api.get<{ data: AdminTemplate[] }>('/admin/templates')
-      return res.data.data
+      const res = await api.get<AdminTemplate[]>('/admin/templates')
+      return res.data
     },
     initialData: initialTemplates,
     staleTime: 60000,

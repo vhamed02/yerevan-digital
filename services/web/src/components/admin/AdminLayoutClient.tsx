@@ -23,7 +23,7 @@ export default function AdminLayoutClient({ children }: { children: React.ReactN
   }
 
   return (
-    <div className="min-h-screen bg-surface-secondary lg:mr-60">
+    <div className="min-h-screen bg-surface-secondary lg:ml-60">
       <AdminSidebar
         mobileOpen={sidebarOpen}
         onMobileClose={() => setSidebarOpen(false)}
