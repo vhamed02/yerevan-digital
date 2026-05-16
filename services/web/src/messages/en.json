@@ -151,7 +151,8 @@
     "orders": "Orders Completed"
   },
   "featuredStores": {
-    "heading": "Active Stores",
+    "label": "Featured",
+    "heading": "Active Stores on Vendora",
     "explore": "Explore All Stores"
   }
 }

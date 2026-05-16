@@ -41,10 +41,12 @@ function StatItem({ label, value, suffix = '' }: { label: string; value: number;
 
   return (
     <div ref={ref} className="flex flex-col items-center gap-2 text-center">
-      <span className="font-heading text-5xl font-extrabold tracking-tight text-white sm:text-6xl">
+      <span className="font-heading text-5xl font-extrabold tracking-tight text-brand-600 sm:text-6xl">
         {count.toLocaleString()}{suffix}
       </span>
-      <span className="text-sm font-medium uppercase tracking-widest text-white/35">{label}</span>
+      <span className="text-sm font-medium uppercase tracking-widest text-content-primary/40">
+        {label}
+      </span>
     </div>
   )
 }
@@ -53,19 +55,8 @@ export default function StatsBar({ stats }: { stats: PlatformStats }) {
   const t = useTranslations('stats')
 
   return (
-    <section className="relative overflow-hidden bg-surface-dark py-20">
-      {/* Grid texture */}
-      <div
-        className="absolute inset-0 opacity-[0.03]"
-        style={{
-          backgroundImage: 'linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(to right, rgba(255,255,255,0.5) 1px, transparent 1px)',
-          backgroundSize: '60px 60px',
-        }}
-      />
-      {/* Center glow */}
-      <div className="absolute left-1/2 top-1/2 h-64 w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand-500/10 blur-3xl" />
-
-      <div className="relative mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+    <section className="bg-brand-50 py-20">
+      <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-12 sm:grid-cols-3">
           <StatItem label={t('stores')} value={stats.stores_count} suffix="+" />
           <StatItem label={t('products')} value={stats.products_count} suffix="+" />

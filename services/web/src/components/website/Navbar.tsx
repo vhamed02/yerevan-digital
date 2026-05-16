@@ -1,8 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Menu, X, Store } from 'lucide-react'
+import { Menu, X } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/Button'
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher'
@@ -11,56 +11,70 @@ import { cn } from '@/lib/utils'
 
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
   const t = useTranslations('nav')
   const { isAuthenticated, user, logout } = useAuthStore()
 
   const dashboardHref = user?.role === 'super_admin' ? '/admin' : '/seller'
 
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 12)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
   return (
-    <header className="sticky top-0 z-40 border-b border-white/10 bg-brand-700/90 backdrop-blur-md">
+    <header
+      className={cn(
+        'sticky top-0 z-40 transition-all duration-200',
+        scrolled
+          ? 'border-b border-border bg-white/95 shadow-sm backdrop-blur-md'
+          : 'border-b border-transparent bg-white'
+      )}
+    >
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <Link href="/" className="flex items-center gap-2 font-heading text-xl font-bold text-white">
-          <Store className="h-6 w-6" />
-          Vendora
+        <Link href="/" className="flex items-center gap-2.5">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-500">
+            <svg className="h-4 w-4 text-white" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+              <path d="M2 5.5A3.5 3.5 0 0 1 8 2.5a3.5 3.5 0 0 1 6 3v.5a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-.5Z" />
+              <path d="M1 10.5a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1v-2Z" />
+            </svg>
+          </div>
+          <span className="font-heading text-lg font-bold text-content-primary tracking-tight">Vendora</span>
         </Link>
 
-        <nav className="hidden items-center gap-6 md:flex">
-          <Link href="/stores" className="text-sm font-medium text-white/80 hover:text-white transition-colors">
+        <nav className="hidden items-center gap-1 md:flex">
+          <Link
+            href="/stores"
+            className="rounded-md px-3 py-2 text-sm font-medium text-content-primary/65 hover:bg-surface-secondary hover:text-content-primary transition-colors"
+          >
             {t('stores')}
           </Link>
         </nav>
 
-        <div className="hidden items-center gap-3 md:flex">
-          <LanguageSwitcher className="border-white/20" />
+        <div className="hidden items-center gap-2 md:flex">
+          <LanguageSwitcher />
           {isAuthenticated ? (
             <>
               <Link href={dashboardHref}>
-                <Button size="sm" variant="ghost" className="text-white hover:bg-white/10">
-                  {t('dashboard')}
-                </Button>
+                <Button size="sm" variant="ghost">{t('dashboard')}</Button>
               </Link>
-              <Button size="sm" variant="outline" className="border-white/30 text-white hover:bg-white/10" onClick={logout}>
-                {t('logout')}
-              </Button>
+              <Button size="sm" variant="outline" onClick={logout}>{t('logout')}</Button>
             </>
           ) : (
             <>
               <Link href="/auth/login">
-                <Button size="sm" variant="ghost" className="text-white hover:bg-white/10">
-                  {t('login')}
-                </Button>
+                <Button size="sm" variant="ghost">{t('login')}</Button>
               </Link>
               <Link href="/auth/register">
-                <Button size="sm" className="bg-white text-brand-700 hover:bg-white/90">
-                  {t('register')}
-                </Button>
+                <Button size="sm">{t('register')}</Button>
               </Link>
             </>
           )}
         </div>
 
         <button
-          className="rounded-md p-2 text-white md:hidden"
+          className="rounded-md p-2 text-content-primary/70 hover:bg-surface-secondary hover:text-content-primary transition-colors md:hidden"
           onClick={() => setMobileOpen((v) => !v)}
           aria-label="Toggle menu"
           aria-expanded={mobileOpen}
@@ -70,51 +84,36 @@ export default function Navbar() {
       </div>
 
       {mobileOpen && (
-        <div className="border-t border-white/10 bg-brand-700 px-4 pb-4 pt-2 md:hidden">
+        <div className="border-t border-border bg-white px-4 pb-4 pt-2 md:hidden">
           <nav className="flex flex-col gap-1">
             <Link
               href="/stores"
-              className="rounded-md px-3 py-2 text-sm font-medium text-white/80 hover:bg-white/10 hover:text-white"
+              className="rounded-md px-3 py-2.5 text-sm font-medium text-content-primary/70 hover:bg-surface-secondary hover:text-content-primary"
               onClick={() => setMobileOpen(false)}
             >
               {t('stores')}
             </Link>
             {isAuthenticated ? (
               <>
-                <Link
-                  href={dashboardHref}
-                  className="rounded-md px-3 py-2 text-sm font-medium text-white/80 hover:bg-white/10 hover:text-white"
-                  onClick={() => setMobileOpen(false)}
-                >
+                <Link href={dashboardHref} className="rounded-md px-3 py-2.5 text-sm font-medium text-content-primary/70 hover:bg-surface-secondary" onClick={() => setMobileOpen(false)}>
                   {t('dashboard')}
                 </Link>
-                <button
-                  className="rounded-md px-3 py-2 text-left text-sm font-medium text-white/80 hover:bg-white/10 hover:text-white"
-                  onClick={() => { logout(); setMobileOpen(false) }}
-                >
+                <button className="rounded-md px-3 py-2.5 text-left text-sm font-medium text-content-primary/70 hover:bg-surface-secondary" onClick={() => { logout(); setMobileOpen(false) }}>
                   {t('logout')}
                 </button>
               </>
             ) : (
               <>
-                <Link
-                  href="/auth/login"
-                  className="rounded-md px-3 py-2 text-sm font-medium text-white/80 hover:bg-white/10 hover:text-white"
-                  onClick={() => setMobileOpen(false)}
-                >
+                <Link href="/auth/login" className="rounded-md px-3 py-2.5 text-sm font-medium text-content-primary/70 hover:bg-surface-secondary" onClick={() => setMobileOpen(false)}>
                   {t('login')}
                 </Link>
-                <Link
-                  href="/auth/register"
-                  className="rounded-md px-3 py-2 text-sm font-medium text-white/80 hover:bg-white/10 hover:text-white"
-                  onClick={() => setMobileOpen(false)}
-                >
+                <Link href="/auth/register" className="rounded-md px-3 py-2.5 text-sm font-medium text-brand-600 hover:bg-brand-50" onClick={() => setMobileOpen(false)}>
                   {t('register')}
                 </Link>
               </>
             )}
             <div className="px-3 pt-2">
-              <LanguageSwitcher className="border-white/20" />
+              <LanguageSwitcher />
             </div>
           </nav>
         </div>
