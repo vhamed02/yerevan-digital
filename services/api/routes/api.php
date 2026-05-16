@@ -25,6 +25,7 @@ Route::prefix('v1')->group(function () {
     Route::get('health', [HealthController::class, 'check']);
     Route::get('stats', [StatsController::class, 'index']);
     Route::get('pages/{slug}', [PageController::class, 'show']);
+    Route::get('stores', [PublicStoreController::class, 'index']);
     Route::get('stores/featured', [PublicStoreController::class, 'featured']);
     Route::get('stores/check-slug', [PublicStoreController::class, 'checkSlug'])->middleware('throttle:slug-check');
     Route::get('categories', [PublicStoreController::class, 'categories']);

@@ -28,12 +28,12 @@ export default async function StoresPage({ searchParams }: PageProps) {
     serverGet<PaginatedResponse<PublicStore>>(`/stores?${params.toString()}`, {
       next: { revalidate: 60 },
     }),
-    serverGet<{ data: PublicCategory[] }>('/categories', { next: { revalidate: 3600 } }),
+    serverGet<PublicCategory[]>('/categories', { next: { revalidate: 3600 } }),
   ])
 
   const stores = storesData?.data ?? []
   const meta = storesData?.meta
-  const categories = categoriesData?.data ?? []
+  const categories = categoriesData ?? []
   const currentPage = meta?.current_page ?? 1
   const lastPage = meta?.last_page ?? 1
 

@@ -7,9 +7,47 @@ use App\Models\Store;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class PublicStoreController extends Controller
 {
+    public function index(Request $request): JsonResponse
+    {
+        $sort    = $request->input('sort', 'newest');
+        $perPage = min((int) $request->input('per_page', 12), 48);
+
+        $query = Store::where('status', StoreStatus::Active)
+            ->withCount('products');
+
+        match ($sort) {
+            'popular' => $query->orderByDesc('products_count'),
+            'oldest'  => $query->orderBy('created_at'),
+            default   => $query->orderByDesc('created_at'),
+        };
+
+        $paginated = $query->paginate($perPage);
+
+        $items = collect($paginated->items())->map(fn($store) => [
+            'id'            => $store->id,
+            'slug'          => $store->slug,
+            'name'          => $store->getTranslations('name'),
+            'logo_url'      => $store->logo   ? asset("storage/{$store->logo}")   : null,
+            'banner_url'    => $store->banner  ? asset("storage/{$store->banner}") : null,
+            'product_count' => $store->products_count,
+            'category'      => null,
+        ])->values()->all();
+
+        return $this->success([
+            'data' => $items,
+            'meta' => [
+                'current_page' => $paginated->currentPage(),
+                'last_page'    => $paginated->lastPage(),
+                'per_page'     => $paginated->perPage(),
+                'total'        => $paginated->total(),
+            ],
+        ]);
+    }
+
     public function featured(): JsonResponse
     {
         $stores = Cache::remember('stores:featured', 900, function () {
