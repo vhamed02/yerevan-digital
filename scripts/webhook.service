@@ -1,0 +1,16 @@
+[Unit]
+Description=Vendora GitHub Webhook Receiver
+After=network.target
+
+[Service]
+Type=simple
+User=deploy
+Group=deploy
+ExecStart=/usr/local/bin/webhook -hooks /home/deploy/vendora/scripts/hooks.json -port 9001 -verbose
+Restart=on-failure
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
