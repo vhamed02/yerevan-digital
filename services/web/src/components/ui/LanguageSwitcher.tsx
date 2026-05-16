@@ -19,8 +19,9 @@ function LanguageSwitcher({ className }: LanguageSwitcherProps) {
 
   const switchLocale = (next: string) => {
     if (next === locale) return
-    const newPath = next === 'hy' ? pathname : `/${next}${pathname}`
-    window.location.href = newPath
+    const bare = pathname.replace(/^\/(en|hy)(\/|$)/, '/').replace(/\/$/, '') || '/'
+    const newPath = next === 'hy' ? bare : `/${next}${bare === '/' ? '' : bare}`
+    window.location.href = newPath || '/'
   }
 
   return (
