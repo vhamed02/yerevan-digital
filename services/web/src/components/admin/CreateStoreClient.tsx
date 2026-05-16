@@ -47,8 +47,8 @@ function SellerSelect({
     if (!q.trim()) { setResults([]); return }
     setLoading(true)
     try {
-      const res = await api.get<{ data: { data: AdminSeller[] } }>(`/admin/sellers?search=${encodeURIComponent(q)}&per_page=8`)
-      setResults(res.data.data.data ?? [])
+      const res = await api.get<{ data: AdminSeller[] }>(`/admin/sellers?search=${encodeURIComponent(q)}&per_page=8`)
+      setResults(res.data.data ?? [])
     } catch {
       setResults([])
     } finally {
