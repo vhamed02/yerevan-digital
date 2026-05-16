@@ -43,7 +43,7 @@ $COMPOSE up -d --no-deps web api
 
 echo "Waiting for PHP-FPM on port 9000..."
 for i in $(seq 1 30); do
-  if $COMPOSE exec -T api sh -c 'grep -q "00002328" /proc/net/tcp /proc/net/tcp6 2>/dev/null'; then
+  if $COMPOSE exec -T api sh -c 'grep -q ":2328 " /proc/net/tcp /proc/net/tcp6 2>/dev/null'; then
     echo "PHP-FPM ready (attempt $i)."
     break
   fi
@@ -59,5 +59,5 @@ echo "Migration done."
 $COMPOSE exec -T nginx nginx -s reload
 echo "Nginx reloaded."
 
-echo " Deploy finished: $(date -Iseconds)"
+echo -e "\033[1;30;102m Deploy finished: $(date -Iseconds) \033[0m"
 echo "========================================"
