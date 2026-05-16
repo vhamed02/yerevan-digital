@@ -14,7 +14,7 @@ export default function Navbar() {
   const t = useTranslations('nav')
   const { isAuthenticated, user, logout } = useAuthStore()
 
-  const dashboardHref = user?.role === 'super-admin' ? '/admin' : '/seller'
+  const dashboardHref = user?.role === 'super_admin' ? '/admin' : '/seller'
 
   return (
     <header className="sticky top-0 z-40 border-b border-white/10 bg-brand-700/90 backdrop-blur-md">

@@ -26,7 +26,7 @@ export function middleware(request: NextRequest) {
   const token = request.cookies.get('vendora_token')?.value
   const role = request.cookies.get('vendora_role')?.value
 
-  if (ADMIN_PATHS.some((p) => bare.startsWith(p)) && (!token || role !== 'super-admin')) {
+  if (ADMIN_PATHS.some((p) => bare.startsWith(p)) && (!token || role !== 'super_admin')) {
     const url = request.nextUrl.clone()
     url.pathname = detectedLocale === DEFAULT_LOCALE ? '/auth/login' : `/${detectedLocale}/auth/login`
     url.search = ''
@@ -42,7 +42,7 @@ export function middleware(request: NextRequest) {
 
   if (AUTH_PATHS.some((p) => bare.startsWith(p)) && token) {
     const url = request.nextUrl.clone()
-    url.pathname = role === 'super-admin' ? '/admin' : '/seller'
+    url.pathname = role === 'super_admin' ? '/admin' : '/seller'
     url.search = ''
     return NextResponse.redirect(url)
   }

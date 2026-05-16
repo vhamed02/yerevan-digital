@@ -13,12 +13,12 @@ export default function AdminLayoutClient({ children }: { children: React.ReactN
 
   useEffect(() => {
     if (!_hasHydrated) return
-    if (!isAuthenticated || !user || user.role !== 'super-admin') {
+    if (!isAuthenticated || !user || user.role !== 'super_admin') {
       router.replace('/auth/login')
     }
   }, [_hasHydrated, isAuthenticated, user, router])
 
-  if (!_hasHydrated || !isAuthenticated || !user || user.role !== 'super-admin') {
+  if (!_hasHydrated || !isAuthenticated || !user || user.role !== 'super_admin') {
     return null
   }
 

@@ -43,7 +43,7 @@ export default function LoginForm() {
       const res = await api.post<LoginResponse>('/auth/login', data)
       login({ user: res.data.user, token: res.data.token, store: res.data.store })
       const role = res.data.user.role
-      router.push(role === 'super-admin' ? '/admin' : '/seller')
+      router.push(role === 'super_admin' ? '/admin' : '/seller')
     } catch {
       toast.error('Invalid email or password')
     }
