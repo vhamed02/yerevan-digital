@@ -25,17 +25,18 @@ echo "========================================"
 # hooks.json has the secret injected locally — tell git to ignore that change
 git update-index --assume-unchanged scripts/hooks.json
 
+PREV_COMMIT=$(git rev-parse HEAD)
+
 git pull origin main
 
 NEW_COMMIT=$(git rev-parse HEAD)
 NEW_SHORT=$(git rev-parse --short HEAD)
-PREV_COMMIT=$(git rev-parse HEAD~1 2>/dev/null || echo "")
 
 echo " Commit after:    $NEW_SHORT"
 
-# Determine which services need rebuilding
+# Diff across ALL commits pulled (not just the last one)
 CHANGED=""
-if [ -n "$PREV_COMMIT" ]; then
+if [ "$PREV_COMMIT" != "$NEW_COMMIT" ]; then
   CHANGED=$(git diff --name-only "$PREV_COMMIT" "$NEW_COMMIT" 2>/dev/null || echo "")
 fi
 
