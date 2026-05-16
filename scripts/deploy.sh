@@ -66,4 +66,5 @@ $COMPOSE exec -T nginx nginx -s reload
 echo "Nginx reloaded."
 
 printf '\033[1;30;102m Deploy finished: %s \033[0m\n' "$(date -Iseconds)"
+printf '\033[1;97;44m %s \033[0m\n' "$(git log -1 --pretty='%h %s')"
 echo "========================================"
