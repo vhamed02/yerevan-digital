@@ -189,7 +189,7 @@ export default function CreateStoreClient() {
       }),
     onSuccess: (res) => {
       toast.success('Store created')
-      router.push(`/admin/stores/${res.data.data.slug}`)
+      router.push(`/admin/stores/${res.data.slug}`)
     },
     onError: (err: any) => {
       const data = err?.response?.data
