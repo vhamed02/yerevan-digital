@@ -391,6 +391,14 @@ export interface StorefrontVariant {
   is_active: boolean
 }
 
+export interface ProductReview {
+  id: number
+  reviewer_name: string
+  rating: number
+  body: string | null
+  created_at: string
+}
+
 export interface StorefrontProduct {
   uuid: string
   slug: string
@@ -408,6 +416,9 @@ export interface StorefrontProduct {
   category?: PublicCategory
   meta_title?: MultiLang
   meta_description?: MultiLang
+  rating_avg?: number | null
+  rating_count?: number
+  reviews?: ProductReview[]
 }
 
 export interface StorefrontOrderItem {

@@ -5,6 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { ShoppingBag, Plus, Minus, Check, ChevronRight } from 'lucide-react'
 import { useStoreCart } from '@/stores/cart.store'
+import ReviewSection from '@/components/store/ReviewSection'
 import type { ProductDetailProps, StorefrontVariant } from '../types'
 
 export function ProductDetail({ product, storeSlug, isPreview }: ProductDetailProps) {
@@ -194,6 +195,16 @@ export function ProductDetail({ product, storeSlug, isPreview }: ProductDetailPr
           )}
         </div>
       </div>
+
+      {!isPreview && (
+        <ReviewSection
+          reviews={product.reviews ?? []}
+          ratingAvg={product.rating_avg ?? null}
+          ratingCount={product.rating_count ?? 0}
+          storeSlug={storeSlug}
+          productSlug={product.slug}
+        />
+      )}
     </div>
   )
 }

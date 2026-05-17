@@ -65,11 +65,16 @@ class ProductController extends Controller
         $store    = $request->attributes->get('currentStore');
         $cacheKey = "store:{$slug}:product:{$productSlug}";
 
-        $payload = Cache::remember($cacheKey, 300, function () use ($store, $productSlug) {
+        $payload = Cache::remember($cacheKey, 60, function () use ($store, $productSlug) {
             $product = Product::where('store_id', $store->id)
                 ->where('slug', $productSlug)
                 ->where('status', ProductStatus::Active)
-                ->with(['images', 'variants' => fn($q) => $q->where('is_active', true), 'category'])
+                ->with([
+                    'images',
+                    'variants' => fn($q) => $q->where('is_active', true),
+                    'category',
+                    'reviews'  => fn($q) => $q->where('is_approved', true)->latest()->limit(50),
+                ])
                 ->firstOrFail();
 
             return (new PublicProductDetailResource($product))->resolve();

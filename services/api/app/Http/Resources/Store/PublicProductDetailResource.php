@@ -53,6 +53,21 @@ class PublicProductDetailResource extends JsonResource
                 'name' => $this->category->getTranslations('name'),
                 'slug' => $this->category->slug,
             ] : null),
+            'rating_avg'        => $this->whenLoaded('reviews', fn() =>
+                $this->reviews->isNotEmpty()
+                    ? round($this->reviews->avg('rating'), 1)
+                    : null
+            ),
+            'rating_count'      => $this->whenLoaded('reviews', fn() => $this->reviews->count()),
+            'reviews'           => $this->whenLoaded('reviews', fn() =>
+                $this->reviews->map(fn($r) => [
+                    'id'            => $r->id,
+                    'reviewer_name' => $r->reviewer_name,
+                    'rating'        => $r->rating,
+                    'body'          => $r->body,
+                    'created_at'    => $r->created_at->toDateString(),
+                ])->values()->all()
+            ),
         ];
     }
 }

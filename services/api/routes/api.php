@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin;
 use App\Http\Controllers\Seller;
 use App\Http\Controllers\Store;
 use App\Http\Controllers\HealthController;
+use App\Http\Controllers\CaptchaController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\PublicStoreController;
@@ -22,6 +23,7 @@ RateLimiter::for('auth', fn($request) => Limit::perMinute(5)->by($request->ip())
 RateLimiter::for('checkout', fn($request) => Limit::perMinute(10)->by($request->ip()));
 RateLimiter::for('slug-check', fn($request) => Limit::perMinute(20)->by($request->ip()));
 RateLimiter::for('contact', fn($request) => Limit::perMinute(3)->by($request->ip()));
+RateLimiter::for('review',  fn($request) => Limit::perMinute(3)->by($request->ip()));
 
 Route::prefix('v1')->group(function () {
     Route::get('health', [HealthController::class, 'check']);
@@ -32,6 +34,7 @@ Route::prefix('v1')->group(function () {
     Route::get('stores/check-slug', [PublicStoreController::class, 'checkSlug'])->middleware('throttle:slug-check');
     Route::get('categories', [PublicStoreController::class, 'categories']);
     Route::post('contact', [ContactController::class, 'send'])->middleware('throttle:contact');
+    Route::get('captcha', [CaptchaController::class, 'generate']);
 
     Route::prefix('auth')->group(function () {
         Route::post('register', [AuthController::class, 'register']);
@@ -89,6 +92,10 @@ Route::prefix('v1')->group(function () {
         Route::delete('pages/{slug}', [Admin\PageController::class, 'destroy']);
 
         Route::post('media/upload', [Admin\MediaController::class, 'upload']);
+
+        Route::get('reviews', [Admin\ProductReviewController::class, 'index']);
+        Route::patch('reviews/{review}/approve', [Admin\ProductReviewController::class, 'approve']);
+        Route::delete('reviews/{review}', [Admin\ProductReviewController::class, 'destroy']);
     });
 
     Route::prefix('seller')->middleware(['auth:sanctum', EnsureUserIsSeller::class])->group(function () {
@@ -146,5 +153,6 @@ Route::prefix('v1')->group(function () {
         Route::post('{slug}/checkout', [Store\CheckoutController::class, 'checkout'])->middleware('throttle:checkout');
         Route::post('{slug}/payments/initiate', [Store\PaymentController::class, 'initiate']);
         Route::post('{slug}/payments/callback/{gateway}', [Store\PaymentController::class, 'callback']);
+        Route::post('{slug}/products/{productSlug}/reviews', [Store\ProductReviewController::class, 'store'])->middleware('throttle:review');
     });
 });
