@@ -86,7 +86,7 @@ export function OrderConfirmationClient({ order, storeSlug }: Props) {
         </div>
       )}
 
-      <div className="flex flex-col items-center justify-center px-4 py-16 text-center">
+      <div className="flex flex-col items-center justify-center gap-3 px-4 py-16 text-center">
         <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-green-50">
           <CheckCircle className="h-12 w-12 text-green-500" />
         </div>
