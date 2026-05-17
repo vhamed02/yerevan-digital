@@ -75,6 +75,7 @@ class PaymentController extends Controller
             failureUrl: "{$frontendUrl}/store/{$slug}/checkout/failed?order={$order->uuid}",
             credentials: $storeGateway->credentials ?? [],
             sandbox: $storeGateway->is_sandbox,
+            sandboxUrl: "{$frontendUrl}/store/{$slug}/checkout/sandbox?order_id={$order->uuid}",
         );
 
         $gateway  = $this->registry->get($gatewayKey);
@@ -174,24 +175,6 @@ class PaymentController extends Controller
         }
 
         return $this->success(null, 'Payment processed.');
-    }
-
-    public function sandboxPay(Request $request): Response|JsonResponse
-    {
-        if (!config('app.sandbox_mode')) {
-            return $this->error('Not available in production.', 403);
-        }
-
-        $orderUuid = $request->query('order_id');
-        $order     = Order::where('uuid', $orderUuid)->with('store')->first();
-
-        return response()->view('sandbox.payment', [
-            'orderId'  => $orderUuid,
-            'amount'   => $order ? number_format((float) $order->total, 2) : '—',
-            'currency' => $order?->currency ?? 'AMD',
-            'storeKey' => $order?->store?->slug ?? '',
-            'apiUrl'   => config('app.url'),
-        ]);
     }
 
     public function sandboxComplete(Request $request): JsonResponse

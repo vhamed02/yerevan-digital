@@ -24,7 +24,7 @@ class IdramGateway implements PaymentGatewayInterface
         if ($request->sandbox || empty($request->credentials)) {
             return new PaymentInitiateResponse(
                 success: true,
-                redirectUrl: url('/api/v1/store/payments/sandbox/pay?order_id=' . $request->orderId),
+                redirectUrl: $request->sandboxUrl ?? url('/api/v1/store/payments/sandbox/pay?order_id=' . $request->orderId),
                 paymentId: 'SANDBOX-' . Str::random(8),
                 errorMessage: null,
             );

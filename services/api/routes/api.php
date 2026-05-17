@@ -132,7 +132,6 @@ Route::prefix('v1')->group(function () {
         Route::patch('payments/{gatewayId}/toggle', [Seller\PaymentController::class, 'toggle']);
     });
 
-    Route::get('store/payments/sandbox/pay', [Store\PaymentController::class, 'sandboxPay']);
     Route::post('store/payments/sandbox/complete', [Store\PaymentController::class, 'sandboxComplete']);
 
     Route::prefix('store')->middleware(ResolveStore::class)->group(function () {

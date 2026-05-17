@@ -422,6 +422,7 @@ export interface StorefrontOrder {
   order_number: string
   status: string
   total: number
+  currency: string
   customer_name: string
   customer_email: string
   items: StorefrontOrderItem[]
