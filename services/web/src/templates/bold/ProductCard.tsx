@@ -56,7 +56,7 @@ export function ProductCard({ product, storeSlug, isPreview }: ProductCardProps)
               }`}
             >
               {added ? <Check className="h-3 w-3" /> : <ArrowRight className="h-3 w-3" />}
-              {added ? 'Added' : 'Add'}
+              {added ? 'Ավելացվեց' : 'Ավելացնել'}
             </button>
           </div>
         </div>

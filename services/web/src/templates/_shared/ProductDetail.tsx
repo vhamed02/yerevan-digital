@@ -40,9 +40,9 @@ export function ProductDetail({ product, storeSlug, isPreview }: ProductDetailPr
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
       <nav className="mb-6 flex items-center gap-1.5 text-sm text-gray-500">
-        <Link href={`/store/${storeSlug}`} className="hover:text-gray-700">Home</Link>
+        <Link href={`/store/${storeSlug}`} className="hover:text-gray-700">Գլխավոր</Link>
         <ChevronRight className="h-3.5 w-3.5" />
-        <Link href={`/store/${storeSlug}/products`} className="hover:text-gray-700">Products</Link>
+        <Link href={`/store/${storeSlug}/products`} className="hover:text-gray-700">Ապրանքներ</Link>
         <ChevronRight className="h-3.5 w-3.5" />
         <span className="text-gray-900">{name}</span>
       </nav>
@@ -103,7 +103,7 @@ export function ProductDetail({ product, storeSlug, isPreview }: ProductDetailPr
 
           {!inStock && (
             <span className="inline-flex w-fit rounded-full bg-red-50 px-3 py-1 text-sm font-medium text-red-600">
-              Out of stock
+              Ապրանքն առկա չէ
             </span>
           )}
 
@@ -172,12 +172,12 @@ export function ProductDetail({ product, storeSlug, isPreview }: ProductDetailPr
             >
               {added ? (
                 <>
-                  <Check className="h-4 w-4" /> Added to Cart
+                  <Check className="h-4 w-4" /> Ավելացվեց
                 </>
               ) : (
                 <>
                   <ShoppingBag className="h-4 w-4" />
-                  {inStock ? 'Add to Cart' : 'Out of Stock'}
+                  {inStock ? 'Ավելացնել' : 'Ոչ առկա'}
                 </>
               )}
             </button>
@@ -185,7 +185,7 @@ export function ProductDetail({ product, storeSlug, isPreview }: ProductDetailPr
 
           {descFull && (
             <div className="border-t border-gray-100 pt-5">
-              <p className="mb-2 text-sm font-semibold text-gray-700">Description</p>
+              <p className="mb-2 text-sm font-semibold text-gray-700">Նկարագրություն</p>
               <div
                 className="prose prose-sm max-w-none text-gray-600"
                 dangerouslySetInnerHTML={{ __html: descFull }}

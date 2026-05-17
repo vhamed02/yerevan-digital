@@ -17,17 +17,17 @@ export function StoreFooter({ store }: StoreFooterProps) {
             )}
           </div>
           <div>
-            <p className="mb-3 text-xs font-bold uppercase tracking-widest text-gray-400">Shop</p>
+            <p className="mb-3 text-xs font-bold uppercase tracking-widest text-gray-400">Գնել</p>
             <ul className="flex flex-col gap-2">
               <li>
                 <Link href={`/store/${store.slug}/products`} className="text-sm text-gray-300 hover:text-white transition-colors">
-                  All Products
+                  Բոլոր ապրանքները
                 </Link>
               </li>
             </ul>
           </div>
           <div>
-            <p className="mb-3 text-xs font-bold uppercase tracking-widest text-gray-400">Contact</p>
+            <p className="mb-3 text-xs font-bold uppercase tracking-widest text-gray-400">Կապ</p>
             <ul className="flex flex-col gap-2 text-sm text-gray-300">
               {store.email && <li><a href={`mailto:${store.email}`} className="hover:text-white transition-colors">{store.email}</a></li>}
               {store.phone && <li>{store.phone}</li>}

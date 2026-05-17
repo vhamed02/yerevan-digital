@@ -60,9 +60,9 @@ export default async function StoreProductsPage({
   const Template = await loadTemplate(store.active_template_key)
 
   const sortOptions = [
-    { value: 'newest', label: 'Newest' },
-    { value: 'price_asc', label: 'Price: Low → High' },
-    { value: 'price_desc', label: 'Price: High → Low' },
+    { value: 'newest', label: 'Նոր' },
+    { value: 'price_asc', label: 'Գին: Աճման' },
+    { value: 'price_desc', label: 'Գին: Նվազման' },
   ]
 
   return (
@@ -77,7 +77,7 @@ export default async function StoreProductsPage({
                 : 'border-gray-200 text-gray-600 hover:border-gray-400'
             }`}
           >
-            All
+            Բոլոր
           </Link>
           {categories.map((cat) => (
             <Link
@@ -99,7 +99,7 @@ export default async function StoreProductsPage({
 
       {meta && (
         <p className="mb-4 text-sm text-gray-500">
-          {meta.total} product{meta.total !== 1 ? 's' : ''}
+          {meta.total} ապրանք
         </p>
       )}
 
@@ -112,18 +112,18 @@ export default async function StoreProductsPage({
               href={`/store/${slug}/products?${new URLSearchParams({ ...sp, page: String(page - 1) })}`}
               className="rounded-lg border border-gray-200 px-4 py-2 text-sm hover:bg-gray-50"
             >
-              ← Prev
+              ← Նախ.
             </Link>
           )}
           <span className="text-sm text-gray-500">
-            Page {page} of {meta.last_page}
+            Էջ {page} / {meta.last_page}
           </span>
           {page < meta.last_page && (
             <Link
               href={`/store/${slug}/products?${new URLSearchParams({ ...sp, page: String(page + 1) })}`}
               className="rounded-lg border border-gray-200 px-4 py-2 text-sm hover:bg-gray-50"
             >
-              Next →
+              Հաջ. →
             </Link>
           )}
         </div>

@@ -26,14 +26,14 @@ export function SandboxPayClient({ orderId, amount, currency, apiUrl }: Props) {
       if (json.success && json.data?.redirect) {
         setResultMsg({
           type: outcome,
-          text: outcome === 'success' ? '✓ Payment confirmed — redirecting…' : '✕ Payment declined — redirecting…',
+          text: outcome === 'success' ? '✓ Վճարումը հաստատված է — վերահղում…' : '✕ Վճարումը մերժված է — վերահղում…',
         })
         setTimeout(() => { window.location.href = json.data.redirect }, 1400)
       } else {
         throw new Error(json.message ?? 'Unexpected error')
       }
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Something went wrong'
+      const msg = err instanceof Error ? err.message : 'Ինչ-որ բան սխալ գնաց'
       setResultMsg({ type: 'fail', text: '✕ ' + msg })
       setLoading(null)
     }
@@ -49,7 +49,7 @@ export function SandboxPayClient({ orderId, amount, currency, apiUrl }: Props) {
         <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-xl px-4 py-2.5 mb-5">
           <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse flex-shrink-0" />
           <span className="text-[11px] font-semibold text-amber-700 uppercase tracking-wider">
-            Sandbox Mode — no real payment will be processed
+            Sandbox ռեժիմ — իրական վճարում չի կատարվի
           </span>
         </div>
 
@@ -69,11 +69,11 @@ export function SandboxPayClient({ orderId, amount, currency, apiUrl }: Props) {
           </p>
           <div className="flex justify-between items-end relative z-10">
             <div>
-              <p className="text-[10px] uppercase tracking-widest text-white/50 mb-0.5">Cardholder</p>
+              <p className="text-[10px] uppercase tracking-widest text-white/50 mb-0.5">Քարտապան</p>
               <p className="text-sm text-white/85 font-medium">TEST USER</p>
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-widest text-white/50 mb-0.5">Expires</p>
+              <p className="text-[10px] uppercase tracking-widest text-white/50 mb-0.5">Ժամկետ</p>
               <p className="text-sm text-white/85 font-medium">12/30</p>
             </div>
             <p className="text-xl font-extrabold italic text-white/70">VISA</p>
@@ -82,14 +82,14 @@ export function SandboxPayClient({ orderId, amount, currency, apiUrl }: Props) {
 
         {/* Form card */}
         <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
-          <p className="text-gray-900 font-semibold text-[15px] mb-0.5">Card Details</p>
-          <p className="text-gray-400 text-[13px] mb-5">Pre-filled with test data — nothing is charged</p>
+          <p className="text-gray-900 font-semibold text-[15px] mb-0.5">Քարտի տվյալներ</p>
+          <p className="text-gray-400 text-[13px] mb-5">Փորձարկման տվյալներ — ոչ մի գումար չի գանձվի</p>
 
           {/* Mock fields */}
           <div className="space-y-3 mb-5">
             <div>
               <label className="block text-[11px] font-semibold uppercase tracking-wide text-gray-400 mb-1.5">
-                Card Number
+                Քարտի համար
               </label>
               <input
                 readOnly
@@ -100,7 +100,7 @@ export function SandboxPayClient({ orderId, amount, currency, apiUrl }: Props) {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="block text-[11px] font-semibold uppercase tracking-wide text-gray-400 mb-1.5">
-                  Expiry
+                  Ժամկետ
                 </label>
                 <input
                   readOnly
@@ -124,13 +124,13 @@ export function SandboxPayClient({ orderId, amount, currency, apiUrl }: Props) {
           {/* Order summary */}
           <div className="bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 mb-5 space-y-2">
             <div className="flex justify-between text-[13px]">
-              <span className="text-gray-400">Order</span>
+              <span className="text-gray-400">Պատվեր</span>
               <span className="text-gray-500 font-mono text-[12px]">
                 {orderId ? orderId.slice(0, 8).toUpperCase() + '…' : '—'}
               </span>
             </div>
             <div className="flex justify-between text-[13px] pt-2 border-t border-gray-100">
-              <span className="text-gray-500">Total</span>
+              <span className="text-gray-500">Ընդամենը</span>
               <span className="text-gray-900 font-bold text-[15px]">{amount} {currency}</span>
             </div>
           </div>
@@ -159,7 +159,7 @@ export function SandboxPayClient({ orderId, amount, currency, apiUrl }: Props) {
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
                 </svg>
               ) : '✓'}
-              &nbsp;Pay Successfully
+              &nbsp;Հաջող վճարում
             </button>
             <button
               onClick={() => complete('fail')}
@@ -172,7 +172,7 @@ export function SandboxPayClient({ orderId, amount, currency, apiUrl }: Props) {
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
                 </svg>
               ) : '✕'}
-              &nbsp;Simulate Failure
+              &nbsp;Ձախողել վճարումը
             </button>
           </div>
         </div>

@@ -55,7 +55,7 @@ export function ProductCard({ product, storeSlug, isPreview }: ProductCardProps)
           onClick={handleAdd}
           className="mt-2 text-xs font-semibold uppercase tracking-widest text-stone-500 hover:text-stone-900 transition-colors"
         >
-          {added ? '✓ Added' : '+ Add to Bag'}
+          {added ? '✓ Ավելացվեց' : '+ Ավելացնել'}
         </button>
       </div>
     </Link>

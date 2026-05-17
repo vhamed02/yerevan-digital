@@ -45,7 +45,7 @@ export function StoreFooter({ store }: StoreFooterProps) {
               href={`mailto:${store.email}`}
               className="text-xs font-semibold uppercase tracking-widest text-stone-400 hover:text-stone-700 transition-colors"
             >
-              Contact
+              Կապ
             </a>
           )}
         </div>

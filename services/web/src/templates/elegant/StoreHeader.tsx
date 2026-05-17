@@ -79,13 +79,13 @@ export function StoreHeader({ store, categories, slug, isPreview }: StoreHeaderP
             href={`/store/${slug}`}
             className="px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-stone-500 hover:text-stone-900"
           >
-            Home
+            Գլխավոր
           </Link>
           <Link
             href={`/store/${slug}/products`}
             className="px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-stone-500 hover:text-stone-900"
           >
-            Products
+            Ապրանքներ
           </Link>
           {categories.slice(0, 4).map((cat) => (
             <Link
@@ -100,7 +100,7 @@ export function StoreHeader({ store, categories, slug, isPreview }: StoreHeaderP
             onClick={() => !isPreview && setCartOpen(true)}
             className="px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-stone-500 hover:text-stone-900"
           >
-            BAG ({cartCount})
+            ՊԱՅՈՒՍԱԿ ({cartCount})
           </button>
         </nav>
 
@@ -116,7 +116,7 @@ export function StoreHeader({ store, categories, slug, isPreview }: StoreHeaderP
             onClick={() => !isPreview && setCartOpen(true)}
             className="text-xs font-semibold uppercase tracking-widest text-stone-600"
           >
-            BAG ({cartCount})
+            ՊԱՅՈՒՍԱԿ ({cartCount})
           </button>
         </div>
 

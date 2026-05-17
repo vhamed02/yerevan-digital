@@ -74,12 +74,12 @@ export function StoreHome({
         {featuredProducts.length > 0 && (
           <section className="mb-10">
             <div className="mb-5 flex items-center justify-between">
-              <h2 className="text-lg font-bold text-gray-900">Featured Products</h2>
+              <h2 className="text-lg font-bold text-gray-900">Ուշագրավ ապրանքներ</h2>
               <Link
                 href={`/store/${slug}/products?featured=1`}
                 className="text-sm text-gray-500 hover:text-gray-700"
               >
-                View all →
+                Տեսնել բոլորը →
               </Link>
             </div>
             <ProductGrid products={featuredProducts} storeSlug={slug} isPreview={isPreview} />
@@ -89,13 +89,13 @@ export function StoreHome({
         <section>
           <div className="mb-5 flex items-center justify-between">
             <h2 className="text-lg font-bold text-gray-900">
-              {featuredProducts.length > 0 ? 'All Products' : 'Products'}
+              {featuredProducts.length > 0 ? 'Բոլոր ապրանքները' : 'Ապրանքներ'}
             </h2>
             <Link
               href={`/store/${slug}/products`}
               className="text-sm text-gray-500 hover:text-gray-700"
             >
-              View all →
+              Տեսնել բոլորը →
             </Link>
           </div>
           <ProductGrid products={products} storeSlug={slug} isPreview={isPreview} />

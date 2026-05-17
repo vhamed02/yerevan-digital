@@ -10,22 +10,22 @@ import api from '@/lib/api'
 import type { CheckoutFormProps } from '../types'
 
 const GATEWAY_META: Record<string, { label: string; badge: string; color: string }> = {
-  idram:     { label: 'Pay with Idram',    badge: 'iDram',  color: '#E8001C' },
-  inecobank: { label: 'Inecobank Transfer', badge: 'Ineco',  color: '#004B87' },
-  telcell:   { label: 'Pay with Telcell',  badge: 'Tcell',  color: '#FF6B00' },
-  ameria:    { label: 'Ameria Bank',       badge: 'Ameria', color: '#003DA5' },
+  idram:     { label: 'Վճարել iDram-ով',    badge: 'iDram',  color: '#E8001C' },
+  inecobank: { label: 'Inecobank փոխանցում', badge: 'Ineco',  color: '#004B87' },
+  telcell:   { label: 'Վճարել Telcell-ով',  badge: 'Tcell',  color: '#FF6B00' },
+  ameria:    { label: 'Ամերիա Բանկ',        badge: 'Ameria', color: '#003DA5' },
 }
 
 const schema = z.object({
-  full_name:      z.string().min(2, 'Required'),
-  email:          z.string().email('Invalid email'),
+  full_name:      z.string().min(2, 'Պարտադիր'),
+  email:          z.string().email('Անվավեր էլ. փոստ'),
   phone:          z.string().optional(),
-  address:        z.string().min(5, 'Required'),
-  city:           z.string().min(2, 'Required'),
+  address:        z.string().min(5, 'Պարտադիր'),
+  city:           z.string().min(2, 'Պարտադիր'),
   postal_code:    z.string().optional(),
-  country:        z.string().min(2, 'Required'),
+  country:        z.string().min(2, 'Պարտադիր'),
   notes:          z.string().optional(),
-  payment_method: z.string().min(1, 'Select a payment method'),
+  payment_method: z.string().min(1, 'Ընտրեք վճարման եղանակ'),
 })
 
 type CheckoutData = z.infer<typeof schema>
@@ -51,7 +51,7 @@ export function CheckoutForm({ storeSlug, store }: CheckoutFormProps) {
   } = useForm<CheckoutData>({
     resolver: zodResolver(schema),
     defaultValues: {
-      country:        'Armenia',
+      country:        'Հայաստան',
       payment_method: gateways[0] ?? '',
     },
   })
@@ -100,26 +100,26 @@ export function CheckoutForm({ storeSlug, store }: CheckoutFormProps) {
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
-      <h1 className="mb-8 text-2xl font-bold text-gray-900">Checkout</h1>
+      <h1 className="mb-8 text-2xl font-bold text-gray-900">Վճարում</h1>
 
       <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_380px]">
         <div className="flex flex-col gap-6">
           <section>
-            <h2 className="mb-4 text-base font-semibold text-gray-900">Customer Info</h2>
+            <h2 className="mb-4 text-base font-semibold text-gray-900">Հաճախորդի տվյալներ</h2>
             <div className="flex flex-col gap-4">
               <div>
-                <label className={labelCls}>Full Name</label>
-                <input {...register('full_name')} className={inputCls} placeholder="Anna Grigoryan" />
+                <label className={labelCls}>Անուն Ազգանուն</label>
+                <input {...register('full_name')} className={inputCls} placeholder="Աննա Գրիգորյան" />
                 {errors.full_name && <p className={errorCls}>{errors.full_name.message}</p>}
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className={labelCls}>Email</label>
+                  <label className={labelCls}>Էլ. փոստ</label>
                   <input {...register('email')} type="email" className={inputCls} placeholder="anna@example.com" />
                   {errors.email && <p className={errorCls}>{errors.email.message}</p>}
                 </div>
                 <div>
-                  <label className={labelCls}>Phone</label>
+                  <label className={labelCls}>Հեռախոս</label>
                   <input {...register('phone')} type="tel" className={inputCls} placeholder="+374 91 000000" />
                   {errors.phone && <p className={errorCls}>{errors.phone.message}</p>}
                 </div>
@@ -128,46 +128,46 @@ export function CheckoutForm({ storeSlug, store }: CheckoutFormProps) {
           </section>
 
           <section>
-            <h2 className="mb-4 text-base font-semibold text-gray-900">Delivery Address</h2>
+            <h2 className="mb-4 text-base font-semibold text-gray-900">Առաքման հասցե</h2>
             <div className="flex flex-col gap-4">
               <div>
-                <label className={labelCls}>Street Address</label>
-                <input {...register('address')} className={inputCls} placeholder="Baghramyan Ave 1" />
+                <label className={labelCls}>Փողոց, տուն</label>
+                <input {...register('address')} className={inputCls} placeholder="Բաղրամյան 1" />
                 {errors.address && <p className={errorCls}>{errors.address.message}</p>}
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className={labelCls}>City</label>
-                  <input {...register('city')} className={inputCls} placeholder="Yerevan" />
+                  <label className={labelCls}>Քաղաք</label>
+                  <input {...register('city')} className={inputCls} placeholder="Երևան" />
                   {errors.city && <p className={errorCls}>{errors.city.message}</p>}
                 </div>
                 <div>
-                  <label className={labelCls}>Postal Code</label>
+                  <label className={labelCls}>Փոստային կոդ</label>
                   <input {...register('postal_code')} className={inputCls} placeholder="0001" />
                 </div>
               </div>
               <div>
-                <label className={labelCls}>Country</label>
+                <label className={labelCls}>Երկիր</label>
                 <input {...register('country')} className={inputCls} />
               </div>
             </div>
           </section>
 
           <section>
-            <h2 className="mb-4 text-base font-semibold text-gray-900">Order Notes</h2>
+            <h2 className="mb-4 text-base font-semibold text-gray-900">Նշումներ</h2>
             <textarea
               {...register('notes')}
               rows={3}
               className="w-full resize-none rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
-              placeholder="Special delivery instructions..."
+              placeholder="Հատուկ ցուցումներ առաքման համար..."
             />
           </section>
 
           <section>
-            <h2 className="mb-4 text-base font-semibold text-gray-900">Payment Method</h2>
+            <h2 className="mb-4 text-base font-semibold text-gray-900">Վճարման եղանակ</h2>
             {gateways.length === 0 ? (
               <p className="rounded-xl border border-gray-100 bg-gray-50 px-4 py-5 text-sm text-gray-500">
-                No payment methods are available for this store yet.
+                Վճարման եղանակ դեռ հասանելի չէ։
               </p>
             ) : (
               <div className="flex flex-col gap-2">
@@ -215,7 +215,7 @@ export function CheckoutForm({ storeSlug, store }: CheckoutFormProps) {
 
         <div className="lg:sticky lg:top-4 lg:self-start">
           <div className="rounded-2xl border border-gray-100 bg-gray-50 p-6">
-            <h2 className="mb-4 text-base font-semibold text-gray-900">Order Summary</h2>
+            <h2 className="mb-4 text-base font-semibold text-gray-900">Պատվերի ամփոփում</h2>
 
             {!mounted ? (
               <div className="mb-4 space-y-3">
@@ -224,7 +224,7 @@ export function CheckoutForm({ storeSlug, store }: CheckoutFormProps) {
                 ))}
               </div>
             ) : items.length === 0 ? (
-              <p className="mb-4 text-sm text-gray-400">Your cart is empty.</p>
+              <p className="mb-4 text-sm text-gray-400">Ձեր զամբյուղը դատարկ է։</p>
             ) : (
               <ul className="mb-4 flex flex-col gap-3">
                 {items.map((item) => (
@@ -239,7 +239,7 @@ export function CheckoutForm({ storeSlug, store }: CheckoutFormProps) {
                       {item.variantName && (
                         <p className="text-xs text-gray-500">{item.variantName}</p>
                       )}
-                      <p className="text-xs text-gray-500">Qty {item.quantity}</p>
+                      <p className="text-xs text-gray-500">Քան. {item.quantity}</p>
                     </div>
                     <span className="whitespace-nowrap text-sm font-medium text-gray-900">
                       {(item.price * item.quantity).toLocaleString()} ֏
@@ -251,15 +251,15 @@ export function CheckoutForm({ storeSlug, store }: CheckoutFormProps) {
 
             <div className="border-t border-gray-200 pt-4">
               <div className="flex items-center justify-between text-sm text-gray-600">
-                <span>Subtotal</span>
+                <span>Ենթամիջ</span>
                 <span>{total.toLocaleString()} ֏</span>
               </div>
               <div className="mt-1 flex items-center justify-between text-sm text-gray-600">
-                <span>Shipping</span>
-                <span className="text-green-600">Free</span>
+                <span>Առաքում</span>
+                <span className="text-green-600">Անվճար</span>
               </div>
               <div className="mt-3 flex items-center justify-between text-base font-bold text-gray-900">
-                <span>Total</span>
+                <span>Ընդամենը</span>
                 <span>{total.toLocaleString()} ֏</span>
               </div>
             </div>
@@ -275,7 +275,7 @@ export function CheckoutForm({ storeSlug, store }: CheckoutFormProps) {
               disabled={isSubmitting || !mounted || items.length === 0 || gateways.length === 0}
               className="mt-4 w-full rounded-xl bg-gray-900 px-4 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {isSubmitting ? 'Processing…' : 'Place Order & Pay →'}
+              {isSubmitting ? 'Մշակվում է...' : 'Պատվիրել և վճարել →'}
             </button>
           </div>
         </div>

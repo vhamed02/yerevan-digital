@@ -36,7 +36,7 @@ export function StoreHome({
           className="mt-8 inline-flex items-center gap-2 rounded-none border-2 border-white bg-transparent px-8 py-3 text-sm font-extrabold uppercase tracking-widest text-white hover:bg-white transition-colors"
           style={{ '--hover-text': primary } as React.CSSProperties}
         >
-          Shop Now →
+          Գնել →
         </Link>
       </div>
 
@@ -62,12 +62,12 @@ export function StoreHome({
         {featuredProducts.length > 0 && (
           <section className="mb-12">
             <div className="mb-6 flex items-center justify-between border-b-4 border-gray-900 pb-3">
-              <h2 className="text-lg font-extrabold uppercase tracking-widest text-gray-900">New Arrivals</h2>
+              <h2 className="text-lg font-extrabold uppercase tracking-widest text-gray-900">Նոր ժամանումներ</h2>
               <Link
                 href={`/store/${slug}/products`}
                 className="text-xs font-extrabold uppercase tracking-widest text-gray-500 hover:text-gray-900"
               >
-                View All →
+                Տեսնել բոլորը →
               </Link>
             </div>
             <div className="flex gap-4 overflow-x-auto pb-2">
@@ -82,7 +82,7 @@ export function StoreHome({
 
         <section>
           <div className="mb-6 flex items-center justify-between border-b-4 border-gray-900 pb-3">
-            <h2 className="text-lg font-extrabold uppercase tracking-widest text-gray-900">All Products</h2>
+            <h2 className="text-lg font-extrabold uppercase tracking-widest text-gray-900">Բոլոր ապրանքները</h2>
           </div>
           <ProductGrid products={products} storeSlug={slug} isPreview={isPreview} />
         </section>

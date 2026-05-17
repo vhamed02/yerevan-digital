@@ -32,7 +32,7 @@ export function StoreHome({
         <div className="relative z-10 flex flex-col items-center px-6 text-center">
           <div className="bg-white/80 px-10 py-8 backdrop-blur-sm">
             <p className="mb-2 text-xs font-semibold uppercase tracking-[0.3em] text-stone-500">
-              Welcome to
+              Բարի գալուստ
             </p>
             <h1
               className="text-4xl font-bold text-stone-900 sm:text-6xl"
@@ -49,7 +49,7 @@ export function StoreHome({
               href={`/store/${slug}/products`}
               className="mt-6 inline-block border-b-2 border-stone-900 pb-0.5 text-xs font-semibold uppercase tracking-widest text-stone-900 hover:border-stone-600 hover:text-stone-600 transition-colors"
             >
-              Explore Collection
+              Ուսումնասիրել
             </Link>
           </div>
         </div>
@@ -62,7 +62,7 @@ export function StoreHome({
               className="mb-8 text-center text-2xl font-bold text-stone-800 sm:text-3xl"
               style={{ fontFamily: 'Georgia, "Playfair Display", serif' }}
             >
-              Our Collection
+              Մեր հավաքածուն
             </h2>
             <div className="grid grid-cols-1 gap-12 sm:grid-cols-2">
               {featuredProducts.slice(0, 4).map((product, i) => (
@@ -101,7 +101,7 @@ export function StoreHome({
                       href={`/store/${slug}/products/${product.slug}`}
                       className="mt-4 inline-block border-b border-stone-900 pb-0.5 text-xs font-semibold uppercase tracking-widest text-stone-900 hover:border-stone-500 transition-colors"
                     >
-                      View Details
+                      Տեսնել
                     </Link>
                   </div>
                 </div>
@@ -115,7 +115,7 @@ export function StoreHome({
             className="mb-8 text-center text-2xl font-bold text-stone-800 sm:text-3xl"
             style={{ fontFamily: 'Georgia, "Playfair Display", serif' }}
           >
-            {featuredProducts.length > 0 ? 'More Products' : 'Our Products'}
+            {featuredProducts.length > 0 ? 'Ավելի ապրանքներ' : 'Մեր ապրանքները'}
           </h2>
           <ProductGrid products={products} storeSlug={slug} isPreview={isPreview} />
           {products.length >= 12 && (
@@ -124,7 +124,7 @@ export function StoreHome({
                 href={`/store/${slug}/products`}
                 className="inline-block border-b-2 border-stone-900 pb-0.5 text-xs font-semibold uppercase tracking-widest text-stone-900 hover:border-stone-500 transition-colors"
               >
-                View All Products
+                Տեսնել բոլոր ապրանքները
               </Link>
             </div>
           )}

@@ -7,7 +7,7 @@ export function ProductGrid({ products, storeSlug, isPreview }: ProductGridProps
   if (products.length === 0) {
     return (
       <div className="py-16 text-center text-gray-400">
-        <p className="text-lg font-bold uppercase tracking-widest">No products found</p>
+        <p className="text-lg font-bold uppercase tracking-widest">Ապրանք չի գտնվել</p>
       </div>
     )
   }

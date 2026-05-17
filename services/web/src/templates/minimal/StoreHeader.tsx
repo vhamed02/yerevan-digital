@@ -48,7 +48,7 @@ export function StoreHeader({ store, categories, slug, isPreview }: StoreHeaderP
               href={`/store/${slug}/products`}
               className="rounded-md px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900"
             >
-              All Products
+              Բոլոր ապրանքները
             </Link>
             {categories.slice(0, 5).map((cat) => (
               <Link
@@ -99,7 +99,7 @@ export function StoreHeader({ store, categories, slug, isPreview }: StoreHeaderP
                 onClick={() => setMobileMenuOpen(false)}
                 className="rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
               >
-                All Products
+                Բոլոր ապրանքները
               </Link>
               {categories.map((cat) => (
                 <Link

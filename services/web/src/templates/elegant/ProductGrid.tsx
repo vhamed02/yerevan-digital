@@ -11,7 +11,7 @@ export function ProductGrid({ products, storeSlug, isPreview }: ProductGridProps
           className="text-lg font-semibold"
           style={{ fontFamily: 'Georgia, serif' }}
         >
-          No products found
+          Ապրանք չի գտնվել
         </p>
       </div>
     )

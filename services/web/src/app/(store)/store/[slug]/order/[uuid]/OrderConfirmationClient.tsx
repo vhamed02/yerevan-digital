@@ -92,11 +92,8 @@ export function OrderConfirmationClient({ order, storeSlug }: Props) {
         </div>
 
         <h1 className="mb-2 text-2xl font-bold text-gray-900 sm:text-3xl">
-          Order Placed!
-        </h1>
-        <p className="text-lg font-semibold text-gray-700 sm:text-xl mb-1">
           Ձեր Պատվերն Ընդունվեց
-        </p>
+        </h1>
 
         {order ? (
           <>
@@ -104,13 +101,13 @@ export function OrderConfirmationClient({ order, storeSlug }: Props) {
               #{order.order_number}
             </p>
             <p className="mb-6 text-sm text-gray-500">
-              An email confirmation has been sent to{' '}
-              <strong>{order.customer_email}</strong>
+              Հաստատման նամակ ուղարկվեց{' '}
+              <strong>{order.customer_email}</strong> հասցեին
             </p>
 
             <div className="mb-8 w-full max-w-sm rounded-2xl border border-gray-100 bg-gray-50 p-5 text-left">
               <p className="mb-3 text-xs font-bold uppercase tracking-widest text-gray-400">
-                Order Summary
+                Պատվերի ամփոփում
               </p>
               <ul className="mb-4 flex flex-col gap-2">
                 {order.items.map((item, i) => (
@@ -129,20 +126,20 @@ export function OrderConfirmationClient({ order, storeSlug }: Props) {
                 ))}
               </ul>
               <div className="flex items-center justify-between border-t border-gray-200 pt-3 font-bold text-gray-900">
-                <span>Total</span>
+                <span>Ընդամենը</span>
                 <span>{order.total.toLocaleString()} ֏</span>
               </div>
             </div>
           </>
         ) : (
-          <p className="mb-8 text-gray-500">Your order has been received.</p>
+          <p className="mb-8 text-gray-500">Ձեր պատվերն ընդունվեց։</p>
         )}
 
         <Link
           href={`/store/${storeSlug}`}
           className="rounded-xl bg-gray-900 px-8 py-3 text-sm font-semibold text-white hover:bg-gray-800 transition-colors"
         >
-          Continue Shopping
+          Շարունակել գնումները
         </Link>
       </div>
     </div>

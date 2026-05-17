@@ -22,14 +22,10 @@ export default async function CheckoutFailedPage({
       </div>
 
       <h1 className="mb-2 text-2xl font-bold text-gray-900 sm:text-3xl">
-        Payment Failed
-      </h1>
-      <p className="mb-1 text-lg font-semibold text-gray-700">
         Վճարումը Չհաջողվեց
-      </p>
+      </h1>
       <p className="mb-8 mt-2 max-w-sm text-sm text-gray-500">
-        Your payment was not completed. Your cart is still saved — you can try
-        again or choose a different payment method.
+        Վճարումը չի կատարվել։ Ձեր զամբյուղը պահպանված է — կարող եք կրկին փորձել կամ ընտրել վճարման այլ եղանակ։
       </p>
 
       <div className="flex flex-wrap justify-center gap-3">
@@ -37,13 +33,13 @@ export default async function CheckoutFailedPage({
           href={`/store/${slug}/cart`}
           className="rounded-xl bg-gray-900 px-6 py-3 text-sm font-semibold text-white hover:bg-gray-800 transition-colors"
         >
-          Back to Cart
+          Վերադառնալ զամբյուղ
         </Link>
         <Link
           href={`/store/${slug}`}
           className="rounded-xl border border-gray-200 px-6 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
         >
-          Continue Shopping
+          Շարունակել գնումները
         </Link>
       </div>
     </div>

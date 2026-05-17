@@ -48,11 +48,11 @@ export function ProductCard({ product, storeSlug, isPreview }: ProductCardProps)
             >
               {added ? (
                 <>
-                  <Check className="h-3.5 w-3.5" /> Added
+                  <Check className="h-3.5 w-3.5" /> Ավելացվեց
                 </>
               ) : (
                 <>
-                  <ShoppingBag className="h-3.5 w-3.5" /> Quick Add
+                  <ShoppingBag className="h-3.5 w-3.5" /> Ավելացնել
                 </>
               )}
             </button>
