@@ -37,21 +37,27 @@ Deploy SSH key: `/home/deploy/.ssh/github_deploy`
 
 ## Recurring bugs / known pitfalls
 
-### 1. `unwrap()` double-envelope bug (frontend)
+### 1. Double-envelope bug (frontend — both SSR and client)
 
-`server-api.ts` `unwrap()` already strips the `{ success, data }` API envelope. If you type `serverAuthGet<{ data: T }>` and then access `.data`, you always get `undefined`.
+**`server-api.ts`** `unwrap()` strips the `{ success, data }` envelope for SSR calls.  
+**`lib/api.ts`** response interceptor does the same for client-side `api.post/get` calls.
 
-**Rule:** Always type the inner payload directly:
+Both mean `response.data` is already the inner payload — never add an extra `.data`.
+
 ```ts
-// CORRECT
+// CORRECT — server-side
 const product = await serverAuthGet<SellerProduct>(`/seller/products/${uuid}`)
 
-// WRONG — .data will be undefined
-const res = await serverAuthGet<{ data: SellerProduct }>(`/seller/products/${uuid}`)
-const product = res?.data
+// CORRECT — client-side
+const res = await api.post<{ uuid: string }>('/store/x/checkout', body)
+const uuid = res.data.uuid          // res.data IS the payload
+
+// WRONG in both cases — .data will be undefined
+const res = await api.post<{ data: { uuid: string } }>('/store/x/checkout', body)
+const uuid = res.data.data.uuid     // data.data is undefined
 ```
 
-Paginated responses return `{ data: T[], meta: {...} }` directly from `unwrap()` — type it as such.
+Paginated responses return `{ data: T[], meta: {...} }` directly — type it as such.
 
 ### 2. Redis serialization bug (backend)
 
