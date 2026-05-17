@@ -1,5 +1,4 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
 import { serverGet } from '@/lib/server-api'
 import type { StorefrontOrder } from '@/types'
 import { OrderConfirmationClient } from './OrderConfirmationClient'
@@ -7,7 +6,7 @@ import { OrderConfirmationClient } from './OrderConfirmationClient'
 export const dynamic = 'force-dynamic'
 
 export async function generateMetadata(): Promise<Metadata> {
-  return { title: 'Order Confirmed | Vendora' }
+  return { title: 'Order Status | Vendora' }
 }
 
 export default async function OrderConfirmationPage({

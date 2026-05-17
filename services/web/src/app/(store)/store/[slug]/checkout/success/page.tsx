@@ -27,7 +27,7 @@ export default async function CheckoutSuccessPage({
   return (
     <>
       <CartClearer storeSlug={slug} />
-      <OrderConfirmationClient order={order} storeSlug={slug} />
+      <OrderConfirmationClient order={order} storeSlug={slug} isNew />
     </>
   )
 }

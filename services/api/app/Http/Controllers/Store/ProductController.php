@@ -22,11 +22,13 @@ class ProductController extends Controller
         $sort     = $request->input('sort', 'newest');
         $search   = $request->input('search');
         $featured = $request->boolean('featured');
+        $minPrice = $request->input('min_price') !== null ? (float) $request->input('min_price') : null;
+        $maxPrice = $request->input('max_price') !== null ? (float) $request->input('max_price') : null;
 
-        $queryHash = md5(json_encode(compact('category', 'sort', 'search', 'featured', 'perPage', 'page')));
+        $queryHash = md5(json_encode(compact('category', 'sort', 'search', 'featured', 'minPrice', 'maxPrice', 'perPage', 'page')));
         $cacheKey  = "store:{$slug}:products:{$queryHash}";
 
-        $payload = Cache::remember($cacheKey, 120, function () use ($store, $perPage, $page, $category, $sort, $search, $featured) {
+        $payload = Cache::remember($cacheKey, 120, function () use ($store, $perPage, $page, $category, $sort, $search, $featured, $minPrice, $maxPrice) {
             $query = Product::where('store_id', $store->id)
                 ->where('status', ProductStatus::Active)
                 ->with(['images', 'category'])
@@ -35,7 +37,9 @@ class ProductController extends Controller
                     $q->where('name->en', 'like', "%{$search}%")
                       ->orWhere('name->hy', 'like', "%{$search}%");
                 }))
-                ->when($featured, fn($q) => $q->where('is_featured', true));
+                ->when($featured, fn($q) => $q->where('is_featured', true))
+                ->when($minPrice !== null, fn($q) => $q->where('price', '>=', $minPrice))
+                ->when($maxPrice !== null, fn($q) => $q->where('price', '<=', $maxPrice));
 
             $query = match ($sort) {
                 'price_asc'  => $query->orderBy('price'),
