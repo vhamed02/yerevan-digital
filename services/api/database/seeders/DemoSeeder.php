@@ -173,7 +173,18 @@ class DemoSeeder extends Seeder
 
     // ─── Product catalogues ────────────────────────────────────────────────────
 
-    private function electronicsProducts(): array
+    private function img(string $kw, int $a, int $b): array
+    {
+        $make = fn(int $lock) => [
+            "https://loremflickr.com/800/600/{$kw}?lock={$lock}",
+            "https://loremflickr.com/200/200/{$kw}?lock={$lock}",
+            "https://loremflickr.com/400/400/{$kw}?lock={$lock}",
+            "https://loremflickr.com/800/800/{$kw}?lock={$lock}",
+        ];
+        return [$make($a), $make($b)];
+    }
+
+        private function electronicsProducts(): array
     {
         return [
             [
@@ -183,6 +194,7 @@ class DemoSeeder extends Seeder
                 'compare_price' => 109900,
                 'stock'       => 12,
                 'sku'         => 'SONY-WH1000XM5',
+                'images'      => $this->img('headphones', 1, 2),
                 'is_featured' => true,
                 'variants'    => [
                     ['name' => ['hy' => 'Սև', 'en' => 'Black'], 'price' => 89900, 'stock' => 7, 'attributes' => ['color' => 'Black']],
@@ -196,6 +208,7 @@ class DemoSeeder extends Seeder
                 'compare_price' => 139900,
                 'stock'       => 20,
                 'sku'         => 'APPLE-AIRPODSPRO2',
+                'images'      => $this->img('earphones', 3, 4),
                 'is_featured' => true,
                 'variants'    => [],
             ],
@@ -206,6 +219,7 @@ class DemoSeeder extends Seeder
                 'compare_price' => null,
                 'stock'       => 5,
                 'sku'         => 'SAM-65QLED4K',
+                'images'      => $this->img('television', 5, 6),
                 'is_featured' => true,
                 'variants'    => [],
             ],
@@ -216,6 +230,7 @@ class DemoSeeder extends Seeder
                 'compare_price' => 39900,
                 'stock'       => 30,
                 'sku'         => 'LOGI-MXM3S',
+                'images'      => $this->img('computer,mouse', 7, 8),
                 'is_featured' => false,
                 'variants'    => [
                     ['name' => ['hy' => 'Գրաֆիտ', 'en' => 'Graphite'], 'price' => 34900, 'stock' => 18, 'attributes' => ['color' => 'Graphite']],
@@ -229,6 +244,7 @@ class DemoSeeder extends Seeder
                 'compare_price' => 22900,
                 'stock'       => 50,
                 'sku'         => 'ANKER-65WGAN',
+                'images'      => $this->img('usb,charger', 9, 10),
                 'is_featured' => false,
                 'variants'    => [],
             ],
@@ -239,6 +255,7 @@ class DemoSeeder extends Seeder
                 'compare_price' => null,
                 'stock'       => 8,
                 'sku'         => 'APPLE-IPADAIRM2',
+                'images'      => $this->img('tablet,ipad', 11, 12),
                 'is_featured' => false,
                 'variants'    => [
                     ['name' => ['hy' => 'Կապույտ / 128GB', 'en' => 'Blue / 128GB'], 'price' => 279900, 'stock' => 3, 'attributes' => ['color' => 'Blue', 'storage' => '128GB']],
@@ -253,6 +270,7 @@ class DemoSeeder extends Seeder
                 'compare_price' => 29900,
                 'stock'       => 25,
                 'sku'         => 'WD-EL2TB',
+                'images'      => $this->img('hard,drive', 13, 14),
                 'is_featured' => false,
                 'variants'    => [],
             ],
@@ -263,6 +281,7 @@ class DemoSeeder extends Seeder
                 'compare_price' => 179900,
                 'stock'       => 15,
                 'sku'         => 'XIAO-RN13PRO5G',
+                'images'      => $this->img('smartphone', 15, 16),
                 'is_featured' => false,
                 'variants'    => [
                     ['name' => ['hy' => 'Սև / 256GB', 'en' => 'Black / 256GB'], 'price' => 159900, 'stock' => 8, 'attributes' => ['color' => 'Black', 'storage' => '256GB']],
@@ -276,6 +295,7 @@ class DemoSeeder extends Seeder
                 'compare_price' => null,
                 'stock'       => 10,
                 'sku'         => 'TPL-DECOXE75',
+                'images'      => $this->img('wifi,router', 17, 18),
                 'is_featured' => false,
                 'variants'    => [],
             ],
@@ -292,6 +312,7 @@ class DemoSeeder extends Seeder
                 'compare_price' => 15900,
                 'stock'       => 40,
                 'sku'         => 'AF-SHIRT-WHT',
+                'images'      => $this->img('white,shirt', 19, 20),
                 'is_featured' => true,
                 'variants'    => [
                     ['name' => ['hy' => 'S', 'en' => 'S'], 'price' => 12900, 'stock' => 10, 'attributes' => ['size' => 'S']],
@@ -307,6 +328,7 @@ class DemoSeeder extends Seeder
                 'compare_price' => 24900,
                 'stock'       => 30,
                 'sku'         => 'AF-JEAN-SLM',
+                'images'      => $this->img('denim,jeans', 21, 22),
                 'is_featured' => true,
                 'variants'    => [
                     ['name' => ['hy' => '28', 'en' => 'W28'], 'price' => 18900, 'stock' => 5, 'attributes' => ['waist' => '28']],
@@ -322,6 +344,7 @@ class DemoSeeder extends Seeder
                 'compare_price' => 89900,
                 'stock'       => 15,
                 'sku'         => 'AF-LJKT-CAS',
+                'images'      => $this->img('leather,jacket', 23, 24),
                 'is_featured' => true,
                 'variants'    => [
                     ['name' => ['hy' => 'S / Սev', 'en' => 'S / Black'], 'price' => 69900, 'stock' => 3, 'attributes' => ['size' => 'S', 'color' => 'Black']],
@@ -337,6 +360,7 @@ class DemoSeeder extends Seeder
                 'compare_price' => null,
                 'stock'       => 25,
                 'sku'         => 'AF-DRSS-FLR',
+                'images'      => $this->img('floral,dress', 25, 26),
                 'is_featured' => false,
                 'variants'    => [
                     ['name' => ['hy' => 'XS', 'en' => 'XS'], 'price' => 22900, 'stock' => 5, 'attributes' => ['size' => 'XS']],
@@ -352,6 +376,7 @@ class DemoSeeder extends Seeder
                 'compare_price' => 62900,
                 'stock'       => 20,
                 'sku'         => 'AF-SWTR-CSH',
+                'images'      => $this->img('cashmere,sweater', 27, 28),
                 'is_featured' => false,
                 'variants'    => [
                     ['name' => ['hy' => 'S / Khaki', 'en' => 'S / Khaki'], 'price' => 49900, 'stock' => 5, 'attributes' => ['size' => 'S', 'color' => 'Khaki']],
@@ -367,6 +392,7 @@ class DemoSeeder extends Seeder
                 'compare_price' => null,
                 'stock'       => 60,
                 'sku'         => 'AF-TSHRT-ORM',
+                'images'      => $this->img('tshirt', 29, 30),
                 'is_featured' => false,
                 'variants'    => [
                     ['name' => ['hy' => 'S / Sev', 'en' => 'S / Black'], 'price' => 8900, 'stock' => 15, 'attributes' => ['size' => 'S', 'color' => 'Black']],
@@ -382,6 +408,7 @@ class DemoSeeder extends Seeder
                 'compare_price' => 39900,
                 'stock'       => 18,
                 'sku'         => 'AF-BAG-EVECLCH',
+                'images'      => $this->img('clutch,bag', 31, 32),
                 'is_featured' => false,
                 'variants'    => [
                     ['name' => ['hy' => 'Ոskeguy', 'en' => 'Gold'], 'price' => 32900, 'stock' => 9, 'attributes' => ['color' => 'Gold']],
@@ -395,6 +422,7 @@ class DemoSeeder extends Seeder
                 'compare_price' => 36900,
                 'stock'       => 35,
                 'sku'         => 'AF-JOG-SET2P',
+                'images'      => $this->img('tracksuit', 33, 34),
                 'is_featured' => false,
                 'variants'    => [
                     ['name' => ['hy' => 'S / Kheghj', 'en' => 'S / Grey'], 'price' => 29900, 'stock' => 8, 'attributes' => ['size' => 'S', 'color' => 'Grey']],
@@ -416,6 +444,7 @@ class DemoSeeder extends Seeder
                 'compare_price' => null,
                 'stock'       => 80,
                 'sku'         => 'AF-HONEY-1KG',
+                'images'      => $this->img('honey,jar', 35, 36),
                 'is_featured' => true,
                 'variants'    => [
                     ['name' => ['hy' => '500g', 'en' => '500g'], 'price' => 2700, 'stock' => 40, 'attributes' => ['weight' => '500g']],
@@ -430,6 +459,7 @@ class DemoSeeder extends Seeder
                 'compare_price' => null,
                 'stock'       => 100,
                 'sku'         => 'AF-COFFEE-ARB',
+                'images'      => $this->img('coffee,beans', 37, 38),
                 'is_featured' => true,
                 'variants'    => [
                     ['name' => ['hy' => '250g', 'en' => '250g'], 'price' => 2200, 'stock' => 50, 'attributes' => ['weight' => '250g']],
@@ -444,6 +474,7 @@ class DemoSeeder extends Seeder
                 'compare_price' => null,
                 'stock'       => 40,
                 'sku'         => 'AF-ARARAT10-500',
+                'images'      => $this->img('brandy,bottle', 39, 40),
                 'is_featured' => true,
                 'variants'    => [],
             ],
@@ -454,6 +485,7 @@ class DemoSeeder extends Seeder
                 'compare_price' => 5400,
                 'stock'       => 60,
                 'sku'         => 'AF-JAM-SET3',
+                'images'      => $this->img('fruit,jam', 41, 42),
                 'is_featured' => false,
                 'variants'    => [],
             ],
@@ -464,6 +496,7 @@ class DemoSeeder extends Seeder
                 'compare_price' => null,
                 'stock'       => 200,
                 'sku'         => 'AF-WATER-6PK',
+                'images'      => $this->img('mineral,water', 43, 44),
                 'is_featured' => false,
                 'variants'    => [],
             ],
@@ -474,6 +507,7 @@ class DemoSeeder extends Seeder
                 'compare_price' => 8500,
                 'stock'       => 45,
                 'sku'         => 'AF-OLIVE-500',
+                'images'      => $this->img('olive,oil', 45, 46),
                 'is_featured' => false,
                 'variants'    => [],
             ],
@@ -484,6 +518,7 @@ class DemoSeeder extends Seeder
                 'compare_price' => null,
                 'stock'       => 70,
                 'sku'         => 'AF-NUTS-400G',
+                'images'      => $this->img('mixed,nuts', 47, 48),
                 'is_featured' => false,
                 'variants'    => [
                     ['name' => ['hy' => '200g', 'en' => '200g'], 'price' => 3200, 'stock' => 35, 'attributes' => ['weight' => '200g']],
@@ -498,6 +533,7 @@ class DemoSeeder extends Seeder
                 'compare_price' => null,
                 'stock'       => 30,
                 'sku'         => 'AF-BSTURMA-200',
+                'images'      => $this->img('charcuterie', 49, 50),
                 'is_featured' => false,
                 'variants'    => [],
             ],
@@ -514,6 +550,7 @@ class DemoSeeder extends Seeder
                 'compare_price' => 15900,
                 'stock'       => 50,
                 'sku'         => 'SB-FCREAM-ROSE',
+                'images'      => $this->img('face,cream', 51, 52),
                 'is_featured' => true,
                 'variants'    => [],
             ],
@@ -524,6 +561,7 @@ class DemoSeeder extends Seeder
                 'compare_price' => null,
                 'stock'       => 60,
                 'sku'         => 'SB-BLOTION-LAV',
+                'images'      => $this->img('body,lotion', 53, 54),
                 'is_featured' => true,
                 'variants'    => [],
             ],
@@ -534,6 +572,7 @@ class DemoSeeder extends Seeder
                 'compare_price' => 14900,
                 'stock'       => 45,
                 'sku'         => 'SB-HAIR-ARGSET',
+                'images'      => $this->img('shampoo,bottle', 55, 56),
                 'is_featured' => false,
                 'variants'    => [],
             ],
@@ -544,6 +583,7 @@ class DemoSeeder extends Seeder
                 'compare_price' => 10900,
                 'stock'       => 55,
                 'sku'         => 'SB-MASK-CHAR',
+                'images'      => $this->img('face,mask', 57, 58),
                 'is_featured' => false,
                 'variants'    => [],
             ],
@@ -554,6 +594,7 @@ class DemoSeeder extends Seeder
                 'compare_price' => null,
                 'stock'       => 40,
                 'sku'         => 'SB-SUN-SPF50',
+                'images'      => $this->img('sunscreen', 59, 60),
                 'is_featured' => false,
                 'variants'    => [],
             ],
@@ -564,6 +605,7 @@ class DemoSeeder extends Seeder
                 'compare_price' => null,
                 'stock'       => 80,
                 'sku'         => 'SB-LIP-SET3',
+                'images'      => $this->img('lipbalm', 61, 62),
                 'is_featured' => false,
                 'variants'    => [],
             ],
@@ -574,6 +616,7 @@ class DemoSeeder extends Seeder
                 'compare_price' => 21900,
                 'stock'       => 35,
                 'sku'         => 'SB-SRM-HYAL',
+                'images'      => $this->img('skincare,serum', 63, 64),
                 'is_featured' => false,
                 'variants'    => [],
             ],
@@ -590,6 +633,7 @@ class DemoSeeder extends Seeder
                 'compare_price' => null,
                 'stock'       => 20,
                 'sku'         => 'AA-BOWL-SET4',
+                'images'      => $this->img('ceramic,bowl', 65, 66),
                 'is_featured' => true,
                 'variants'    => [
                     ['name' => ['hy' => 'Kargnil / 4-pack', 'en' => 'Blue / 4-pack'], 'price' => 24900, 'stock' => 10, 'attributes' => ['color' => 'Blue']],
@@ -603,6 +647,7 @@ class DemoSeeder extends Seeder
                 'compare_price' => null,
                 'stock'       => 8,
                 'sku'         => 'AA-RUG-6090',
+                'images'      => $this->img('woven,rug', 67, 68),
                 'is_featured' => true,
                 'variants'    => [],
             ],
@@ -613,6 +658,7 @@ class DemoSeeder extends Seeder
                 'compare_price' => 42900,
                 'stock'       => 12,
                 'sku'         => 'AA-KHACH-3040',
+                'images'      => $this->img('stone,carving', 69, 70),
                 'is_featured' => true,
                 'variants'    => [],
             ],
@@ -623,6 +669,7 @@ class DemoSeeder extends Seeder
                 'compare_price' => null,
                 'stock'       => 30,
                 'sku'         => 'AA-JRNL-SML',
+                'images'      => $this->img('leather,journal', 71, 72),
                 'is_featured' => false,
                 'variants'    => [
                     ['name' => ['hy' => 'Kzagni', 'en' => 'Brown'], 'price' => 12900, 'stock' => 15, 'attributes' => ['color' => 'Brown']],
@@ -636,6 +683,7 @@ class DemoSeeder extends Seeder
                 'compare_price' => 22900,
                 'stock'       => 25,
                 'sku'         => 'AA-CNDL-GFTSET',
+                'images'      => $this->img('beeswax,candle', 73, 74),
                 'is_featured' => false,
                 'variants'    => [],
             ],
@@ -646,6 +694,7 @@ class DemoSeeder extends Seeder
                 'compare_price' => null,
                 'stock'       => 40,
                 'sku'         => 'AA-MUG-CERM',
+                'images'      => $this->img('ceramic,mug', 75, 76),
                 'is_featured' => false,
                 'variants'    => [
                     ['name' => ['hy' => 'Kargnil', 'en' => 'Blue'], 'price' => 8900, 'stock' => 15, 'attributes' => ['color' => 'Blue']],
@@ -660,6 +709,7 @@ class DemoSeeder extends Seeder
                 'compare_price' => null,
                 'stock'       => 15,
                 'sku'         => 'AA-MACR-WALL',
+                'images'      => $this->img('macrame', 77, 78),
                 'is_featured' => false,
                 'variants'    => [],
             ],
@@ -676,6 +726,7 @@ class DemoSeeder extends Seeder
                 'compare_price' => 18900,
                 'stock'       => 60,
                 'sku'         => 'SM-NIKE-DFTEE',
+                'images'      => $this->img('running,shirt', 79, 80),
                 'is_featured' => true,
                 'variants'    => [
                     ['name' => ['hy' => 'S / Sev', 'en' => 'S / Black'], 'price' => 14900, 'stock' => 12, 'attributes' => ['size' => 'S', 'color' => 'Black']],
@@ -691,6 +742,7 @@ class DemoSeeder extends Seeder
                 'compare_price' => 109900,
                 'stock'       => 20,
                 'sku'         => 'SM-ADID-UB22',
+                'images'      => $this->img('running,shoes', 81, 82),
                 'is_featured' => true,
                 'variants'    => [
                     ['name' => ['hy' => '41', 'en' => 'EU 41'], 'price' => 89900, 'stock' => 4, 'attributes' => ['size' => 'EU 41']],
@@ -706,6 +758,7 @@ class DemoSeeder extends Seeder
                 'compare_price' => 15900,
                 'stock'       => 50,
                 'sku'         => 'SM-RESBND-SET5',
+                'images'      => $this->img('resistance,band', 83, 84),
                 'is_featured' => true,
                 'variants'    => [],
             ],
@@ -716,6 +769,7 @@ class DemoSeeder extends Seeder
                 'compare_price' => null,
                 'stock'       => 35,
                 'sku'         => 'SM-YOGA-6MM',
+                'images'      => $this->img('yoga,mat', 85, 86),
                 'is_featured' => false,
                 'variants'    => [
                     ['name' => ['hy' => 'Moryakaguyn', 'en' => 'Navy Blue'], 'price' => 16900, 'stock' => 15, 'attributes' => ['color' => 'Navy Blue']],
@@ -730,6 +784,7 @@ class DemoSeeder extends Seeder
                 'compare_price' => 149900,
                 'stock'       => 10,
                 'sku'         => 'SM-DUMBL-ADJ24',
+                'images'      => $this->img('dumbbell', 87, 88),
                 'is_featured' => false,
                 'variants'    => [],
             ],
@@ -740,6 +795,7 @@ class DemoSeeder extends Seeder
                 'compare_price' => null,
                 'stock'       => 80,
                 'sku'         => 'SM-SHKR-700',
+                'images'      => $this->img('protein,shaker', 89, 90),
                 'is_featured' => false,
                 'variants'    => [
                     ['name' => ['hy' => 'Sev', 'en' => 'Black'], 'price' => 3900, 'stock' => 30, 'attributes' => ['color' => 'Black']],
@@ -754,6 +810,7 @@ class DemoSeeder extends Seeder
                 'compare_price' => 17900,
                 'stock'       => 30,
                 'sku'         => 'SM-PULLUP-DOOR',
+                'images'      => $this->img('pullup', 91, 92),
                 'is_featured' => false,
                 'variants'    => [],
             ],
@@ -764,6 +821,7 @@ class DemoSeeder extends Seeder
                 'compare_price' => null,
                 'stock'       => 60,
                 'sku'         => 'SM-ROPE-SPD',
+                'images'      => $this->img('jump,rope', 93, 94),
                 'is_featured' => false,
                 'variants'    => [],
             ],
@@ -902,8 +960,20 @@ class DemoSeeder extends Seeder
                 ]
             );
 
-            if ($product->wasRecentlyCreated) {
-                // placeholder images (consistent per product via seed)
+            if (isset($def['images'])) {
+                ProductImage::where('product_id', $product->id)->delete();
+                foreach ($def['images'] as $j => [$orig, $thumb, $med, $lrg]) {
+                    ProductImage::create([
+                        'product_id'     => $product->id,
+                        'path_original'  => $orig,
+                        'path_thumbnail' => $thumb,
+                        'path_medium'    => $med,
+                        'path_large'     => $lrg,
+                        'sort_order'     => $j,
+                        'is_primary'     => $j === 0,
+                    ]);
+                }
+            } elseif ($product->wasRecentlyCreated) {
                 $seeds = ['a' . $i, 'b' . $i];
                 foreach ($seeds as $j => $seed) {
                     ProductImage::create([
@@ -916,7 +986,9 @@ class DemoSeeder extends Seeder
                         'is_primary'     => $j === 0,
                     ]);
                 }
+            }
 
+            if ($product->wasRecentlyCreated) {
                 foreach ($def['variants'] as $v) {
                     ProductVariant::create([
                         'product_id' => $product->id,
