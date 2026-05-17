@@ -26,7 +26,7 @@ class IdramGateway implements PaymentGatewayInterface
 
             return new PaymentInitiateResponse(
                 success: true,
-                redirectUrl: config('app.url') . '/api/v1/store/payments/sandbox/pay?transaction_id=' . $transactionUuid,
+                redirectUrl: url('/api/v1/store/payments/sandbox/pay?transaction_id=' . $transactionUuid),
                 paymentId: 'SANDBOX-' . Str::random(8),
                 errorMessage: null,
             );

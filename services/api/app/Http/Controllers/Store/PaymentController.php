@@ -62,7 +62,7 @@ class PaymentController extends Controller
             'initiated_at'       => now(),
         ]);
 
-        $frontendUrl = rtrim(config('services.frontend_url', config('app.url')), '/');
+        $frontendUrl = rtrim(env('FRONTEND_URL', config('app.url')), '/');
 
         $paymentRequest = new PaymentRequest(
             orderId: $order->uuid,
