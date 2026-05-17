@@ -58,7 +58,6 @@ export function CheckoutForm({ storeSlug }: CheckoutFormProps) {
       { order_uuid: uuid, payment_method: data.payment_method }
     )
 
-    clearCart()
     window.location.href = payRes.data.data.redirect_url
   }
 
