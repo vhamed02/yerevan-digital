@@ -66,7 +66,5 @@ $COMPOSE exec -T nginx nginx -s reload
 echo "Nginx reloaded."
 
 printf '\033[1;30;102m Deploy finished: %s \033[0m\n' "$(date -Iseconds)"
-_BG_COLORS=(41 42 43 44 45 46 101 102 104 105 106)
-_RAND_BG=${_BG_COLORS[$RANDOM % ${#_BG_COLORS[@]}]}
-printf "\033[1;97;${_RAND_BG}m %s \033[0m\n" "$(git log -1 --pretty='%h %s')"
+printf '\033[1;30;103m %s \033[0m\n' "$(git log -1 --pretty='%h %s')"
 echo "========================================"
