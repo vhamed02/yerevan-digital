@@ -41,8 +41,8 @@ function CaptchaWidget({ apiUrl, onToken }: { apiUrl: string; onToken: (token: s
     setAnswer('')
     const res = await fetch(`${apiUrl}/api/v1/captcha`)
     const json = await res.json()
-    setImg(json.data.image)
-    setRawToken(json.data.token)
+    setImg(json.image)
+    setRawToken(json.token)
     onToken('') // reset parent token on reload
   }, [apiUrl, onToken])
 
