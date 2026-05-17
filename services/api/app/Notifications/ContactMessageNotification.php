@@ -43,11 +43,8 @@ class ContactMessageNotification extends Notification implements ShouldQueue
         }
 
         $mail->line('---')
-             ->line($this->message);
-
-        if ($this->senderEmail) {
-            $mail->action('Reply by email', "mailto:{$this->senderEmail}");
-        }
+             ->line($this->message)
+             ->salutation(' ');
 
         return $mail;
     }
