@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin;
 use App\Http\Controllers\Seller;
 use App\Http\Controllers\Store;
 use App\Http\Controllers\HealthController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\PublicStoreController;
 use App\Http\Controllers\StatsController;
@@ -20,6 +21,7 @@ RateLimiter::for('api', fn($request) => Limit::perMinute(100)->by($request->ip()
 RateLimiter::for('auth', fn($request) => Limit::perMinute(5)->by($request->ip()));
 RateLimiter::for('checkout', fn($request) => Limit::perMinute(10)->by($request->ip()));
 RateLimiter::for('slug-check', fn($request) => Limit::perMinute(20)->by($request->ip()));
+RateLimiter::for('contact', fn($request) => Limit::perMinute(3)->by($request->ip()));
 
 Route::prefix('v1')->group(function () {
     Route::get('health', [HealthController::class, 'check']);
@@ -29,6 +31,7 @@ Route::prefix('v1')->group(function () {
     Route::get('stores/featured', [PublicStoreController::class, 'featured']);
     Route::get('stores/check-slug', [PublicStoreController::class, 'checkSlug'])->middleware('throttle:slug-check');
     Route::get('categories', [PublicStoreController::class, 'categories']);
+    Route::post('contact', [ContactController::class, 'send'])->middleware('throttle:contact');
 
     Route::prefix('auth')->group(function () {
         Route::post('register', [AuthController::class, 'register']);

@@ -54,7 +54,8 @@ return [
 
     'url' => env('APP_URL', 'http://localhost'),
 
-    'sandbox_mode' => env('SANDBOX_MODE', false),
+    'sandbox_mode'  => env('SANDBOX_MODE', false),
+    'contact_email' => env('CONTACT_EMAIL', 'support@vendora.am'),
 
     /*
     |--------------------------------------------------------------------------

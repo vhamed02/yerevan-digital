@@ -3,6 +3,7 @@ import { getLocale } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 import { serverGet } from '@/lib/server-api'
 import StaticPageContent from '@/components/website/StaticPageContent'
+import ContactForm from '@/components/website/ContactForm'
 import type { Page } from '@/types'
 
 export const revalidate = 3600
@@ -20,5 +21,13 @@ export default async function ContactPage() {
   const locale = await getLocale()
   const page = await serverGet<Page>('/pages/contact')
   if (!page) notFound()
-  return <StaticPageContent page={page} locale={locale} />
+
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? ''
+
+  return (
+    <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6 lg:px-8">
+      <StaticPageContent page={page} locale={locale} bare />
+      <ContactForm locale={locale} apiUrl={apiUrl} />
+    </div>
+  )
 }
