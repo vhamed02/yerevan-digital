@@ -217,7 +217,8 @@ export default function ProductForm({ product, categories }: ProductFormProps) {
         </div>
       </div>
 
-      <div className="flex gap-6 p-6">
+      <div className="mx-auto max-w-7xl w-full px-4 sm:px-6 lg:px-8">
+      <div className="flex gap-6 py-6">
         <div className="flex min-w-0 flex-1 flex-col gap-6">
           <section className="rounded-xl border border-border bg-surface p-5">
             <h2 className="mb-4 text-sm font-semibold text-content-primary">Basic Info</h2>
@@ -522,6 +523,7 @@ export default function ProductForm({ product, categories }: ProductFormProps) {
             </div>
           </div>
         </aside>
+      </div>
       </div>
     </>
   )
