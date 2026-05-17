@@ -112,7 +112,40 @@ interface OrderItem {
 }
 ```
 
-### 6. Auth store `updateStore()` / stale localStorage
+### 6. SQLite test compatibility (raw SQL)
+
+Tests run against SQLite in-memory (`phpunit.xml`). MySQL-specific functions crash tests:
+
+```php
+// WRONG — MySQL only, breaks tests
+->selectRaw('SUM(CASE WHEN MONTH(created_at) = ? THEN ...')
+->selectRaw('... DATE(created_at) = CURDATE() ...')
+
+// CORRECT — database-agnostic
+->whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()])
+->whereDate('created_at', today())
+// Group by date in PHP after fetching, or use substr($row->created_at, 0, 10)
+```
+
+### 7. Running tests (no local PHP)
+
+The production api container uses `--no-dev` so PHPUnit isn't installed. Workflow:
+```bash
+# Install dev deps in running container (ephemeral — lost on restart)
+docker compose -f docker-compose.yml -f docker-compose.prod.yml exec -T api composer install --no-interaction
+
+# Copy changed source files into container before running
+CONTAINER=$(docker compose -f docker-compose.yml -f docker-compose.prod.yml ps -q api)
+docker cp services/api/path/to/File.php "$CONTAINER":/var/www/html/path/to/File.php
+
+# Run tests
+docker compose -f docker-compose.yml -f docker-compose.prod.yml exec -T api ./vendor/bin/phpunit --colors=never
+
+# Web tests (no node locally either)
+docker run --rm -v /home/deploy/vendora/services/web:/app -w /app node:22-alpine sh -c "npm install --silent && npm test"
+```
+
+### 8. Auth store `updateStore()` / stale localStorage
 
 `sellerStore` is persisted in localStorage via Zustand. `updateStore()` must handle a `null` starting state:
 ```ts
@@ -145,12 +178,19 @@ docker compose -f docker-compose.yml -f docker-compose.prod.yml exec api php art
 
 ---
 
+## Architecture notes
+
+- **Each seller has exactly one store.** The seller middleware, dashboard, and all seller API routes are scoped to a single store per user. Multi-store would require a significant refactor.
+- **Seller layout:** `SellerLayoutClient` renders `{children}` directly inside `min-h-screen` (no `<main>` wrapper). Each seller page/component owns its own `mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8` container. `StoreDesignClient` goes full-bleed (no container, no negative margins needed).
+- **Product slug check endpoint:** `GET /seller/products/check-slug?slug=x&exclude=uuid` — must come before `products/{uuid}` in routes or Laravel matches it as a UUID.
+
 ## Key file locations
 
 | What | Where |
 |------|-------|
 | API routes | `services/api/routes/api.php` |
 | Seller middleware | `services/api/app/Http/Middleware/EnsureUserIsSeller.php` |
+| Seller DashboardController | `services/api/app/Http/Controllers/Seller/DashboardController.php` |
 | Seller OrderController | `services/api/app/Http/Controllers/Seller/OrderController.php` |
 | Frontend types | `services/web/src/types/index.ts` |
 | Server-side API client | `services/web/src/lib/server-api.ts` |
