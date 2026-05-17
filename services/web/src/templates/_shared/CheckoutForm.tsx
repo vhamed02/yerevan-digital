@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod/v4'
@@ -9,16 +10,16 @@ import api from '@/lib/api'
 import type { CheckoutFormProps } from '../types'
 
 const GATEWAY_META: Record<string, { label: string; badge: string; color: string }> = {
-  idram:     { label: 'Pay with Idram',       badge: 'iDram',  color: '#E8001C' },
-  inecobank: { label: 'Inecobank Transfer',    badge: 'Ineco',  color: '#004B87' },
-  telcell:   { label: 'Pay with Telcell',      badge: 'Tcell',  color: '#FF6B00' },
-  ameria:    { label: 'Ameria Bank',           badge: 'Ameria', color: '#003DA5' },
+  idram:     { label: 'Pay with Idram',    badge: 'iDram',  color: '#E8001C' },
+  inecobank: { label: 'Inecobank Transfer', badge: 'Ineco',  color: '#004B87' },
+  telcell:   { label: 'Pay with Telcell',  badge: 'Tcell',  color: '#FF6B00' },
+  ameria:    { label: 'Ameria Bank',       badge: 'Ameria', color: '#003DA5' },
 }
 
 const schema = z.object({
   full_name:      z.string().min(2, 'Required'),
   email:          z.string().email('Invalid email'),
-  phone:          z.string().min(8, 'Invalid phone'),
+  phone:          z.string().optional(),
   address:        z.string().min(5, 'Required'),
   city:           z.string().min(2, 'Required'),
   postal_code:    z.string().optional(),
@@ -30,8 +31,16 @@ const schema = z.object({
 type CheckoutData = z.infer<typeof schema>
 
 export function CheckoutForm({ storeSlug, store }: CheckoutFormProps) {
-  const { items, getTotal } = useStoreCart(storeSlug)
-  const total = getTotal()
+  const [mounted, setMounted] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
+
+  useEffect(() => { setMounted(true) }, [])
+
+  const { items: cartItems, getTotal } = useStoreCart(storeSlug)
+  // Use empty state during SSR to avoid hydration mismatch with localStorage
+  const items = mounted ? cartItems : []
+  const total = mounted ? getTotal() : 0
+
   const gateways = store.payment_gateways ?? []
 
   const {
@@ -50,26 +59,38 @@ export function CheckoutForm({ storeSlug, store }: CheckoutFormProps) {
   const selectedMethod = watch('payment_method')
 
   async function onSubmit(data: CheckoutData) {
-    const orderRes = await api.post<{ uuid: string }>(
-      `/store/${storeSlug}/checkout`,
-      {
-        ...data,
-        items: items.map((i) => ({
-          product_id: i.productId,
-          variant_id: i.variantId ?? null,
-          quantity:   i.quantity,
-          price:      i.price,
-        })),
+    setSubmitError(null)
+    try {
+      const orderRes = await api.post<{ uuid: string }>(
+        `/store/${storeSlug}/checkout`,
+        {
+          ...data,
+          items: items.map((i) => ({
+            product_id: i.productId,
+            variant_id: i.variantId ?? null,
+            quantity:   i.quantity,
+          })),
+        }
+      )
+      const uuid = orderRes.data.uuid
+
+      const payRes = await api.post<{ redirect_url: string }>(
+        `/store/${storeSlug}/payments/initiate`,
+        { order_uuid: uuid, payment_method: data.payment_method }
+      )
+
+      window.location.href = payRes.data.redirect_url
+    } catch (err: unknown) {
+      const axiosErr = err as { response?: { data?: { message?: string; errors?: Record<string, string[]> } } }
+      const apiMessage = axiosErr.response?.data?.message
+      const fieldErrors = axiosErr.response?.data?.errors
+      if (fieldErrors) {
+        const first = Object.values(fieldErrors).flat()[0]
+        setSubmitError(first ?? apiMessage ?? 'Something went wrong. Please try again.')
+      } else {
+        setSubmitError(apiMessage ?? 'Something went wrong. Please try again.')
       }
-    )
-    const uuid = orderRes.data.uuid
-
-    const payRes = await api.post<{ redirect_url: string }>(
-      `/store/${storeSlug}/payments/initiate`,
-      { order_uuid: uuid, payment_method: data.payment_method }
-    )
-
-    window.location.href = payRes.data.redirect_url
+    }
   }
 
   const inputCls =
@@ -195,27 +216,39 @@ export function CheckoutForm({ storeSlug, store }: CheckoutFormProps) {
         <div className="lg:sticky lg:top-4 lg:self-start">
           <div className="rounded-2xl border border-gray-100 bg-gray-50 p-6">
             <h2 className="mb-4 text-base font-semibold text-gray-900">Order Summary</h2>
-            <ul className="mb-4 flex flex-col gap-3">
-              {items.map((item) => (
-                <li key={`${item.productId}:${item.variantId ?? ''}`} className="flex items-start gap-3">
-                  {item.image && (
-                    <div className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-lg border border-gray-100 bg-white">
-                      <Image src={item.image} alt={item.productName} fill className="object-cover" />
-                    </div>
-                  )}
-                  <div className="min-w-0 flex-1">
-                    <p className="line-clamp-1 text-sm font-medium text-gray-900">{item.productName}</p>
-                    {item.variantName && (
-                      <p className="text-xs text-gray-500">{item.variantName}</p>
+
+            {!mounted ? (
+              <div className="mb-4 space-y-3">
+                {[1, 2].map((i) => (
+                  <div key={i} className="h-12 animate-pulse rounded-lg bg-gray-200" />
+                ))}
+              </div>
+            ) : items.length === 0 ? (
+              <p className="mb-4 text-sm text-gray-400">Your cart is empty.</p>
+            ) : (
+              <ul className="mb-4 flex flex-col gap-3">
+                {items.map((item) => (
+                  <li key={`${item.productId}:${item.variantId ?? ''}`} className="flex items-start gap-3">
+                    {item.image && (
+                      <div className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-lg border border-gray-100 bg-white">
+                        <Image src={item.image} alt={item.productName} fill className="object-cover" />
+                      </div>
                     )}
-                    <p className="text-xs text-gray-500">Qty {item.quantity}</p>
-                  </div>
-                  <span className="whitespace-nowrap text-sm font-medium text-gray-900">
-                    {(item.price * item.quantity).toLocaleString()} ֏
-                  </span>
-                </li>
-              ))}
-            </ul>
+                    <div className="min-w-0 flex-1">
+                      <p className="line-clamp-1 text-sm font-medium text-gray-900">{item.productName}</p>
+                      {item.variantName && (
+                        <p className="text-xs text-gray-500">{item.variantName}</p>
+                      )}
+                      <p className="text-xs text-gray-500">Qty {item.quantity}</p>
+                    </div>
+                    <span className="whitespace-nowrap text-sm font-medium text-gray-900">
+                      {(item.price * item.quantity).toLocaleString()} ֏
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+
             <div className="border-t border-gray-200 pt-4">
               <div className="flex items-center justify-between text-sm text-gray-600">
                 <span>Subtotal</span>
@@ -231,10 +264,16 @@ export function CheckoutForm({ storeSlug, store }: CheckoutFormProps) {
               </div>
             </div>
 
+            {submitError && (
+              <div className="mt-4 rounded-lg border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700">
+                {submitError}
+              </div>
+            )}
+
             <button
               type="submit"
-              disabled={isSubmitting || items.length === 0 || gateways.length === 0}
-              className="mt-5 w-full rounded-xl bg-gray-900 px-4 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
+              disabled={isSubmitting || !mounted || items.length === 0 || gateways.length === 0}
+              className="mt-4 w-full rounded-xl bg-gray-900 px-4 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isSubmitting ? 'Processing…' : 'Place Order & Pay →'}
             </button>
