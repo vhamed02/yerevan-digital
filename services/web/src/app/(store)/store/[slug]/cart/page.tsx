@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Minus, Plus, X, ShoppingBag } from 'lucide-react'
@@ -7,11 +8,14 @@ import { useParams } from 'next/navigation'
 import { useStoreCart } from '@/stores/cart.store'
 
 export default function CartPage() {
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => { setMounted(true) }, [])
   const { slug } = useParams<{ slug: string }>()
-  const { items, removeItem, updateQuantity, getTotal } = useStoreCart(slug)
-  const total = getTotal()
+  const { items: storeItems, removeItem, updateQuantity, getTotal } = useStoreCart(slug)
+  const items = mounted ? storeItems : []
+  const total = mounted ? getTotal() : 0
 
-  if (items.length === 0) {
+  if (!mounted || items.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center px-4 py-24 text-center">
         <ShoppingBag className="mb-4 h-16 w-16 text-gray-200" />

@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { X, Minus, Plus, ShoppingBag } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -7,9 +8,12 @@ import { useStoreCart } from '@/stores/cart.store'
 import type { CartDrawerProps } from '../types'
 
 export function CartDrawer({ open, onClose, storeSlug }: CartDrawerProps) {
-  const { items, removeItem, updateQuantity, getTotal, getItemCount } = useStoreCart(storeSlug)
-  const total = getTotal()
-  const count = getItemCount()
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => { setMounted(true) }, [])
+  const { items: storeItems, removeItem, updateQuantity, getTotal, getItemCount } = useStoreCart(storeSlug)
+  const items = mounted ? storeItems : []
+  const total = mounted ? getTotal() : 0
+  const count = mounted ? getItemCount() : 0
 
   return (
     <>

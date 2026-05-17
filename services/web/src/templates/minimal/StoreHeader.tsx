@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Search, ShoppingBag, Menu, X } from 'lucide-react'
@@ -11,8 +11,10 @@ import type { StoreHeaderProps } from '../types'
 export function StoreHeader({ store, categories, slug, isPreview }: StoreHeaderProps) {
   const [cartOpen, setCartOpen] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => { setMounted(true) }, [])
   const { getItemCount } = useStoreCart(slug)
-  const cartCount = getItemCount()
+  const cartCount = mounted ? getItemCount() : 0
   const name = store.name.hy || store.name.en
 
   return (
