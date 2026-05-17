@@ -108,7 +108,7 @@ export default async function StoreProductsPage({
         </div>
       </div>
 
-      <div className="mb-5">
+      <div className="mb-5 w-64">
         <PriceRangeFilter storeSlug={slug} initialMin={minPrice} initialMax={maxPrice} />
       </div>
 
