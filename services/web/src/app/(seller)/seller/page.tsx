@@ -27,7 +27,7 @@ export default async function SellerDashboardPage() {
   const store = storeData
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 flex flex-col gap-6">
       {store && <StoreStatusBanner status={store.status} />}
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">

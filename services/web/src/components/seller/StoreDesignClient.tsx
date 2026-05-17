@@ -79,7 +79,7 @@ export default function StoreDesignClient({ templates, initialDesign }: StoreDes
 
   return (
     <>
-      <div className="-mx-4 -my-6 flex h-[calc(100vh-64px)] sm:-mx-6 lg:-mx-8">
+      <div className="flex h-[calc(100vh-64px)]">
         <div className="flex w-72 shrink-0 flex-col border-r border-border bg-surface overflow-y-auto">
           <div className="flex flex-col gap-5 p-5 pb-24">
             <div>

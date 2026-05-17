@@ -53,7 +53,7 @@ export default function SellerLayoutClient({ children, categories }: SellerLayou
       <SellerTopNav onMenuClick={() => setMobileOpen(true)} />
       <SellerMobileNav open={mobileOpen} onClose={() => setMobileOpen(false)} />
       <div className="min-h-screen bg-surface-secondary pt-16">
-        <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">{children}</main>
+        {children}
       </div>
     </>
   )

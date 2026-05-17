@@ -193,7 +193,7 @@ export default function ProductForm({ product, categories }: ProductFormProps) {
   }
 
   return (
-    <div className="flex flex-col gap-0">
+    <>
       <div className="sticky top-16 z-20 flex items-center justify-between border-b border-border bg-surface px-6 py-3">
         <h1 className="font-heading text-lg font-bold text-content-primary truncate">
           {isEdit ? `Edit: ${product.name.hy || product.name.en}` : 'New Product'}
@@ -523,6 +523,6 @@ export default function ProductForm({ product, categories }: ProductFormProps) {
           </div>
         </aside>
       </div>
-    </div>
+    </>
   )
 }
