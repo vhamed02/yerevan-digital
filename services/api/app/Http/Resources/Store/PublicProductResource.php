@@ -34,7 +34,7 @@ class PublicProductResource extends JsonResource
                     'medium'    => $this->imageUrl($img->path_medium),
                     'large'     => $this->imageUrl($img->path_large),
                     'original'  => $this->imageUrl($img->path_original),
-                ])
+                ])->values()->all()
             ),
             'category'      => $this->whenLoaded('category', fn() => $this->category ? [
                 'id'   => $this->category->id,

@@ -33,7 +33,7 @@ class PublicProductDetailResource extends JsonResource
                     'medium'    => $this->imageUrl($img->path_medium),
                     'large'     => $this->imageUrl($img->path_large),
                     'original'  => $this->imageUrl($img->path_original),
-                ])
+                ])->values()->all()
             ),
             'variants'          => $this->whenLoaded('variants', fn() =>
                 $this->variants
@@ -41,12 +41,12 @@ class PublicProductDetailResource extends JsonResource
                     ->values()
                     ->map(fn($v) => [
                         'id'         => $v->id,
-                        'attributes' => $v->attributes,
+                        'attributes' => $v->attributes ?? [],
                         'price'      => (float) $v->price,
                         'stock'      => $v->stock,
                         'sku'        => $v->sku,
                         'is_active'  => $v->is_active,
-                    ])
+                    ])->all()
             ),
             'category'          => $this->whenLoaded('category', fn() => $this->category ? [
                 'id'   => $this->category->id,
