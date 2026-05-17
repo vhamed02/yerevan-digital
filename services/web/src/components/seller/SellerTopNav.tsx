@@ -5,7 +5,6 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import {
   Store as StoreIcon,
-  ChevronDown,
   Bell,
   Menu,
   X,
@@ -63,22 +62,9 @@ export default function SellerTopNav({ onMenuClick }: SellerTopNavProps) {
         </Link>
 
         {sellerStore && (
-          <DropdownMenu.Root>
-            <DropdownMenu.Trigger className="flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-sm font-medium text-content-primary hover:bg-surface-secondary transition-colors">
-              <span className="max-w-[120px] truncate">{storeName}</span>
-              <ChevronDown className="h-3.5 w-3.5 text-content-muted" />
-            </DropdownMenu.Trigger>
-            <DropdownMenu.Portal>
-              <DropdownMenu.Content
-                className="z-50 min-w-[180px] rounded-lg border border-border bg-surface p-1 shadow-lg"
-                sideOffset={6}
-              >
-                <DropdownMenu.Item className="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-content-primary hover:bg-surface-secondary outline-none">
-                  <span className="font-medium">{storeName}</span>
-                </DropdownMenu.Item>
-              </DropdownMenu.Content>
-            </DropdownMenu.Portal>
-          </DropdownMenu.Root>
+          <span className="flex items-center rounded-md border border-border px-3 py-1.5 text-sm font-medium text-content-primary">
+            <span className="max-w-[120px] truncate">{storeName}</span>
+          </span>
         )}
       </div>
 
