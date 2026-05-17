@@ -178,15 +178,68 @@ class PaymentController extends Controller
 
     public function sandboxPay(Request $request): Response|JsonResponse
     {
-        if (app()->environment('production')) {
+        if (!config('app.sandbox_mode')) {
             return $this->error('Not available in production.', 403);
         }
 
-        $transactionId = $request->query('transaction_id');
+        $orderUuid = $request->query('order_id');
+        $order     = Order::where('uuid', $orderUuid)->with('store')->first();
 
         return response()->view('sandbox.payment', [
-            'transactionId' => $transactionId,
-            'appUrl'        => config('app.url'),
+            'orderId'  => $orderUuid,
+            'amount'   => $order ? number_format((float) $order->total, 2) : '—',
+            'currency' => $order?->currency ?? 'AMD',
+            'storeKey' => $order?->store?->slug ?? '',
+            'apiUrl'   => config('app.url'),
         ]);
+    }
+
+    public function sandboxComplete(Request $request): JsonResponse
+    {
+        if (!config('app.sandbox_mode')) {
+            return $this->error('Not available in production.', 403);
+        }
+
+        $orderUuid = $request->input('order_id');
+        $success   = $request->input('outcome') === 'success';
+
+        $transaction = Transaction::whereHas('order', fn($q) => $q->where('uuid', $orderUuid))
+            ->where('status', TransactionStatus::Pending)
+            ->latest()
+            ->first();
+
+        if (!$transaction) {
+            return $this->error('Transaction not found.', 404);
+        }
+
+        $transaction->update([
+            'status'                  => $success ? TransactionStatus::Success : TransactionStatus::Failed,
+            'external_transaction_id' => 'SANDBOX-' . strtoupper(\Illuminate\Support\Str::random(8)),
+            'completed_at'            => now(),
+        ]);
+
+        $order       = $transaction->order;
+        $slug        = $order->store->slug;
+        $frontendUrl = rtrim(env('FRONTEND_URL', config('app.url')), '/');
+
+        if ($success) {
+            $order->update([
+                'payment_status' => PaymentStatus::Paid,
+                'status'         => OrderStatus::Processing,
+                'paid_at'        => now(),
+                'payment_method' => 'sandbox',
+            ]);
+
+            $freshOrder = $order->fresh();
+            $order->store->owner->notify(new NewOrderNotification($freshOrder));
+
+            Notification::route('mail', [
+                $freshOrder->customer_email => $freshOrder->customer_name,
+            ])->notify(new CustomerOrderConfirmationNotification($freshOrder));
+
+            return $this->success(['redirect' => "{$frontendUrl}/store/{$slug}/checkout/success?order={$order->uuid}"]);
+        }
+
+        return $this->success(['redirect' => "{$frontendUrl}/store/{$slug}/checkout/failed?order={$order->uuid}"]);
     }
 }

@@ -133,6 +133,7 @@ Route::prefix('v1')->group(function () {
     });
 
     Route::get('store/payments/sandbox/pay', [Store\PaymentController::class, 'sandboxPay']);
+    Route::post('store/payments/sandbox/complete', [Store\PaymentController::class, 'sandboxComplete']);
 
     Route::prefix('store')->middleware(ResolveStore::class)->group(function () {
         Route::get('{slug}/info', [Store\StoreController::class, 'info']);

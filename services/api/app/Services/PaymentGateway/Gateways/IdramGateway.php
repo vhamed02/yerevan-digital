@@ -22,11 +22,9 @@ class IdramGateway implements PaymentGatewayInterface
     public function initiate(PaymentRequest $request): PaymentInitiateResponse
     {
         if ($request->sandbox || empty($request->credentials)) {
-            $transactionUuid = (string) Str::uuid();
-
             return new PaymentInitiateResponse(
                 success: true,
-                redirectUrl: url('/api/v1/store/payments/sandbox/pay?transaction_id=' . $transactionUuid),
+                redirectUrl: url('/api/v1/store/payments/sandbox/pay?order_id=' . $request->orderId),
                 paymentId: 'SANDBOX-' . Str::random(8),
                 errorMessage: null,
             );
