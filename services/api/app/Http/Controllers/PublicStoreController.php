@@ -31,8 +31,8 @@ class PublicStoreController extends Controller
             'id'            => $store->id,
             'slug'          => $store->slug,
             'name'          => $store->getTranslations('name'),
-            'logo_url'      => $store->logo   ? asset("storage/{$store->logo}")   : null,
-            'banner_url'    => $store->banner  ? asset("storage/{$store->banner}") : null,
+            'logo_url'      => $this->imageUrl($store->logo),
+            'banner_url'    => $this->imageUrl($store->banner),
             'product_count' => $store->products_count,
             'category'      => null,
         ])->values()->all();
@@ -62,8 +62,8 @@ class PublicStoreController extends Controller
                     'slug'          => $store->slug,
                     'name'          => $store->getTranslations('name'),
                     'description'   => $store->getTranslations('description'),
-                    'logo_url'      => $store->logo ? asset("storage/{$store->logo}") : null,
-                    'banner_url'    => $store->banner ? asset("storage/{$store->banner}") : null,
+                    'logo_url'      => $this->imageUrl($store->logo),
+                    'banner_url'    => $this->imageUrl($store->banner),
                     'product_count' => $store->products_count,
                 ])
                 ->values()
@@ -90,6 +90,13 @@ class PublicStoreController extends Controller
             ->all();
 
         return $this->success($categories);
+    }
+
+    private function imageUrl(?string $path): ?string
+    {
+        if (!$path) return null;
+        if (str_starts_with($path, 'http')) return $path;
+        return asset("storage/{$path}");
     }
 
     public function checkSlug(Request $request): JsonResponse

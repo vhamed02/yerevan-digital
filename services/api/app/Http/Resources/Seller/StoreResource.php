@@ -2,11 +2,14 @@
 
 namespace App\Http\Resources\Seller;
 
+use App\Http\Resources\Concerns\ResolvesImageUrl;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class StoreResource extends JsonResource
 {
+    use ResolvesImageUrl;
+
     public function toArray(Request $request): array
     {
         return [
@@ -15,9 +18,9 @@ class StoreResource extends JsonResource
             'slug'                => $this->slug,
             'name'                => $this->getTranslations('name'),
             'description'         => $this->getTranslations('description'),
-            'logo'                => $this->logo,
-            'banner'              => $this->banner,
-            'favicon'             => $this->favicon,
+            'logo_url'            => $this->imageUrl($this->logo),
+            'banner_url'          => $this->imageUrl($this->banner),
+            'favicon_url'         => $this->imageUrl($this->favicon),
             'primary_color'       => $this->primary_color,
             'active_template_key' => $this->active_template_key,
             'status'              => $this->status->value,

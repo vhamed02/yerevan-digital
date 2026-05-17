@@ -2,12 +2,14 @@
 
 namespace App\Http\Resources\Store;
 
+use App\Http\Resources\Concerns\ResolvesImageUrl;
 use App\Models\StoreTemplateConfig;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class StoreInfoResource extends JsonResource
 {
+    use ResolvesImageUrl;
     public function __construct($resource, private readonly ?array $templateConfig = null)
     {
         parent::__construct($resource);
@@ -22,8 +24,8 @@ class StoreInfoResource extends JsonResource
             'slug'                => $this->slug,
             'name'                => $this->getTranslations('name'),
             'description'         => $this->getTranslations('description'),
-            'logo_url'            => $this->logo ? asset("storage/{$this->logo}") : null,
-            'banner_url'          => $this->banner ? asset("storage/{$this->banner}") : null,
+            'logo_url'            => $this->imageUrl($this->logo),
+            'banner_url'          => $this->imageUrl($this->banner),
             'active_template_key' => $this->active_template_key ?: 'minimal',
             'template_config'     => [
                 'primary_color'       => $config['primary_color'] ?? ($this->primary_color ?: '#6366f1'),

@@ -2,11 +2,14 @@
 
 namespace App\Http\Resources\Store;
 
+use App\Http\Resources\Concerns\ResolvesImageUrl;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class PublicProductResource extends JsonResource
 {
+    use ResolvesImageUrl;
+
     public function toArray(Request $request): array
     {
         $primaryImage = $this->whenLoaded('images', fn() =>
@@ -27,10 +30,10 @@ class PublicProductResource extends JsonResource
             'images'        => $this->whenLoaded('images', fn() =>
                 $this->images->map(fn($img) => [
                     'uuid'      => (string) $img->id,
-                    'thumbnail' => $img->path_thumbnail ? asset("storage/{$img->path_thumbnail}") : null,
-                    'medium'    => $img->path_medium ? asset("storage/{$img->path_medium}") : null,
-                    'large'     => $img->path_large ? asset("storage/{$img->path_large}") : null,
-                    'original'  => $img->path_original ? asset("storage/{$img->path_original}") : null,
+                    'thumbnail' => $this->imageUrl($img->path_thumbnail),
+                    'medium'    => $this->imageUrl($img->path_medium),
+                    'large'     => $this->imageUrl($img->path_large),
+                    'original'  => $this->imageUrl($img->path_original),
                 ])
             ),
             'category'      => $this->whenLoaded('category', fn() => $this->category ? [
