@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { Package, ShoppingCart, TrendingUp, Clock, Plus, Bell, Palette } from 'lucide-react'
+import { Package, ShoppingCart, TrendingUp, Clock, Plus, Bell, Palette, ExternalLink } from 'lucide-react'
 import StatCard from '@/components/admin/StatCard'
 import StoreStatusBanner from '@/components/seller/StoreStatusBanner'
 import { RevenueBarChart, OrderStatusDonut } from '@/components/seller/SellerCharts'
@@ -89,6 +89,17 @@ export default async function SellerDashboardPage() {
             <Palette className="h-4 w-4" />
             Change Store Design
           </Link>
+          {store?.slug && (
+            <a
+              href={`/store/${store.slug}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 rounded-lg border border-border px-4 py-2.5 text-sm font-medium text-content-primary hover:bg-surface-secondary transition-colors"
+            >
+              <ExternalLink className="h-4 w-4" />
+              View Store
+            </a>
+          )}
         </div>
       </div>
 
