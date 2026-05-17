@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Star, Check, Trash2 } from 'lucide-react'
-import { api } from '@/lib/api'
+import api from '@/lib/api'
 import type { AdminReview } from '@/app/(admin)/admin/reviews/page'
 
 function Stars({ value }: { value: number }) {
