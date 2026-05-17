@@ -1,0 +1,161 @@
+# Vendora — Claude Code Project Memory
+
+## Deploy workflow (CRITICAL)
+
+**Never run docker commands manually.** All changes must be committed and pushed to git.
+
+```bash
+# Stage and commit
+git add <files>
+git commit -m "Your message"
+
+# Push (must use deploy user — root lacks SSH key)
+sudo -u deploy git -C /home/deploy/vendora push origin main
+```
+
+The GitHub webhook triggers `scripts/deploy.sh` automatically, which:
+- Pulls latest, rebuilds `web` and `api` containers
+- Runs `optimize:clear`, `cache:clear`, `migrate --force`
+- Reloads nginx
+
+Git identity: `user.name="Vendora Dev"`, `user.email=vhamed02@gmail.com`  
+Deploy SSH key: `/home/deploy/.ssh/github_deploy`
+
+**Do not mention "Claude" in commit messages.**
+
+---
+
+## Infrastructure
+
+- **Server:** Ubuntu 24, radif.org, repo at `/home/deploy/vendora`
+- **Stack:** Laravel 13 / PHP 8.5 API + Next.js 16.2.6 frontend, MySQL 8, Redis 7, Docker Compose
+- **Networks:** `vendora-backend` (api, mysql, mongodb, redis), `vendora-frontend` (nginx, web, api)
+- **SSR API path:** Next.js server-side calls `http://nginx:8080/api/v1/...` — nginx listens on 8080 and proxies to PHP-FPM at `api:9000`
+- **Client-side API path:** `https://radif.org/api/v1/...`
+
+---
+
+## Recurring bugs / known pitfalls
+
+### 1. `unwrap()` double-envelope bug (frontend)
+
+`server-api.ts` `unwrap()` already strips the `{ success, data }` API envelope. If you type `serverAuthGet<{ data: T }>` and then access `.data`, you always get `undefined`.
+
+**Rule:** Always type the inner payload directly:
+```ts
+// CORRECT
+const product = await serverAuthGet<SellerProduct>(`/seller/products/${uuid}`)
+
+// WRONG — .data will be undefined
+const res = await serverAuthGet<{ data: SellerProduct }>(`/seller/products/${uuid}`)
+const product = res?.data
+```
+
+Paginated responses return `{ data: T[], meta: {...} }` directly from `unwrap()` — type it as such.
+
+### 2. Redis serialization bug (backend)
+
+Eloquent models and Collections cached in Redis become `__PHP_Incomplete_Class` on unserialize → broken API responses.
+
+**Rule:** Only cache scalar values or plain PHP arrays:
+```php
+// CORRECT
+->values()->all()        // Collection → plain array
+->resolve()              // Resource → plain array
+->value('id')            // single scalar
+
+// WRONG — never cache Eloquent models or Collections directly
+Cache::put('key', $store);
+Cache::put('key', $collection);
+```
+
+Fixed instances: `ResolveStore` middleware (caches store ID only), `StoreController::categories()`, `PublicStoreController::featured()`.
+
+### 3. Spatie roles vs `role` column
+
+`EnsureUserIsSeller` middleware uses `$user->hasRole('seller')` (Spatie permission table), **not** the `role` enum column on `users`.
+
+**Rule:** When creating sellers (admin or seeder), always call both:
+```php
+$user->update(['role' => UserRole::Seller]);
+$user->assignRole('seller');
+```
+
+Missing `assignRole()` causes 403 on all seller API calls even though `users.role = 'seller'`.
+
+### 4. Order status transitions
+
+`ALLOWED_TRANSITIONS` in `Seller/OrderController.php` governs valid status changes:
+```php
+'pending'    => ['paid', 'processing', 'cancelled'],
+'paid'       => ['processing', 'cancelled'],
+'processing' => ['shipped', 'cancelled'],
+'shipped'    => ['delivered'],
+'delivered'  => [],
+'cancelled'  => [],
+'refunded'   => [],
+```
+`pending → processing` is intentionally allowed (COD and manual payment flows).
+
+### 5. `OrderItem` API shape
+
+`OrderItemResource` returns flat fields — there is no nested `product` object:
+```ts
+interface OrderItem {
+  id: number
+  product_name: MultiLang   // { hy, en }
+  variant_name?: MultiLang
+  sku?: string
+  quantity: number
+  unit_price: number
+  total_price: number
+}
+```
+
+### 6. Auth store `updateStore()` / stale localStorage
+
+`sellerStore` is persisted in localStorage via Zustand. `updateStore()` must handle a `null` starting state:
+```ts
+updateStore: (partial) =>
+  set((state) => ({
+    sellerStore: { ...(state.sellerStore ?? {}), ...partial } as Store,
+  })),
+```
+
+`SellerLayoutClient` verifies localStorage against the API on load to self-heal stale state. Pages render `null` until `storeChecked` is true, preventing premature wizard display.
+
+---
+
+## Demo seeders
+
+`database/seeders/DemoSeeder.php` — 6 Armenian stores, 50+ products, ~180 orders.
+
+Seller accounts (all password `Password1!`):
+- hayk@yerevan-tech.am
+- nune@armfashion.am
+- gor@ararat-foods.am
+- mariam@sevan-beauty.am
+- armen@artisan-am.am
+- tigran@sportmax.am
+
+Run after deploy:
+```bash
+docker compose -f docker-compose.yml -f docker-compose.prod.yml exec api php artisan db:seed --class=DemoSeeder
+```
+
+---
+
+## Key file locations
+
+| What | Where |
+|------|-------|
+| API routes | `services/api/routes/api.php` |
+| Seller middleware | `services/api/app/Http/Middleware/EnsureUserIsSeller.php` |
+| Seller OrderController | `services/api/app/Http/Controllers/Seller/OrderController.php` |
+| Frontend types | `services/web/src/types/index.ts` |
+| Server-side API client | `services/web/src/lib/server-api.ts` |
+| Auth Zustand store | `services/web/src/stores/auth.store.ts` |
+| Seller layout client | `services/web/src/components/seller/SellerLayoutClient.tsx` |
+| SearchableSelect UI | `services/web/src/components/ui/SearchableSelect.tsx` |
+| Deploy script | `scripts/deploy.sh` |
+| Demo seeder | `services/api/database/seeders/DemoSeeder.php` |
