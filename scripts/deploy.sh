@@ -111,5 +111,6 @@ took $T
 TOTAL=$(( $(date +%s) - DEPLOY_START ))
 printf '\n%b\n' "$HR"
 printf '\033[1;30;102m  ✔  Deploy finished in %ds  ·  %s  \033[0m\n' "$TOTAL" "$(date '+%Y-%m-%d %H:%M:%S')"
-printf '\033[1;30;48;5;226m  %s  %s  \033[0m\n' "$NEW_SHORT" "$COMMIT_MSG"
+_RAND_COLOR=$((16 + RANDOM % 216))
+printf "\033[1;30;48;5;${_RAND_COLOR}m  %s  %s  \033[0m\n" "$NEW_SHORT" "$COMMIT_MSG"
 printf '%b\n\n' "$HR"
