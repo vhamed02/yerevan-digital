@@ -8,6 +8,7 @@ use App\Enums\TransactionStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\Transaction;
+use App\Notifications\CustomerOrderConfirmationNotification;
 use App\Notifications\NewOrderNotification;
 use App\Services\PaymentGateway\DTOs\PaymentRequest;
 use App\Services\PaymentGateway\PaymentGatewayRegistry;
@@ -15,6 +16,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Notification;
 
 class PaymentController extends Controller
 {
@@ -156,7 +158,12 @@ class PaymentController extends Controller
                 'payment_method' => $gateway,
             ]);
 
-            $order->store->owner->notify(new NewOrderNotification($order->fresh()));
+            $freshOrder = $order->fresh();
+            $order->store->owner->notify(new NewOrderNotification($freshOrder));
+
+            Notification::route('mail', [
+                $freshOrder->customer_email => $freshOrder->customer_name,
+            ])->notify(new CustomerOrderConfirmationNotification($freshOrder));
         }
 
         if ($gateway === 'idram') {
