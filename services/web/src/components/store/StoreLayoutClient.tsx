@@ -3,14 +3,10 @@
 import { Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import * as MinimalTemplate from '@/templates/minimal'
-import * as BoldTemplate from '@/templates/bold'
-import * as ElegantTemplate from '@/templates/elegant'
 import type { StorefrontStore, PublicCategory } from '@/types'
 
 const TEMPLATES = {
   minimal: MinimalTemplate,
-  bold: BoldTemplate,
-  elegant: ElegantTemplate,
 } as const
 
 type TemplateKey = keyof typeof TEMPLATES

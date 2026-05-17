@@ -1,9 +1,7 @@
-export type TemplateKey = 'minimal' | 'bold' | 'elegant'
+export type TemplateKey = 'minimal'
 
 const templateLoaders = {
   minimal: () => import('@/templates/minimal'),
-  bold: () => import('@/templates/bold'),
-  elegant: () => import('@/templates/elegant'),
 } as const
 
 export async function loadTemplate(key: TemplateKey | string) {
