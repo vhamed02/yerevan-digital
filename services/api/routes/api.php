@@ -89,6 +89,8 @@ Route::prefix('v1')->group(function () {
     });
 
     Route::prefix('seller')->middleware(['auth:sanctum', EnsureUserIsSeller::class])->group(function () {
+        Route::get('dashboard', Seller\DashboardController::class);
+
         Route::get('store', [Seller\StoreController::class, 'show']);
         Route::post('store', [Seller\StoreController::class, 'store']);
         Route::patch('store', [Seller\StoreController::class, 'update']);
