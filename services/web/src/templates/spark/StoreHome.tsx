@@ -6,14 +6,14 @@ import Image from 'next/image'
 import { ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react'
 import { ProductCard } from './ProductCard'
 import { ProductGrid } from './ProductGrid'
-import type { StoreHomeProps } from '../types'
+import type { StoreHomeProps, StorefrontProduct } from '../types'
 
 function FeaturedSlider({
   products,
   storeSlug,
   isPreview,
 }: {
-  products: import('../types').StorefrontProduct[]
+  products: StorefrontProduct[]
   storeSlug: string
   isPreview?: boolean
 }) {
@@ -141,16 +141,7 @@ export function StoreHome({
               <Link
                 key={cat.id}
                 href={`/store/${slug}/products?category=${cat.slug}`}
-                className="flex-shrink-0 rounded-full border border-gray-200 px-4 py-1.5 text-sm font-medium text-gray-600 transition-colors whitespace-nowrap hover:border-current"
-                style={{ ['--tw-hover-text' as string]: 'var(--accent)' }}
-                onMouseEnter={(e) => {
-                  ;(e.currentTarget as HTMLAnchorElement).style.borderColor = 'var(--accent)'
-                  ;(e.currentTarget as HTMLAnchorElement).style.color = 'var(--accent)'
-                }}
-                onMouseLeave={(e) => {
-                  ;(e.currentTarget as HTMLAnchorElement).style.borderColor = ''
-                  ;(e.currentTarget as HTMLAnchorElement).style.color = ''
-                }}
+                className="flex-shrink-0 rounded-full border border-gray-200 px-4 py-1.5 text-sm font-medium text-gray-600 transition-colors whitespace-nowrap hover:border-[var(--accent)] hover:text-[var(--accent)]"
               >
                 {cat.name.hy || cat.name.en}
               </Link>
