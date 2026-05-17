@@ -5,6 +5,7 @@ import { serverGet } from '@/lib/server-api'
 import { loadTemplate } from '@/lib/templates'
 import { SortSelect } from '@/components/store/SortSelect'
 import { PriceRangeFilter } from '@/components/store/PriceRangeFilter'
+import { SearchInput } from '@/components/store/SearchInput'
 import type { StorefrontStore, StorefrontProduct, PublicCategory } from '@/types'
 
 export const dynamic = 'force-dynamic'
@@ -37,6 +38,7 @@ export default async function StoreProductsPage({
   const isPreview = sp.preview === 'true'
   const minPrice = sp.min_price ?? ''
   const maxPrice = sp.max_price ?? ''
+  const search = sp.search ?? ''
 
   const queryParams = new URLSearchParams({
     ...(category ? { category } : {}),
@@ -45,6 +47,7 @@ export default async function StoreProductsPage({
     per_page: '24',
     ...(minPrice ? { min_price: minPrice } : {}),
     ...(maxPrice ? { max_price: maxPrice } : {}),
+    ...(search ? { search } : {}),
   })
 
   const [storeData, productsData, categoriesData] = await Promise.all([
@@ -99,7 +102,10 @@ export default async function StoreProductsPage({
           ))}
         </div>
 
-        <SortSelect value={sort} options={sortOptions} />
+        <div className="flex items-center gap-2">
+          <SearchInput storeSlug={slug} initialValue={search} />
+          <SortSelect value={sort} options={sortOptions} />
+        </div>
       </div>
 
       <div className="mb-5">
