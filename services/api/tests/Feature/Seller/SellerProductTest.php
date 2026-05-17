@@ -180,4 +180,59 @@ class SellerProductTest extends TestCase
     {
         $this->getJson('/api/v1/seller/products')->assertStatus(401);
     }
+
+    public function test_check_slug_available(): void
+    {
+        $this->actingAsSeller()
+            ->getJson('/api/v1/seller/products/check-slug?slug=my-new-product')
+            ->assertOk()
+            ->assertJsonPath('data.available', true);
+    }
+
+    public function test_check_slug_taken_returns_409(): void
+    {
+        Product::factory()->create(['store_id' => $this->store->id, 'slug' => 'taken-slug']);
+
+        $this->actingAsSeller()
+            ->getJson('/api/v1/seller/products/check-slug?slug=taken-slug')
+            ->assertStatus(409);
+    }
+
+    public function test_check_slug_excludes_own_product_when_editing(): void
+    {
+        $product = Product::factory()->create(['store_id' => $this->store->id, 'slug' => 'my-product']);
+
+        $this->actingAsSeller()
+            ->getJson("/api/v1/seller/products/check-slug?slug=my-product&exclude={$product->uuid}")
+            ->assertOk()
+            ->assertJsonPath('data.available', true);
+    }
+
+    public function test_check_slug_taken_by_different_product_in_same_store(): void
+    {
+        Product::factory()->create(['store_id' => $this->store->id, 'slug' => 'existing-slug']);
+        $other = Product::factory()->create(['store_id' => $this->store->id, 'slug' => 'my-product']);
+
+        $this->actingAsSeller()
+            ->getJson("/api/v1/seller/products/check-slug?slug=existing-slug&exclude={$other->uuid}")
+            ->assertStatus(409);
+    }
+
+    public function test_check_slug_same_slug_allowed_in_different_store(): void
+    {
+        $otherStore = Store::factory()->create();
+        Product::factory()->create(['store_id' => $otherStore->id, 'slug' => 'shared-name']);
+
+        $this->actingAsSeller()
+            ->getJson('/api/v1/seller/products/check-slug?slug=shared-name')
+            ->assertOk()
+            ->assertJsonPath('data.available', true);
+    }
+
+    public function test_check_slug_rejects_invalid_format(): void
+    {
+        $this->actingAsSeller()
+            ->getJson('/api/v1/seller/products/check-slug?slug=Invalid Slug!')
+            ->assertStatus(422);
+    }
 }

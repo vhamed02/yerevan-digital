@@ -104,6 +104,7 @@ Route::prefix('v1')->group(function () {
 
         Route::get('products', [Seller\ProductController::class, 'index']);
         Route::post('products', [Seller\ProductController::class, 'store']);
+        Route::get('products/check-slug', [Seller\ProductController::class, 'checkSlug']);
         Route::get('products/{uuid}', [Seller\ProductController::class, 'show']);
         Route::patch('products/{uuid}', [Seller\ProductController::class, 'update']);
         Route::delete('products/{uuid}', [Seller\ProductController::class, 'destroy']);

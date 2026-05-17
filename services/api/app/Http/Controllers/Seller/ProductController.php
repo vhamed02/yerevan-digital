@@ -25,6 +25,32 @@ class ProductController extends Controller
         private readonly SlugService  $slugService,
     ) {}
 
+    public function checkSlug(Request $request): JsonResponse
+    {
+        $store = $request->attributes->get('sellerStore');
+        if (!$store) {
+            return $this->error('You have not created a store yet.', 404);
+        }
+
+        $request->validate([
+            'slug'    => ['required', 'string', 'regex:/^[a-z0-9-]+$/'],
+            'exclude' => ['sometimes', 'nullable', 'string'],
+        ]);
+
+        $query = Product::where('store_id', $store->id)
+            ->where('slug', $request->input('slug'));
+
+        if ($request->filled('exclude')) {
+            $query->where('uuid', '!=', $request->input('exclude'));
+        }
+
+        if ($query->exists()) {
+            return $this->error('Slug is already taken.', 409);
+        }
+
+        return $this->success(['available' => true]);
+    }
+
     public function index(Request $request): JsonResponse
     {
         $store = $request->attributes->get('sellerStore');
