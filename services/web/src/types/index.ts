@@ -379,6 +379,7 @@ export interface StorefrontStore {
   category?: PublicCategory
   active_template_key: string
   template_config: StoreTemplateConfig
+  payment_gateways?: string[]
 }
 
 export interface StorefrontVariant {

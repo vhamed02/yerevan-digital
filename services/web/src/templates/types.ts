@@ -46,6 +46,7 @@ export interface CartDrawerProps {
 
 export interface CheckoutFormProps {
   storeSlug: string
+  store: StorefrontStore
 }
 
 export type { StorefrontProduct, StorefrontVariant, StorefrontStore, PublicCategory }

@@ -28,5 +28,5 @@ export default async function CheckoutPage({
 
   const Template = await loadTemplate(storeData.active_template_key)
 
-  return <Template.CheckoutForm storeSlug={slug} />
+  return <Template.CheckoutForm storeSlug={slug} store={storeData} />
 }

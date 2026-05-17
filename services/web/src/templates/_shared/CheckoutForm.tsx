@@ -8,35 +8,46 @@ import { useStoreCart } from '@/stores/cart.store'
 import api from '@/lib/api'
 import type { CheckoutFormProps } from '../types'
 
+const GATEWAY_META: Record<string, { label: string; badge: string; color: string }> = {
+  idram:     { label: 'Pay with Idram',       badge: 'iDram',  color: '#E8001C' },
+  inecobank: { label: 'Inecobank Transfer',    badge: 'Ineco',  color: '#004B87' },
+  telcell:   { label: 'Pay with Telcell',      badge: 'Tcell',  color: '#FF6B00' },
+  ameria:    { label: 'Ameria Bank',           badge: 'Ameria', color: '#003DA5' },
+}
+
 const schema = z.object({
-  full_name: z.string().min(2, 'Required'),
-  email: z.string().email('Invalid email'),
-  phone: z.string().min(8, 'Invalid phone'),
-  address: z.string().min(5, 'Required'),
-  city: z.string().min(2, 'Required'),
-  postal_code: z.string().optional(),
-  country: z.string().min(2, 'Required'),
-  notes: z.string().optional(),
-  payment_method: z.enum(['idram']),
+  full_name:      z.string().min(2, 'Required'),
+  email:          z.string().email('Invalid email'),
+  phone:          z.string().min(8, 'Invalid phone'),
+  address:        z.string().min(5, 'Required'),
+  city:           z.string().min(2, 'Required'),
+  postal_code:    z.string().optional(),
+  country:        z.string().min(2, 'Required'),
+  notes:          z.string().optional(),
+  payment_method: z.string().min(1, 'Select a payment method'),
 })
 
 type CheckoutData = z.infer<typeof schema>
 
-export function CheckoutForm({ storeSlug }: CheckoutFormProps) {
-  const { items, getTotal, clearCart } = useStoreCart(storeSlug)
+export function CheckoutForm({ storeSlug, store }: CheckoutFormProps) {
+  const { items, getTotal } = useStoreCart(storeSlug)
   const total = getTotal()
+  const gateways = store.payment_gateways ?? []
 
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm<CheckoutData>({
     resolver: zodResolver(schema),
     defaultValues: {
-      country: 'Armenia',
-      payment_method: 'idram',
+      country:        'Armenia',
+      payment_method: gateways[0] ?? '',
     },
   })
+
+  const selectedMethod = watch('payment_method')
 
   async function onSubmit(data: CheckoutData) {
     const orderRes = await api.post<{ data: { uuid: string } }>(
@@ -46,8 +57,8 @@ export function CheckoutForm({ storeSlug }: CheckoutFormProps) {
         items: items.map((i) => ({
           product_id: i.productId,
           variant_id: i.variantId ?? null,
-          quantity: i.quantity,
-          price: i.price,
+          quantity:   i.quantity,
+          price:      i.price,
         })),
       }
     )
@@ -133,31 +144,51 @@ export function CheckoutForm({ storeSlug }: CheckoutFormProps) {
 
           <section>
             <h2 className="mb-4 text-base font-semibold text-gray-900">Payment Method</h2>
-            <div className="flex flex-col gap-2">
-              <label className="flex cursor-pointer items-center gap-3 rounded-xl border-2 border-gray-900 bg-gray-50 p-4">
-                <input
-                  type="radio"
-                  value="idram"
-                  {...register('payment_method')}
-                  className="h-4 w-4"
-                />
-                <div className="flex items-center gap-2">
-                  <div className="flex h-8 w-16 items-center justify-center rounded bg-[#E8001C] text-xs font-bold text-white">
-                    iDram
-                  </div>
-                  <span className="text-sm font-medium text-gray-900">Pay with Idram</span>
-                </div>
-              </label>
-              <label className="flex cursor-not-allowed items-center gap-3 rounded-xl border border-gray-100 p-4 opacity-50">
-                <input type="radio" disabled className="h-4 w-4" />
-                <div className="flex items-center gap-2">
-                  <div className="flex h-8 w-16 items-center justify-center rounded bg-gray-200 text-xs font-medium text-gray-500">
-                    Inecobank
-                  </div>
-                  <span className="text-sm text-gray-500">Coming Soon</span>
-                </div>
-              </label>
-            </div>
+            {gateways.length === 0 ? (
+              <p className="rounded-xl border border-gray-100 bg-gray-50 px-4 py-5 text-sm text-gray-500">
+                No payment methods are available for this store yet.
+              </p>
+            ) : (
+              <div className="flex flex-col gap-2">
+                {gateways.map((key) => {
+                  const meta = GATEWAY_META[key] ?? {
+                    label: key,
+                    badge: key.slice(0, 5),
+                    color: '#374151',
+                  }
+                  const isSelected = selectedMethod === key
+                  return (
+                    <label
+                      key={key}
+                      className={`flex cursor-pointer items-center gap-3 rounded-xl border-2 p-4 transition-colors ${
+                        isSelected
+                          ? 'border-gray-900 bg-gray-50'
+                          : 'border-gray-100 bg-white hover:border-gray-300'
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        value={key}
+                        {...register('payment_method')}
+                        className="h-4 w-4"
+                      />
+                      <div className="flex items-center gap-2">
+                        <div
+                          className="flex h-8 w-16 items-center justify-center rounded text-xs font-bold text-white"
+                          style={{ backgroundColor: meta.color }}
+                        >
+                          {meta.badge}
+                        </div>
+                        <span className="text-sm font-medium text-gray-900">{meta.label}</span>
+                      </div>
+                    </label>
+                  )
+                })}
+              </div>
+            )}
+            {errors.payment_method && (
+              <p className={errorCls}>{errors.payment_method.message}</p>
+            )}
           </section>
         </div>
 
@@ -168,18 +199,18 @@ export function CheckoutForm({ storeSlug }: CheckoutFormProps) {
               {items.map((item) => (
                 <li key={`${item.productId}:${item.variantId ?? ''}`} className="flex items-start gap-3">
                   {item.image && (
-                    <div className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-lg bg-white border border-gray-100">
+                    <div className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-lg border border-gray-100 bg-white">
                       <Image src={item.image} alt={item.productName} fill className="object-cover" />
                     </div>
                   )}
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900 line-clamp-1">{item.productName}</p>
+                  <div className="min-w-0 flex-1">
+                    <p className="line-clamp-1 text-sm font-medium text-gray-900">{item.productName}</p>
                     {item.variantName && (
                       <p className="text-xs text-gray-500">{item.variantName}</p>
                     )}
                     <p className="text-xs text-gray-500">Qty {item.quantity}</p>
                   </div>
-                  <span className="text-sm font-medium text-gray-900 whitespace-nowrap">
+                  <span className="whitespace-nowrap text-sm font-medium text-gray-900">
                     {(item.price * item.quantity).toLocaleString()} ֏
                   </span>
                 </li>
@@ -202,7 +233,7 @@ export function CheckoutForm({ storeSlug }: CheckoutFormProps) {
 
             <button
               type="submit"
-              disabled={isSubmitting || items.length === 0}
+              disabled={isSubmitting || items.length === 0 || gateways.length === 0}
               className="mt-5 w-full rounded-xl bg-gray-900 px-4 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isSubmitting ? 'Processing…' : 'Place Order & Pay →'}
