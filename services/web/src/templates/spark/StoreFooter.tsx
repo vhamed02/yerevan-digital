@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Instagram, Facebook, Mail, Phone, MapPin } from 'lucide-react'
+import { Camera, Globe, Mail, Phone, MapPin } from 'lucide-react'
 import type { StoreFooterProps } from '../types'
 
 export function StoreFooter({ store }: StoreFooterProps) {
@@ -28,7 +28,7 @@ export function StoreFooter({ store }: StoreFooterProps) {
                     className="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-gray-500 shadow-sm transition-colors hover:text-pink-500"
                     aria-label="Instagram"
                   >
-                    <Instagram className="h-4 w-4" />
+                    <Camera className="h-4 w-4" />
                   </a>
                 )}
                 {store.social_facebook && (
@@ -39,7 +39,7 @@ export function StoreFooter({ store }: StoreFooterProps) {
                     className="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-gray-500 shadow-sm transition-colors hover:text-blue-600"
                     aria-label="Facebook"
                   >
-                    <Facebook className="h-4 w-4" />
+                    <Globe className="h-4 w-4" />
                   </a>
                 )}
               </div>
