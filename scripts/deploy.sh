@@ -69,7 +69,7 @@ took $T
 # ── start ─────────────────────────────────────────────────────────────────────
 section "Starting services"
 T=$(date +%s)
-$COMPOSE up -d --no-deps web api
+$COMPOSE up -d --no-deps web api queue
 ok "Containers up"
 took $T
 
