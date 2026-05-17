@@ -50,7 +50,7 @@ export function CheckoutForm({ storeSlug, store }: CheckoutFormProps) {
   const selectedMethod = watch('payment_method')
 
   async function onSubmit(data: CheckoutData) {
-    const orderRes = await api.post<{ data: { uuid: string } }>(
+    const orderRes = await api.post<{ uuid: string }>(
       `/store/${storeSlug}/checkout`,
       {
         ...data,
@@ -62,14 +62,14 @@ export function CheckoutForm({ storeSlug, store }: CheckoutFormProps) {
         })),
       }
     )
-    const uuid = orderRes.data.data.uuid
+    const uuid = orderRes.data.uuid
 
-    const payRes = await api.post<{ data: { redirect_url: string } }>(
+    const payRes = await api.post<{ redirect_url: string }>(
       `/store/${storeSlug}/payments/initiate`,
       { order_uuid: uuid, payment_method: data.payment_method }
     )
 
-    window.location.href = payRes.data.data.redirect_url
+    window.location.href = payRes.data.redirect_url
   }
 
   const inputCls =
