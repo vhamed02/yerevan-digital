@@ -3,10 +3,12 @@
 import { Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import * as MinimalTemplate from '@/templates/minimal'
+import * as SparkTemplate from '@/templates/spark'
 import type { StorefrontStore, PublicCategory } from '@/types'
 
 const TEMPLATES = {
   minimal: MinimalTemplate,
+  spark: SparkTemplate,
 } as const
 
 type TemplateKey = keyof typeof TEMPLATES
@@ -41,10 +43,12 @@ function Inner({ store, categories, children }: Props) {
         }
       : store
 
+  const primaryColor = effectiveStore.template_config.primary_color || '#6366f1'
   const cssVars = {
-    '--store-primary': effectiveStore.template_config.primary_color || '#6366f1',
+    '--store-primary': primaryColor,
     '--store-secondary': effectiveStore.template_config.secondary_color || '#8b5cf6',
     '--store-font-heading': effectiveStore.template_config.font_heading || 'Inter',
+    '--accent': primaryColor,
   } as React.CSSProperties
 
   return (

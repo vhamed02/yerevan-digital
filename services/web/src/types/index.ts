@@ -329,6 +329,7 @@ export interface StoreDesignSettings {
   products_per_row: number
   show_hero_banner: boolean
   show_categories_bar: boolean
+  show_featured_slider: boolean
 }
 
 export interface SellerTemplate {
@@ -360,6 +361,7 @@ export interface StoreTemplateConfig {
   products_per_row?: number
   show_hero_banner?: boolean
   show_categories_bar?: boolean
+  show_featured_slider?: boolean
 }
 
 export interface StorefrontStore {

@@ -1,7 +1,8 @@
-export type TemplateKey = 'minimal'
+export type TemplateKey = 'minimal' | 'spark'
 
 const templateLoaders = {
   minimal: () => import('@/templates/minimal'),
+  spark: () => import('@/templates/spark'),
 } as const
 
 export async function loadTemplate(key: TemplateKey | string) {

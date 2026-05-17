@@ -30,6 +30,7 @@ const DEFAULT_DESIGN: StoreDesignSettings = {
   products_per_row: 3,
   show_hero_banner: true,
   show_categories_bar: true,
+  show_featured_slider: true,
 }
 
 interface StoreDesignClientProps {
@@ -183,10 +184,10 @@ export default function StoreDesignClient({ templates, initialDesign }: StoreDes
                     ))}
                   </div>
                 </div>
-                {(['show_hero_banner', 'show_categories_bar'] as const).map((field) => (
+                {(['show_hero_banner', 'show_categories_bar', 'show_featured_slider'] as const).map((field) => (
                   <label key={field} className="flex cursor-pointer items-center justify-between">
                     <span className="text-sm text-content-secondary">
-                      {field === 'show_hero_banner' ? 'Show hero banner' : 'Show categories bar'}
+                      {field === 'show_hero_banner' ? 'Show hero banner' : field === 'show_categories_bar' ? 'Show categories bar' : 'Show featured slider'}
                     </span>
                     <button
                       type="button"

@@ -13,6 +13,7 @@ import { cn } from '@/lib/utils'
 
 const TEMPLATES = [
   { key: 'minimal', label: 'Minimal', description: 'Clean & simple' },
+  { key: 'spark', label: 'Spark', description: 'Modern & vibrant' },
 ]
 
 const CURRENCIES = ['AMD', 'USD', 'EUR', 'RUB']
