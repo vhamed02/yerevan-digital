@@ -16,18 +16,21 @@ interface PendingApprovalBannerProps {
 export default function PendingApprovalBanner({ stores }: PendingApprovalBannerProps) {
   const queryClient = useQueryClient()
   const [rejectTarget, setRejectTarget] = useState<AdminStore | null>(null)
+  const [approvingSlug, setApprovingSlug] = useState<string | null>(null)
 
   const approve = useMutation({
-    mutationFn: (storeId: number) => api.post(`/admin/stores/${storeId}/approve`),
+    mutationFn: (slug: string) => api.patch(`/admin/stores/${slug}/approve`),
+    onMutate: (slug) => setApprovingSlug(slug),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-dashboard'] })
       toast.success('Store approved')
     },
     onError: () => toast.error('Failed to approve store'),
+    onSettled: () => setApprovingSlug(null),
   })
 
   const reject = useMutation({
-    mutationFn: (storeId: number) => api.post(`/admin/stores/${storeId}/reject`),
+    mutationFn: (slug: string) => api.patch(`/admin/stores/${slug}/suspend`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-dashboard'] })
       toast.success('Store rejected')
@@ -66,8 +69,8 @@ export default function PendingApprovalBanner({ stores }: PendingApprovalBannerP
                 <Button
                   size="sm"
                   variant="success"
-                  loading={approve.isPending && approve.variables === store.id}
-                  onClick={() => approve.mutate(store.id)}
+                  loading={approvingSlug === store.slug}
+                  onClick={() => approve.mutate(store.slug)}
                 >
                   <Check className="h-3.5 w-3.5" />
                   Approve
@@ -90,11 +93,11 @@ export default function PendingApprovalBanner({ stores }: PendingApprovalBannerP
         open={rejectTarget !== null}
         onOpenChange={(open) => !open && setRejectTarget(null)}
         title="Reject Store"
-        message={`Are you sure you want to reject "${rejectTarget?.name.hy || rejectTarget?.name.en}"? This will notify the seller.`}
+        message={`Are you sure you want to reject "${rejectTarget?.name.hy || rejectTarget?.name.en}"? This will suspend the store and notify the seller.`}
         confirmLabel="Reject"
         destructive
         loading={reject.isPending}
-        onConfirm={() => rejectTarget && reject.mutate(rejectTarget.id)}
+        onConfirm={() => rejectTarget && reject.mutate(rejectTarget.slug)}
       />
     </>
   )

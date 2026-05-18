@@ -6,14 +6,14 @@ import { ConfirmModal } from '@/components/ui/Modal'
 import api from '@/lib/api'
 
 interface ApproveStoreDialogProps {
-  storeId: number | null
+  storeSlug: string | null
   storeName: string
   onClose: () => void
   invalidateKey?: string[]
 }
 
 export default function ApproveStoreDialog({
-  storeId,
+  storeSlug,
   storeName,
   onClose,
   invalidateKey = ['admin-stores'],
@@ -21,7 +21,7 @@ export default function ApproveStoreDialog({
   const queryClient = useQueryClient()
 
   const mutation = useMutation({
-    mutationFn: (id: number) => api.post(`/admin/stores/${id}/approve`),
+    mutationFn: (slug: string) => api.patch(`/admin/stores/${slug}/approve`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: invalidateKey })
       toast.success('Store approved successfully')
@@ -32,13 +32,13 @@ export default function ApproveStoreDialog({
 
   return (
     <ConfirmModal
-      open={storeId !== null}
+      open={storeSlug !== null}
       onOpenChange={(open) => !open && onClose()}
       title="Approve Store"
       message={`Approve "${storeName}"? The seller will be notified and their store will become active.`}
       confirmLabel="Approve"
       loading={mutation.isPending}
-      onConfirm={() => storeId !== null && mutation.mutate(storeId)}
+      onConfirm={() => storeSlug !== null && mutation.mutate(storeSlug)}
     />
   )
 }

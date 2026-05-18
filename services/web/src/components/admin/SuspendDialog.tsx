@@ -8,7 +8,7 @@ import api from '@/lib/api'
 type SuspendTargetType = 'store' | 'seller'
 
 interface SuspendDialogProps {
-  targetId: number | null
+  targetId: string | number | null
   targetName: string
   targetType: SuspendTargetType
   currentStatus?: string
@@ -29,8 +29,14 @@ export default function SuspendDialog({
   const action = isSuspended ? 'activate' : 'suspend'
 
   const mutation = useMutation({
-    mutationFn: (id: number) =>
-      api.post(`/admin/${targetType === 'store' ? 'stores' : 'sellers'}/${id}/${action}`),
+    mutationFn: (id: string | number) => {
+      if (targetType === 'store') {
+        const endpoint = isSuspended ? 'approve' : 'suspend'
+        return api.patch(`/admin/stores/${id}/${endpoint}`)
+      }
+      const newStatus = isSuspended ? 'active' : 'suspended'
+      return api.patch(`/admin/sellers/${id}/status`, { status: newStatus })
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: invalidateKey ?? [`admin-${targetType}s`],

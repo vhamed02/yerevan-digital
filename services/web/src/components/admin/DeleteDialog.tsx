@@ -8,7 +8,7 @@ import api from '@/lib/api'
 type DeleteTargetType = 'store' | 'seller' | 'category' | 'template'
 
 interface DeleteDialogProps {
-  targetId: number | null
+  targetId: string | number | null
   targetName: string
   targetType: DeleteTargetType
   onClose: () => void
@@ -34,7 +34,7 @@ export default function DeleteDialog({
   const queryClient = useQueryClient()
 
   const mutation = useMutation({
-    mutationFn: (id: number) => api.delete(`/admin/${endpointMap[targetType]}/${id}`),
+    mutationFn: (id: string | number) => api.delete(`/admin/${endpointMap[targetType]}/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: invalidateKey ?? [`admin-${targetType}s`],

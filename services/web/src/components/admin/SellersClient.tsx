@@ -99,11 +99,11 @@ export default function SellersClient({ initialData, initialMeta }: SellersClien
       ),
     },
     {
-      accessorKey: 'joined_at',
+      accessorKey: 'created_at',
       header: 'Joined',
       cell: ({ row }) => (
         <span className="text-sm text-content-muted">
-          {new Date(row.original.joined_at).toLocaleDateString()}
+          {new Date(row.original.created_at).toLocaleDateString()}
         </span>
       ),
     },

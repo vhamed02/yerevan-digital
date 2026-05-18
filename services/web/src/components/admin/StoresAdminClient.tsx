@@ -57,8 +57,7 @@ export default function StoresAdminClient({ initialData, initialMeta }: StoresAd
   })
 
   const featureMutation = useMutation({
-    mutationFn: ({ id, featured }: { id: number; featured: boolean }) =>
-      api.patch(`/admin/stores/${id}`, { is_featured: featured }),
+    mutationFn: (slug: string) => api.patch(`/admin/stores/${slug}/feature`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-stores'] })
       toast.success('Store updated')
@@ -146,12 +145,7 @@ export default function StoresAdminClient({ initialData, initialMeta }: StoresAd
       header: 'Featured',
       cell: ({ row }) => (
         <button
-          onClick={() =>
-            featureMutation.mutate({
-              id: row.original.id,
-              featured: !row.original.is_featured,
-            })
-          }
+          onClick={() => featureMutation.mutate(row.original.slug)}
           className={cn(
             'relative inline-flex h-5 w-9 items-center rounded-full transition-colors',
             row.original.is_featured ? 'bg-brand-500' : 'bg-border'
@@ -301,13 +295,13 @@ export default function StoresAdminClient({ initialData, initialMeta }: StoresAd
       </div>
 
       <ApproveStoreDialog
-        storeId={approveTarget?.id ?? null}
+        storeSlug={approveTarget?.slug ?? null}
         storeName={approveTarget?.name.hy || approveTarget?.name.en || ''}
         onClose={() => setApproveTarget(null)}
         invalidateKey={['admin-stores']}
       />
       <SuspendDialog
-        targetId={suspendTarget?.id ?? null}
+        targetId={suspendTarget?.slug ?? null}
         targetName={suspendTarget?.name.hy || suspendTarget?.name.en || ''}
         targetType="store"
         currentStatus={suspendTarget?.status}
@@ -315,7 +309,7 @@ export default function StoresAdminClient({ initialData, initialMeta }: StoresAd
         invalidateKey={['admin-stores']}
       />
       <DeleteDialog
-        targetId={deleteTarget?.id ?? null}
+        targetId={deleteTarget?.slug ?? null}
         targetName={deleteTarget?.name.hy || deleteTarget?.name.en || ''}
         targetType="store"
         onClose={() => setDeleteTarget(null)}

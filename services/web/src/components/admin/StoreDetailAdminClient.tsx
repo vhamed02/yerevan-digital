@@ -149,13 +149,13 @@ export default function StoreDetailAdminClient({ store }: StoreDetailAdminClient
       </div>
 
       <ApproveStoreDialog
-        storeId={showApprove ? store.id : null}
+        storeSlug={showApprove ? store.slug : null}
         storeName={storeName}
         onClose={() => setShowApprove(false)}
         invalidateKey={['admin-stores', store.slug]}
       />
       <SuspendDialog
-        targetId={showSuspend ? store.id : null}
+        targetId={showSuspend ? store.slug : null}
         targetName={storeName}
         targetType="store"
         currentStatus={store.status}
@@ -163,7 +163,7 @@ export default function StoreDetailAdminClient({ store }: StoreDetailAdminClient
         invalidateKey={['admin-stores', store.slug]}
       />
       <DeleteDialog
-        targetId={showDelete ? store.id : null}
+        targetId={showDelete ? store.slug : null}
         targetName={storeName}
         targetType="store"
         onClose={() => setShowDelete(false)}

@@ -48,6 +48,7 @@ Route::prefix('v1')->group(function () {
     });
 
     Route::prefix('admin')->middleware(['auth:sanctum', EnsureUserIsAdmin::class])->group(function () {
+        Route::get('dashboard', [Admin\DashboardController::class, 'dashboard']);
         Route::get('dashboard/stats', [Admin\DashboardController::class, 'stats']);
 
         Route::get('sellers', [Admin\SellerController::class, 'index']);
