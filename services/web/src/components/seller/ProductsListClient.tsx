@@ -97,26 +97,6 @@ export default function ProductsListClient({ initialData, initialMeta, categorie
 
   const columns: ColumnDef<SellerProduct>[] = [
     {
-      id: 'select',
-      header: ({ table }) => (
-        <input
-          type="checkbox"
-          checked={table.getIsAllPageRowsSelected()}
-          onChange={table.getToggleAllPageRowsSelectedHandler()}
-          className="rounded border-border"
-        />
-      ),
-      cell: ({ row }) => (
-        <input
-          type="checkbox"
-          checked={row.getIsSelected()}
-          onChange={row.getToggleSelectedHandler()}
-          className="rounded border-border"
-        />
-      ),
-      size: 40,
-    },
-    {
       id: 'product',
       header: 'Product',
       cell: ({ row }) => (
@@ -290,7 +270,14 @@ export default function ProductsListClient({ initialData, initialMeta, categorie
           </Tabs.List>
 
           <div className="mt-4 rounded-xl border border-border bg-surface p-5">
-            <AdminTable columns={columns} data={products} loading={isFetching} toolbar={toolbar} />
+            <AdminTable
+            columns={columns}
+            data={products}
+            loading={isFetching}
+            toolbar={toolbar}
+            selectable
+            onSelectionChange={(rows) => setSelectedIds(rows.map((r) => r.uuid))}
+          />
           </div>
         </Tabs.Root>
       </div>

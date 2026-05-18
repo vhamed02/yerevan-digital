@@ -10,6 +10,8 @@ interface AdminTableProps<TData> {
   toolbar?: React.ReactNode
   emptyState?: React.ReactNode
   pageSize?: number
+  selectable?: boolean
+  onSelectionChange?: (rows: TData[]) => void
 }
 
 export default function AdminTable<TData>({
@@ -19,6 +21,8 @@ export default function AdminTable<TData>({
   toolbar,
   emptyState,
   pageSize = 10,
+  selectable,
+  onSelectionChange,
 }: AdminTableProps<TData>) {
   return (
     <div className="flex flex-col gap-4">
@@ -29,6 +33,8 @@ export default function AdminTable<TData>({
         loading={loading}
         emptyState={emptyState}
         pageSize={pageSize}
+        selectable={selectable}
+        onSelectionChange={onSelectionChange}
       />
     </div>
   )

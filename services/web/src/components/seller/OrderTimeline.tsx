@@ -2,6 +2,7 @@ import { Check } from 'lucide-react'
 
 const TIMELINE_STEPS = [
   { key: 'pending', label: 'Pending' },
+  { key: 'paid', label: 'Paid' },
   { key: 'processing', label: 'Processing' },
   { key: 'shipped', label: 'Shipped' },
   { key: 'delivered', label: 'Delivered' },
@@ -9,10 +10,12 @@ const TIMELINE_STEPS = [
 
 const ORDER_RANK: Record<string, number> = {
   pending: 0,
-  processing: 1,
-  shipped: 2,
-  delivered: 3,
+  paid: 1,
+  processing: 2,
+  shipped: 3,
+  delivered: 4,
   cancelled: -1,
+  refunded: -1,
 }
 
 interface OrderTimelineProps {

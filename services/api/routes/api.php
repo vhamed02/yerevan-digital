@@ -120,6 +120,7 @@ Route::prefix('v1')->group(function () {
         Route::get('products/{uuid}', [Seller\ProductController::class, 'show']);
         Route::patch('products/{uuid}', [Seller\ProductController::class, 'update']);
         Route::delete('products/{uuid}', [Seller\ProductController::class, 'destroy']);
+        Route::post('products/{uuid}/duplicate', [Seller\ProductController::class, 'duplicate']);
         Route::patch('products/{uuid}/status', [Seller\ProductController::class, 'updateStatus']);
         Route::post('products/{uuid}/images', [Seller\ProductController::class, 'uploadImages']);
         Route::patch('products/{uuid}/images/reorder', [Seller\ProductController::class, 'reorderImages']);

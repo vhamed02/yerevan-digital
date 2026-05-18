@@ -9,6 +9,8 @@ class StoreTemplateSeeder extends Seeder
 {
     public function run(): void
     {
+        StoreTemplate::whereNotIn('key', ['minimal', 'spark'])->delete();
+
         $templates = [
             [
                 'key'         => 'minimal',
@@ -18,18 +20,11 @@ class StoreTemplateSeeder extends Seeder
                 'sort_order'  => 1,
             ],
             [
-                'key'         => 'bold',
-                'name'        => ['hy' => 'Համարձակ', 'en' => 'Bold'],
-                'description' => ['hy' => 'Վառ գույներով և համարձակ ոճով', 'en' => 'Vibrant colors and bold style'],
+                'key'         => 'spark',
+                'name'        => ['hy' => 'Սպարք', 'en' => 'Spark'],
+                'description' => ['hy' => 'Ժամանակակից խանութ՝ ֆիչերד սլայդերով', 'en' => 'Modern storefront with featured slider'],
                 'is_active'   => true,
                 'sort_order'  => 2,
-            ],
-            [
-                'key'         => 'elegant',
-                'name'        => ['hy' => 'Էլեգանտ', 'en' => 'Elegant'],
-                'description' => ['hy' => 'Նուրբ և էլեգանտ տեսք', 'en' => 'Refined and elegant look'],
-                'is_active'   => true,
-                'sort_order'  => 3,
             ],
         ];
 

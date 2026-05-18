@@ -146,6 +146,28 @@ class ProductController extends Controller
         return $this->success(null, 'Product deleted.');
     }
 
+    public function duplicate(Request $request, string $uuid): JsonResponse
+    {
+        $store = $request->attributes->get('sellerStore');
+        if (!$store) {
+            return $this->error('You have not created a store yet.', 404);
+        }
+
+        $product = Product::where('store_id', $store->id)->where('uuid', $uuid)->firstOrFail();
+
+        $nameEn = $product->name['en'] ?? $product->name['hy'];
+        $newSlug = $this->slugService->generateForProduct($nameEn . ' copy', $store->id);
+
+        $copy = $product->replicate(['uuid']);
+        $copy->uuid = \Illuminate\Support\Str::uuid();
+        $copy->slug = $newSlug;
+        $copy->status = \App\Enums\ProductStatus::Draft;
+        $copy->is_featured = false;
+        $copy->save();
+
+        return $this->success(new ProductDetailResource($copy->load(['images', 'variants', 'category'])), 'Product duplicated.', 201);
+    }
+
     public function updateStatus(UpdateProductStatusRequest $request, string $uuid): JsonResponse
     {
         $store = $request->attributes->get('sellerStore');

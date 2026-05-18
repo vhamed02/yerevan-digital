@@ -55,11 +55,29 @@ export interface Variant {
 export interface Order {
   uuid: string
   order_number: string
-  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled'
+  status: 'pending' | 'paid' | 'processing' | 'shipped' | 'delivered' | 'cancelled' | 'refunded'
+  payment_status: 'pending' | 'paid' | 'failed' | 'refunded'
+  payment_method?: string
+  subtotal: number
+  discount: number
+  shipping_cost: number
+  tax: number
   total: number
+  currency: string
   customer_name: string
   customer_email: string
   customer_phone?: string
+  shipping_address?: {
+    line1?: string
+    line2?: string
+    city?: string
+    postal_code?: string
+    country?: string
+  }
+  notes?: string
+  paid_at?: string
+  shipped_at?: string
+  delivered_at?: string
   items: OrderItem[]
   created_at: string
 }
