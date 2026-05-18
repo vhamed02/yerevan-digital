@@ -24,12 +24,17 @@ class CustomerOrderConfirmationNotification extends Notification implements Shou
 
     public function toMail(object $notifiable): MailMessage
     {
-        $order = $this->order->loadMissing(['items', 'store']);
+        $order  = $this->order->loadMissing(['items', 'store']);
+        $locale = $notifiable->locale ?? 'hy';
+        $subject = $locale === 'hy'
+            ? "Պատվերը հաստատված է — #{$order->order_number}"
+            : "Order Confirmed — #{$order->order_number}";
 
         return (new MailMessage)
-            ->subject("Order Confirmed — #{$order->order_number}")
+            ->subject($subject)
             ->view('emails.orders.order-confirmation', [
-                'order' => $order,
+                'order'  => $order,
+                'locale' => $locale,
             ]);
     }
 }
