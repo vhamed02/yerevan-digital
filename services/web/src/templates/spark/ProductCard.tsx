@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { ShoppingBag, Check, Heart } from 'lucide-react'
+import { ShoppingBag, Check, Heart, Eye } from 'lucide-react'
 import { useStoreCart } from '@/stores/cart.store'
 import type { ProductCardProps } from '../types'
 
@@ -118,14 +118,22 @@ export function ProductCard({ product, storeSlug, isPreview }: ProductCardProps)
           <p className="line-clamp-2 text-sm font-semibold leading-snug text-gray-900 group-hover:text-[var(--accent)] transition-colors">
             {name}
           </p>
-          <div className="mt-auto flex items-center gap-2 pt-2.5">
-            <span className="text-base font-black text-gray-900">
-              {product.price.toLocaleString()} ֏
-            </span>
-            {isOnSale && (
-              <span className="text-xs font-medium text-gray-400 line-through">
-                {product.compare_price!.toLocaleString()} ֏
+          <div className="mt-auto pt-2.5">
+            <div className="flex items-center gap-2">
+              <span className="text-base font-black text-gray-900">
+                {product.price.toLocaleString()} ֏
               </span>
+              {isOnSale && (
+                <span className="text-xs font-medium text-gray-400 line-through">
+                  {product.compare_price!.toLocaleString()} ֏
+                </span>
+              )}
+            </div>
+            {product.view_count > 0 && (
+              <div className="mt-1.5 flex items-center gap-1 text-[11px] text-gray-400">
+                <Eye className="h-3 w-3" />
+                <span>{product.view_count.toLocaleString()}</span>
+              </div>
             )}
           </div>
         </div>

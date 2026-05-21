@@ -36,6 +36,7 @@ class PublicProductResource extends JsonResource
                     'original'  => $this->imageUrl($img->path_original),
                 ])->values()->all()
             ),
+            'view_count'    => (int) ($this->view_count ?? 0),
             'category'      => $this->whenLoaded('category', fn() => $this->category ? [
                 'id'   => $this->category->id,
                 'name' => $this->category->getTranslations('name'),

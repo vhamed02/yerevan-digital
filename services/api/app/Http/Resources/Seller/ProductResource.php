@@ -26,6 +26,7 @@ class ProductResource extends JsonResource
             'is_featured'  => $this->is_featured,
             'sort_order'   => $this->sort_order,
             'stock_status' => $this->stock > 0 ? 'in_stock' : 'out_of_stock',
+            'view_count'   => (int) ($this->view_count ?? 0),
             'created_at'   => $this->created_at?->toIso8601String(),
             'primary_image'=> $primaryImage ? new ProductImageResource($primaryImage) : null,
             'category'     => $this->whenLoaded('category', fn() => $this->category ? [

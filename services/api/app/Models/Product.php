@@ -63,6 +63,7 @@ class Product extends Model
             'allow_backorders' => 'boolean',
             'is_featured'     => 'boolean',
             'status'          => ProductStatus::class,
+            'view_count'      => 'integer',
         ];
     }
 

@@ -7,6 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod/v4'
 import { toast } from 'sonner'
 import { useMutation } from '@tanstack/react-query'
+import { Eye } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Textarea } from '@/components/ui/Textarea'
@@ -459,6 +460,16 @@ export default function ProductForm({ product, categories }: ProductFormProps) {
 
         <aside className="hidden w-52 shrink-0 xl:block">
           <div className="sticky top-28 flex flex-col gap-4">
+            {isEdit && (product.view_count ?? 0) >= 0 && (
+              <div className="rounded-xl border border-border bg-surface p-4">
+                <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-content-muted">Views</p>
+                <div className="flex items-center gap-2 text-content-primary">
+                  <Eye className="h-4 w-4 text-content-muted" />
+                  <span className="text-xl font-bold">{(product.view_count ?? 0).toLocaleString()}</span>
+                </div>
+                <p className="mt-1 text-xs text-content-muted">unique visitors (12h dedup)</p>
+              </div>
+            )}
             <div className="rounded-xl border border-border bg-surface p-4">
               <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-content-muted">Status</p>
               <Controller

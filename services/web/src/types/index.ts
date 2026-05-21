@@ -282,6 +282,7 @@ export interface SellerProduct {
   allow_backorders: boolean
   status: 'draft' | 'active' | 'archived'
   is_featured: boolean
+  view_count: number
   category?: PublicCategory
   images: ProductImage[] | null
   variants?: SellerVariant[]
@@ -434,6 +435,7 @@ export interface StorefrontProduct {
   is_featured: boolean
   stock: number
   manage_stock: boolean
+  view_count: number
   images: ProductImage[] | null
   variants?: StorefrontVariant[]
   category?: PublicCategory

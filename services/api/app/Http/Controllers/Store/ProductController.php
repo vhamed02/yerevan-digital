@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Store;
 
+use App\Events\ProductViewed;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Store\PublicProductDetailResource;
 use App\Http\Resources\Store\PublicProductResource;
@@ -60,8 +61,9 @@ class ProductController extends Controller
     {
         $store    = $request->attributes->get('currentStore');
         $cacheKey = "store:{$slug}:product:{$productSlug}";
+        $idKey    = "store:{$slug}:product:{$productSlug}:id";
 
-        $payload = Cache::remember($cacheKey, 60, function () use ($store, $productSlug) {
+        $payload = Cache::remember($cacheKey, 60, function () use ($store, $productSlug, $idKey) {
             $product = $this->products->findPublicByStoreAndSlug($store->id, $productSlug, [
                 'images',
                 'variants' => fn($q) => $q->where('is_active', true),
@@ -69,8 +71,15 @@ class ProductController extends Controller
                 'reviews'  => fn($q) => $q->where('is_approved', true)->latest()->limit(50),
             ]);
 
+            Cache::put($idKey, $product->id, 3600);
+
             return (new PublicProductDetailResource($product))->resolve();
         });
+
+        $productId = Cache::get($idKey);
+        if ($productId && !$request->boolean('preview')) {
+            event(new ProductViewed($productId, $request->ip()));
+        }
 
         return $this->success($payload);
     }

@@ -5,7 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import {
   ShoppingBag, Plus, Minus, Check, ChevronRight,
-  ShieldCheck, RefreshCw, Truck, ChevronDown, Star, X,
+  ShieldCheck, RefreshCw, Truck, ChevronDown, Star, X, Eye,
 } from 'lucide-react'
 import { useStoreCart } from '@/stores/cart.store'
 import ReviewSection from '@/components/store/ReviewSection'
@@ -181,10 +181,18 @@ export function ProductDetail({ product, storeSlug, isPreview }: ProductDetailPr
 
           {/* ── Info ── */}
           <div className="flex flex-col gap-6">
-            {/* Rating */}
-            {product.rating_avg != null && (product.rating_count ?? 0) > 0 && (
-              <StarRating avg={product.rating_avg} count={product.rating_count!} />
-            )}
+            {/* Rating + views row */}
+            <div className="flex flex-wrap items-center gap-4">
+              {product.rating_avg != null && (product.rating_count ?? 0) > 0 && (
+                <StarRating avg={product.rating_avg} count={product.rating_count!} />
+              )}
+              {product.view_count > 0 && (
+                <div className="flex items-center gap-1.5 text-sm text-gray-400">
+                  <Eye className="h-4 w-4" />
+                  <span>{product.view_count.toLocaleString()} դիտում</span>
+                </div>
+              )}
+            </div>
 
             {/* Title */}
             <div>

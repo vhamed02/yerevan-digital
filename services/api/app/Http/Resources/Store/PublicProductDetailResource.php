@@ -53,6 +53,7 @@ class PublicProductDetailResource extends JsonResource
                 'name' => $this->category->getTranslations('name'),
                 'slug' => $this->category->slug,
             ] : null),
+            'view_count'        => (int) ($this->view_count ?? 0),
             'rating_avg'        => $this->whenLoaded('reviews', fn() =>
                 $this->reviews->isNotEmpty()
                     ? round($this->reviews->avg('rating'), 1)

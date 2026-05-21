@@ -170,6 +170,62 @@ class StorePublicTest extends TestCase
             ->assertJsonPath('data.uuid', $product->uuid);
     }
 
+    public function test_product_view_increments_on_first_visit(): void
+    {
+        $product = Product::factory()->create([
+            'store_id'    => $this->store->id,
+            'status'      => ProductStatus::Active,
+            'view_count'  => 0,
+        ]);
+
+        $this->getJson("/api/v1/store/{$this->store->slug}/products/{$product->slug}");
+
+        $this->assertEquals(1, $product->fresh()->view_count);
+    }
+
+    public function test_product_view_deduplicates_same_ip_within_12_hours(): void
+    {
+        $product = Product::factory()->create([
+            'store_id'   => $this->store->id,
+            'status'     => ProductStatus::Active,
+            'view_count' => 0,
+        ]);
+
+        $url = "/api/v1/store/{$this->store->slug}/products/{$product->slug}";
+
+        $this->getJson($url);
+        $this->getJson($url);
+        $this->getJson($url);
+
+        $this->assertEquals(1, $product->fresh()->view_count);
+    }
+
+    public function test_product_view_not_counted_in_preview_mode(): void
+    {
+        $product = Product::factory()->create([
+            'store_id'   => $this->store->id,
+            'status'     => ProductStatus::Active,
+            'view_count' => 0,
+        ]);
+
+        $this->getJson("/api/v1/store/{$this->store->slug}/products/{$product->slug}?preview=true");
+
+        $this->assertEquals(0, $product->fresh()->view_count);
+    }
+
+    public function test_product_detail_includes_view_count(): void
+    {
+        $product = Product::factory()->create([
+            'store_id'   => $this->store->id,
+            'status'     => ProductStatus::Active,
+            'view_count' => 42,
+        ]);
+
+        $this->getJson("/api/v1/store/{$this->store->slug}/products/{$product->slug}?preview=true")
+            ->assertOk()
+            ->assertJsonPath('data.view_count', 42);
+    }
+
     public function test_product_detail_returns_404_for_draft(): void
     {
         $product = Product::factory()->draft()->create(['store_id' => $this->store->id]);

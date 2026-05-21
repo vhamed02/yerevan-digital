@@ -30,6 +30,7 @@ class ProductDetailResource extends JsonResource
             'stock_status'      => $this->stock > 0 ? 'in_stock' : 'out_of_stock',
             'meta_title'        => $this->getTranslations('meta_title'),
             'meta_description'  => $this->getTranslations('meta_description'),
+            'view_count'        => (int) ($this->view_count ?? 0),
             'created_at'        => $this->created_at?->toIso8601String(),
             'updated_at'        => $this->updated_at?->toIso8601String(),
             'images'            => ProductImageResource::collection($this->whenLoaded('images')),
