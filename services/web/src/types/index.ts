@@ -110,6 +110,7 @@ export interface PaginatedResponse<T> {
     last_page: number
     per_page: number
     total: number
+    price_max?: number
   }
 }
 

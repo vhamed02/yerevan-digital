@@ -28,4 +28,6 @@ interface ProductRepositoryInterface
     public function findPublicByStoreAndSlug(int $storeId, string $slug, array $with = []): Product;
 
     public function findActiveByStoreAndUuid(int $storeId, string $uuid, bool $lock = false): Product;
+
+    public function maxPriceForStore(int $storeId): float;
 }

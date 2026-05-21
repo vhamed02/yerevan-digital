@@ -51,7 +51,7 @@ export function StoreHeader({ store, categories, slug, isPreview }: StoreHeaderP
               : 'bg-white border-b border-gray-100'
           }`}
         >
-          <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3.5">
+          <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3.5">
             <Link href={`/store/${slug}`} className="flex flex-shrink-0 items-center gap-3 group">
               {store.logo_url ? (
                 <Image

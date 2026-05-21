@@ -271,7 +271,7 @@ export function StoreHome({ store, featuredProducts, products, categories, slug,
       {/* ─── Trust strip ─── */}
       {showTrustStrip && (
         <div className="bg-white">
-          <div className="mx-auto flex max-w-6xl items-center justify-around gap-2 overflow-x-auto px-4 py-4" style={{ scrollbarWidth: 'none' }}>
+          <div className="mx-auto flex max-w-7xl items-center justify-around gap-2 overflow-x-auto px-4 py-4" style={{ scrollbarWidth: 'none' }}>
             {TRUST_ITEMS.map(({ icon: Icon, label }) => (
               <div key={label} className="flex flex-shrink-0 items-center gap-2.5 px-4">
                 <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl" style={{ backgroundColor: 'color-mix(in srgb, var(--accent) 12%, white)' }}>
@@ -284,7 +284,7 @@ export function StoreHome({ store, featuredProducts, products, categories, slug,
         </div>
       )}
 
-      <div className="mx-auto max-w-6xl px-4 py-14 flex flex-col gap-20">
+      <div className="mx-auto max-w-7xl px-4 py-14 flex flex-col gap-20">
 
         {/* ─── Categories ─── */}
         {showCategoryBar && categories.length > 0 && (

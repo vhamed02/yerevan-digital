@@ -34,7 +34,7 @@ export function StoreFooter({ store }: StoreFooterProps) {
 
       {/* Links grid */}
       <div className="bg-gray-950">
-        <div className="mx-auto max-w-6xl px-4 py-12">
+        <div className="mx-auto max-w-7xl px-4 py-12">
           <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3">
             {/* Brand */}
             <div>

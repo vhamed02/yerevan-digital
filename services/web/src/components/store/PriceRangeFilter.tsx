@@ -3,16 +3,17 @@
 import { useState, useRef, useCallback } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 
-const RANGE_MAX = 300_000
 const STEP = 1_000
 
 interface Props {
   storeSlug: string
   initialMin: string
   initialMax: string
+  rangeMax: number
 }
 
-export function PriceRangeFilter({ storeSlug, initialMin, initialMax }: Props) {
+export function PriceRangeFilter({ storeSlug, initialMin, initialMax, rangeMax }: Props) {
+  const RANGE_MAX = rangeMax > 0 ? Math.ceil(rangeMax / STEP) * STEP : STEP
   const router = useRouter()
   const sp = useSearchParams()
   const [min, setMin] = useState(initialMin ? Math.min(Number(initialMin), RANGE_MAX) : 0)
@@ -89,7 +90,7 @@ export function PriceRangeFilter({ storeSlug, initialMin, initialMax }: Props) {
       <span className="min-w-[44px] rounded-lg bg-gray-50 px-2 py-1 text-center text-xs font-semibold text-gray-700">
         {min === 0 ? '0' : min.toLocaleString()} ֏
       </span>
-      <div className="relative flex w-28 items-center" style={{ height: 16 }}>
+      <div className="relative flex items-center" style={{ width: 200, height: 16 }}>
         <div className="absolute inset-x-0 top-1/2 h-1 -translate-y-1/2 rounded-full bg-gray-100" />
         <div
           className="absolute top-1/2 h-1 -translate-y-1/2 rounded-full bg-gray-900 transition-all"
@@ -117,7 +118,7 @@ export function PriceRangeFilter({ storeSlug, initialMin, initialMax }: Props) {
         />
       </div>
       <span className="min-w-[56px] rounded-lg bg-gray-50 px-2 py-1 text-center text-xs font-semibold text-gray-700">
-        {max >= RANGE_MAX ? `300K+` : max.toLocaleString()} ֏
+        {max >= RANGE_MAX ? `${RANGE_MAX.toLocaleString()}+` : max.toLocaleString()} ֏
       </span>
       {hasFilter && (
         <button

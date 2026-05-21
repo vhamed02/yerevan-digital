@@ -33,8 +33,9 @@ class ProductController extends Controller
 
         $queryHash = md5(json_encode(compact('filters', 'sort', 'perPage', 'page')));
         $cacheKey  = "store:{$slug}:products:{$queryHash}";
+        $maxKey    = "store:{$slug}:max_price";
 
-        $payload = Cache::remember($cacheKey, 120, function () use ($store, $filters, $sort, $perPage, $page) {
+        $payload  = Cache::remember($cacheKey, 120, function () use ($store, $filters, $sort, $perPage, $page) {
             $paginator = $this->products->paginatePublicByStore($store->id, $filters, $sort, $perPage, $page);
 
             return [
@@ -47,6 +48,10 @@ class ProductController extends Controller
                 ],
             ];
         });
+
+        $maxPrice = Cache::remember($maxKey, 300, fn() => $this->products->maxPriceForStore($store->id));
+
+        $payload['meta']['price_max'] = $maxPrice;
 
         return $this->success($payload);
     }

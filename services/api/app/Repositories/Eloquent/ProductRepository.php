@@ -130,4 +130,11 @@ class ProductRepository implements ProductRepositoryInterface
 
         return $query->firstOrFail();
     }
+
+    public function maxPriceForStore(int $storeId): float
+    {
+        return (float) Product::where('store_id', $storeId)
+            ->where('status', ProductStatus::Active)
+            ->max('price') ?? 0;
+    }
 }

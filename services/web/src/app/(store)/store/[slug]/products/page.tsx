@@ -71,16 +71,17 @@ export default async function StoreProductsPage({
     serverGet<StorefrontStore>(`/store/${slug}/info`),
     serverGet<{
       data: StorefrontProduct[]
-      meta: { current_page: number; last_page: number; total: number }
+      meta: { current_page: number; last_page: number; total: number; price_max?: number }
     }>(`/store/${slug}/products?${queryParams}`),
     serverGet<PublicCategory[]>(`/store/${slug}/categories`),
   ])
 
   if (!storeData) notFound()
   const store = storeData
-  const products = productsData?.data ?? []
+  const products  = productsData?.data ?? []
   const categories = categoriesData ?? []
-  const meta = productsData?.meta
+  const meta      = productsData?.meta
+  const priceMax  = meta?.price_max ?? 0
 
   const Template = await loadTemplate(store.active_template_key)
 
@@ -91,7 +92,7 @@ export default async function StoreProductsPage({
   ]
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8">
+    <div className="mx-auto max-w-7xl px-4 py-8">
       <div className="mb-6 flex flex-wrap items-center gap-3">
         <div className="flex flex-1 flex-wrap gap-2">
           <Link
@@ -126,7 +127,7 @@ export default async function StoreProductsPage({
       </div>
 
       <div className="mb-5 flex flex-wrap items-center gap-2 rounded-2xl border border-gray-100 bg-white px-4 py-3">
-        <PriceRangeFilter storeSlug={slug} initialMin={minPrice} initialMax={maxPrice} />
+        <PriceRangeFilter storeSlug={slug} initialMin={minPrice} initialMax={maxPrice} rangeMax={priceMax} />
         <div className="mx-1 h-5 w-px bg-gray-200" />
         {(
           [
