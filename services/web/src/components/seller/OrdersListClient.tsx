@@ -1,9 +1,11 @@
 'use client'
 
 import Link from 'next/link'
+import { useState } from 'react'
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 import type { ColumnDef } from '@tanstack/react-table'
+import { toast } from 'sonner'
 import AdminTable from '@/components/admin/AdminTable'
 import { StatusBadge } from '@/components/ui/StatusBadge'
 import { Button } from '@/components/ui/Button'
@@ -30,6 +32,7 @@ export default function OrdersListClient({ initialData, initialMeta }: OrdersLis
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
+  const [exporting, setExporting] = useState(false)
 
   const status = searchParams.get('status') ?? ''
 
@@ -44,6 +47,21 @@ export default function OrdersListClient({ initialData, initialMeta }: OrdersLis
     initialData: initialMeta ? { data: initialData, meta: initialMeta } : undefined,
     staleTime: 30000,
   })
+
+  async function handleExport() {
+    setExporting(true)
+    try {
+      const params = new URLSearchParams()
+      if (status) params.set('status', status)
+      const query = params.toString()
+      await api.get(`/seller/orders/export${query ? `?${query}` : ''}`)
+      toast.success('Export queued — you will receive an email shortly.')
+    } catch {
+      toast.error('Failed to queue export. Please try again.')
+    } finally {
+      setExporting(false)
+    }
+  }
 
   function setParam(key: string, value: string) {
     const params = new URLSearchParams(searchParams.toString())
@@ -112,7 +130,12 @@ export default function OrdersListClient({ initialData, initialMeta }: OrdersLis
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 flex flex-col gap-6">
-      <h1 className="font-heading text-2xl font-bold text-content-primary">Orders</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="font-heading text-2xl font-bold text-content-primary">Orders</h1>
+        <Button variant="outline" size="sm" onClick={handleExport} disabled={exporting}>
+          {exporting ? 'Queuing…' : 'Export CSV'}
+        </Button>
+      </div>
 
       <Tabs.Root value={status} onValueChange={(v) => setParam('status', v)}>
         <Tabs.List className="flex gap-0 border-b border-border overflow-x-auto">
