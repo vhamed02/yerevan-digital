@@ -5,7 +5,9 @@ namespace App\Repositories\Eloquent;
 use App\Enums\StoreStatus;
 use App\Models\Store;
 use App\Repositories\Contracts\AdminStoreRepositoryInterface;
+use Carbon\Carbon;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
 class AdminStoreRepository implements AdminStoreRepositoryInterface
@@ -82,5 +84,39 @@ class AdminStoreRepository implements AdminStoreRepositoryInterface
     public function softDelete(string $slug): void
     {
         $this->resolve($slug)->delete();
+    }
+
+    public function countActive(): int
+    {
+        return Store::where('status', StoreStatus::Active)->count();
+    }
+
+    public function countPending(): int
+    {
+        return Store::where('status', StoreStatus::Pending)->count();
+    }
+
+    public function countBetween(Carbon $from, Carbon $to): int
+    {
+        return Store::whereBetween('created_at', [$from, $to])->count();
+    }
+
+    public function pendingWithOwner(int $limit): Collection
+    {
+        return Store::where('status', StoreStatus::Pending)
+            ->with('owner')
+            ->latest()
+            ->limit($limit)
+            ->get();
+    }
+
+    public function topByRevenue(int $limit): Collection
+    {
+        return Store::withCount('orders')
+            ->withSum('orders', 'total')
+            ->where('status', StoreStatus::Active)
+            ->orderByDesc('orders_count')
+            ->limit($limit)
+            ->get();
     }
 }

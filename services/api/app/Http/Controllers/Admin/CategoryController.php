@@ -8,22 +8,18 @@ use App\Http\Requests\Admin\StoreCategoryRequest;
 use App\Http\Requests\Admin\UpdateCategoryRequest;
 use App\Http\Resources\Admin\CategoryResource;
 use App\Models\Category;
+use App\Repositories\Contracts\CategoryRepositoryInterface;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 class CategoryController extends Controller
 {
+    public function __construct(private readonly CategoryRepositoryInterface $categories) {}
+
     public function index(): JsonResponse
     {
-        $categories = Category::withCount('products as product_count')
-            ->with(['children' => fn($q) => $q->withCount('products as product_count')
-                ->with(['children' => fn($q) => $q->withCount('products as product_count')])])
-            ->whereNull('parent_id')
-            ->orderBy('sort_order')
-            ->get();
-
-        return $this->success(CategoryResource::collection($categories));
+        return $this->success(CategoryResource::collection($this->categories->treeWithProductCounts()));
     }
 
     public function store(StoreCategoryRequest $request): JsonResponse
@@ -34,7 +30,7 @@ class CategoryController extends Controller
             $data['slug'] = Str::slug($data['name']['en']);
         }
 
-        $category = Category::create($data);
+        $category = $this->categories->create($data);
 
         return $this->success(new CategoryResource($category), 'Category created.', 201);
     }
@@ -47,9 +43,9 @@ class CategoryController extends Controller
             $data['slug'] = Str::slug($data['name']['en']);
         }
 
-        $category->update($data);
+        $updated = $this->categories->update($category, $data);
 
-        return $this->success(new CategoryResource($category->fresh('children')), 'Category updated.');
+        return $this->success(new CategoryResource($updated->fresh('children')), 'Category updated.');
     }
 
     public function destroy(Category $category): JsonResponse
@@ -60,7 +56,7 @@ class CategoryController extends Controller
             return $this->error('Cannot delete category with active products.', 422);
         }
 
-        $category->delete();
+        $this->categories->delete($category);
 
         return $this->success(null, 'Category deleted.');
     }
@@ -72,24 +68,14 @@ class CategoryController extends Controller
             'order.*' => ['integer', 'exists:categories,id'],
         ]);
 
-        DB::transaction(function () use ($data) {
-            foreach ($data['order'] as $position => $id) {
-                Category::where('id', $id)->update(['sort_order' => $position]);
-            }
-        });
+        $this->categories->reorder($data['order']);
 
         return $this->success(null, 'Categories sorted.');
     }
 
     public function reorder(ReorderCategoryRequest $request, Category $category): JsonResponse
     {
-        $order = $request->validated()['order'];
-
-        DB::transaction(function () use ($order) {
-            foreach ($order as $position => $id) {
-                Category::where('id', $id)->update(['sort_order' => $position]);
-            }
-        });
+        $this->categories->reorder($request->validated()['order']);
 
         $category->load('children');
 

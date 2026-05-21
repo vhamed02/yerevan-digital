@@ -18,4 +18,8 @@ interface AdminSellerRepositoryInterface
     public function updatePassword(int $id, string $password): void;
 
     public function softDeleteWithStore(int $id): void;
+
+    public function countTotal(): int;
+
+    public function countBetween(\Carbon\Carbon $from, \Carbon\Carbon $to): int;
 }

@@ -10,19 +10,20 @@ use App\Http\Requests\Seller\UpdateProductStatusRequest;
 use App\Http\Resources\Seller\ProductDetailResource;
 use App\Http\Resources\Seller\ProductImageResource;
 use App\Http\Resources\Seller\ProductResource;
-use App\Models\Product;
-use App\Models\ProductImage;
+use App\Repositories\Contracts\ProductRepositoryInterface;
 use App\Services\ImageService;
 use App\Services\SlugService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class ProductController extends Controller
 {
     public function __construct(
-        private readonly ImageService $imageService,
-        private readonly SlugService  $slugService,
+        private readonly ProductRepositoryInterface $products,
+        private readonly ImageService               $imageService,
+        private readonly SlugService                $slugService,
     ) {}
 
     public function checkSlug(Request $request): JsonResponse
@@ -37,14 +38,7 @@ class ProductController extends Controller
             'exclude' => ['sometimes', 'nullable', 'string'],
         ]);
 
-        $query = Product::where('store_id', $store->id)
-            ->where('slug', $request->input('slug'));
-
-        if ($request->filled('exclude')) {
-            $query->where('uuid', '!=', $request->input('exclude'));
-        }
-
-        if ($query->exists()) {
+        if ($this->products->slugExists($store->id, $request->input('slug'), $request->input('exclude'))) {
             return $this->error('Slug is already taken.', 409);
         }
 
@@ -58,24 +52,10 @@ class ProductController extends Controller
             return $this->error('You have not created a store yet.', 404);
         }
 
-        $query = Product::where('store_id', $store->id)
-            ->with(['images' => fn($q) => $q->where('is_primary', true), 'category'])
-            ->when($request->status, fn($q) => $q->where('status', $request->status))
-            ->when($request->category_id, fn($q) => $q->where('category_id', $request->category_id))
-            ->when($request->search, fn($q) => $q->where(function ($q) use ($request) {
-                $q->where('name->en', 'like', "%{$request->search}%")
-                    ->orWhere('name->hy', 'like', "%{$request->search}%")
-                    ->orWhere('sku', 'like', "%{$request->search}%");
-            }));
+        $filters = $request->only(['status', 'category_id', 'search']);
+        $paginator = $this->products->paginateByStore($store->id, $filters, $request->input('sort', ''), 20);
 
-        $query = match ($request->sort) {
-            'price_asc'  => $query->orderBy('price'),
-            'price_desc' => $query->orderByDesc('price'),
-            'stock_low'  => $query->orderBy('stock'),
-            default      => $query->latest(),
-        };
-
-        return $this->paginated(ProductResource::collection($query->paginate(20)));
+        return $this->paginated(ProductResource::collection($paginator));
     }
 
     public function show(Request $request, string $uuid): JsonResponse
@@ -85,10 +65,7 @@ class ProductController extends Controller
             return $this->error('You have not created a store yet.', 404);
         }
 
-        $product = Product::where('store_id', $store->id)
-            ->where('uuid', $uuid)
-            ->with(['images', 'variants', 'category'])
-            ->firstOrFail();
+        $product = $this->products->findByStoreAndUuid($store->id, $uuid, ['images', 'variants', 'category']);
 
         return $this->success(new ProductDetailResource($product));
     }
@@ -105,9 +82,8 @@ class ProductController extends Controller
         $data['slug'] = empty($data['slug'])
             ? $this->slugService->generateForProduct($nameEn, $store->id)
             : $data['slug'];
-        $data['store_id'] = $store->id;
 
-        $product = Product::create($data);
+        $product = $this->products->createForStore($store->id, $data);
 
         return $this->success(new ProductDetailResource($product->load(['images', 'variants', 'category'])), 'Product created.', 201);
     }
@@ -119,8 +95,7 @@ class ProductController extends Controller
             return $this->error('You have not created a store yet.', 404);
         }
 
-        $product = Product::where('store_id', $store->id)->where('uuid', $uuid)->firstOrFail();
-
+        $product = $this->products->findByStoreAndUuid($store->id, $uuid);
         $data = $request->validated();
 
         if (isset($data['name']) && empty($data['slug'])) {
@@ -128,7 +103,7 @@ class ProductController extends Controller
             $data['slug'] = $this->slugService->generateForProduct($nameEn, $store->id, $product->id);
         }
 
-        $product->update($data);
+        $this->products->update($product, $data);
 
         return $this->success(new ProductDetailResource($product->fresh(['images', 'variants', 'category'])), 'Product updated.');
     }
@@ -140,8 +115,8 @@ class ProductController extends Controller
             return $this->error('You have not created a store yet.', 404);
         }
 
-        $product = Product::where('store_id', $store->id)->where('uuid', $uuid)->firstOrFail();
-        $product->delete();
+        $product = $this->products->findByStoreAndUuid($store->id, $uuid);
+        $this->products->delete($product);
 
         return $this->success(null, 'Product deleted.');
     }
@@ -153,17 +128,12 @@ class ProductController extends Controller
             return $this->error('You have not created a store yet.', 404);
         }
 
-        $product = Product::where('store_id', $store->id)->where('uuid', $uuid)->firstOrFail();
+        $product = $this->products->findByStoreAndUuid($store->id, $uuid);
 
         $nameEn = $product->name['en'] ?? $product->name['hy'];
         $newSlug = $this->slugService->generateForProduct($nameEn . ' copy', $store->id);
 
-        $copy = $product->replicate(['uuid']);
-        $copy->uuid = \Illuminate\Support\Str::uuid();
-        $copy->slug = $newSlug;
-        $copy->status = \App\Enums\ProductStatus::Draft;
-        $copy->is_featured = false;
-        $copy->save();
+        $copy = $this->products->duplicate($product, (string) Str::uuid(), $newSlug);
 
         return $this->success(new ProductDetailResource($copy->load(['images', 'variants', 'category'])), 'Product duplicated.', 201);
     }
@@ -175,17 +145,17 @@ class ProductController extends Controller
             return $this->error('You have not created a store yet.', 404);
         }
 
-        $product = Product::where('store_id', $store->id)->where('uuid', $uuid)->firstOrFail();
-        $product->update(['status' => $request->validated()['status']]);
+        $product = $this->products->findByStoreAndUuid($store->id, $uuid);
+        $this->products->update($product, ['status' => $request->validated()['status']]);
 
-        return $this->success(['status' => $product->status->value], 'Product status updated.');
+        return $this->success(['status' => $product->fresh()->status->value], 'Product status updated.');
     }
 
     public function uploadImages(Request $request, string $uuid): JsonResponse
     {
         $request->validate([
-            'images'    => ['required', 'array', 'max:10'],
-            'images.*'  => ['required', 'image', 'mimes:jpeg,png,webp', 'max:5120'],
+            'images'   => ['required', 'array', 'max:10'],
+            'images.*' => ['required', 'image', 'mimes:jpeg,png,webp', 'max:5120'],
         ]);
 
         $store = $request->attributes->get('sellerStore');
@@ -193,7 +163,7 @@ class ProductController extends Controller
             return $this->error('You have not created a store yet.', 404);
         }
 
-        $product = Product::where('store_id', $store->id)->where('uuid', $uuid)->firstOrFail();
+        $product = $this->products->findByStoreAndUuid($store->id, $uuid);
         $isFirst = !$product->images()->exists();
         $uploaded = [];
 
@@ -222,7 +192,7 @@ class ProductController extends Controller
             return $this->error('You have not created a store yet.', 404);
         }
 
-        $product = Product::where('store_id', $store->id)->where('uuid', $uuid)->firstOrFail();
+        $product = $this->products->findByStoreAndUuid($store->id, $uuid);
         $image = $product->images()->findOrFail($imageId);
         $wasPrimary = $image->is_primary;
         $image->delete();
@@ -241,7 +211,7 @@ class ProductController extends Controller
             return $this->error('You have not created a store yet.', 404);
         }
 
-        $product = Product::where('store_id', $store->id)->where('uuid', $uuid)->firstOrFail();
+        $product = $this->products->findByStoreAndUuid($store->id, $uuid);
         $order = $request->validated()['order'];
 
         DB::transaction(function () use ($product, $order) {

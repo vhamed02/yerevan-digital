@@ -3,6 +3,7 @@
 namespace App\Repositories\Contracts;
 
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
 interface AdminStoreRepositoryInterface
@@ -20,4 +21,14 @@ interface AdminStoreRepositoryInterface
     public function toggleFeatured(string $slug): Model;
 
     public function softDelete(string $slug): void;
+
+    public function countActive(): int;
+
+    public function countPending(): int;
+
+    public function countBetween(\Carbon\Carbon $from, \Carbon\Carbon $to): int;
+
+    public function pendingWithOwner(int $limit): Collection;
+
+    public function topByRevenue(int $limit): Collection;
 }

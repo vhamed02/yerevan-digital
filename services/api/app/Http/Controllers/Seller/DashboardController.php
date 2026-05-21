@@ -5,13 +5,15 @@ namespace App\Http\Controllers\Seller;
 use App\Enums\ProductStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Seller\OrderResource;
-use App\Models\Order;
+use App\Repositories\Contracts\OrderRepositoryInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
+    public function __construct(private readonly OrderRepositoryInterface $orders) {}
+
     public function __invoke(Request $request): JsonResponse
     {
         $store = $request->attributes->get('sellerStore');
@@ -100,10 +102,7 @@ class DashboardController extends Controller
 
     private function recentOrders(object $store): array
     {
-        return Order::where('store_id', $store->id)
-            ->latest()
-            ->limit(5)
-            ->get()
+        return $this->orders->recentByStore($store->id, 5)
             ->map(fn($order) => (new OrderResource($order))->resolve())
             ->values()
             ->all();

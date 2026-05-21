@@ -1,0 +1,38 @@
+<?php
+
+namespace App\Repositories\Contracts;
+
+use App\Models\Order;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Collection;
+
+interface OrderRepositoryInterface
+{
+    public function paginateByStore(int $storeId, array $filters): LengthAwarePaginator;
+
+    public function findByStoreAndUuid(int $storeId, string $uuid, array $with = []): Order;
+
+    public function create(array $data): Order;
+
+    public function update(Order $order, array $data): Order;
+
+    public function recentByStore(int $storeId, int $limit = 5): Collection;
+
+    public function findPublicByStoreAndUuid(int $storeId, string $uuid, array $with = []): Order;
+
+    public function countToday(): int;
+
+    public function countYesterday(): int;
+
+    public function revenueBetween(\Carbon\Carbon $from, \Carbon\Carbon $to): float;
+
+    public function revenueTotal(): float;
+
+    public function chartLast30Days(): array;
+
+    public function countsByStatus(): array;
+
+    public function recentWithStore(int $limit): Collection;
+
+    public function countAll(): int;
+}

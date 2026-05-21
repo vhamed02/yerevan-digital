@@ -2,16 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Page;
+use App\Repositories\Contracts\PageRepositoryInterface;
 use Illuminate\Http\JsonResponse;
 
 class PageController extends Controller
 {
+    public function __construct(private readonly PageRepositoryInterface $pages) {}
+
     public function show(string $slug): JsonResponse
     {
-        $page = Page::where('slug', $slug)->where('is_published', true)->firstOrFail();
+        $page = $this->pages->findBySlug($slug);
 
-        if (! $page) {
+        if (!$page->is_published) {
             return $this->error('Page not found.', 404);
         }
 

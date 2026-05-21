@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Store;
 
 use App\Http\Controllers\CaptchaController;
 use App\Http\Controllers\Controller;
-use App\Models\Product;
-use App\Models\ProductReview;
+use App\Repositories\Contracts\ProductRepositoryInterface;
+use App\Repositories\Contracts\ProductReviewRepositoryInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -13,21 +13,22 @@ use Illuminate\Validation\ValidationException;
 
 class ProductReviewController extends Controller
 {
+    public function __construct(
+        private readonly ProductRepositoryInterface        $products,
+        private readonly ProductReviewRepositoryInterface  $reviews,
+    ) {}
+
     public function store(Request $request, string $slug, string $productSlug): JsonResponse
     {
         $store = $request->attributes->get('currentStore');
 
-        $product = Product::where('store_id', $store->id)
-            ->where('slug', $productSlug)
-            ->where('status', 'active')
-            ->firstOrFail();
+        $product = $this->products->findPublicByStoreAndSlug($store->id, $productSlug);
 
         $data = $request->validate([
-            'reviewer_name'  => ['required', 'string', 'max:100'],
-            'reviewer_email' => ['nullable', 'email', 'max:200'],
-            'rating'         => ['required', 'integer', 'min:1', 'max:5'],
-            'body'           => ['nullable', 'string', 'max:2000'],
-            // spam protection fields
+            'reviewer_name'         => ['required', 'string', 'max:100'],
+            'reviewer_email'        => ['nullable', 'email', 'max:200'],
+            'rating'                => ['required', 'integer', 'min:1', 'max:5'],
+            'body'                  => ['nullable', 'string', 'max:2000'],
             'cf_turnstile_response' => ['nullable', 'string'],
             'captcha_token'         => ['nullable', 'string'],
             'captcha_answer'        => ['nullable', 'string'],
@@ -35,20 +36,13 @@ class ProductReviewController extends Controller
 
         $this->verifySpamProtection($request);
 
-        // prevent duplicate review from same email
-        if (!empty($data['reviewer_email'])) {
-            $exists = ProductReview::where('product_id', $product->id)
-                ->where('reviewer_email', $data['reviewer_email'])
-                ->exists();
-
-            if ($exists) {
-                throw ValidationException::withMessages([
-                    'reviewer_email' => ['You have already reviewed this product.'],
-                ]);
-            }
+        if (!empty($data['reviewer_email']) && $this->reviews->existsByEmailAndProduct($product->id, $data['reviewer_email'])) {
+            throw ValidationException::withMessages([
+                'reviewer_email' => ['You have already reviewed this product.'],
+            ]);
         }
 
-        ProductReview::create([
+        $this->reviews->create([
             'store_id'       => $store->id,
             'product_id'     => $product->id,
             'reviewer_name'  => $data['reviewer_name'],
@@ -81,7 +75,6 @@ class ProductReviewController extends Controller
             return;
         }
 
-        // fallback: image captcha
         $token  = $request->input('captcha_token', '');
         $answer = $request->input('captcha_answer', '');
         if (!$token || !$answer || !CaptchaController::verify($token, $answer)) {

@@ -6,6 +6,7 @@ use App\Enums\UserRole;
 use App\Enums\UserStatus;
 use App\Models\User;
 use App\Repositories\Contracts\AdminSellerRepositoryInterface;
+use Carbon\Carbon;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Model;
 
@@ -66,5 +67,17 @@ class AdminSellerRepository implements AdminSellerRepositoryInterface
         $seller = User::where('role', UserRole::Seller)->findOrFail($id);
         $seller->store?->delete();
         $seller->delete();
+    }
+
+    public function countTotal(): int
+    {
+        return User::where('role', UserRole::Seller)->count();
+    }
+
+    public function countBetween(Carbon $from, Carbon $to): int
+    {
+        return User::where('role', UserRole::Seller)
+            ->whereBetween('created_at', [$from, $to])
+            ->count();
     }
 }

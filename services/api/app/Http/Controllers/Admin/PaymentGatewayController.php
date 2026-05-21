@@ -6,34 +6,31 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\UpdatePaymentGatewayRequest;
 use App\Http\Resources\Admin\PaymentGatewayResource;
 use App\Models\PaymentGateway;
+use App\Repositories\Contracts\PaymentGatewayRepositoryInterface;
 use Illuminate\Http\JsonResponse;
 
 class PaymentGatewayController extends Controller
 {
+    public function __construct(private readonly PaymentGatewayRepositoryInterface $gateways) {}
+
     public function index(): JsonResponse
     {
-        $gateways = PaymentGateway::withCount([
-            'storeGateways as store_gateways_count' => fn($q) => $q->where('is_enabled', true),
-        ])
-            ->orderBy('sort_order')
-            ->get();
-
-        return $this->success(PaymentGatewayResource::collection($gateways));
+        return $this->success(PaymentGatewayResource::collection($this->gateways->allOrdered()));
     }
 
     public function update(UpdatePaymentGatewayRequest $request, PaymentGateway $gateway): JsonResponse
     {
-        $gateway->update($request->validated());
+        $updated = $this->gateways->update($gateway, $request->validated());
 
-        return $this->success(new PaymentGatewayResource($gateway->fresh()), 'Gateway updated.');
+        return $this->success(new PaymentGatewayResource($updated), 'Gateway updated.');
     }
 
     public function toggle(PaymentGateway $gateway): JsonResponse
     {
-        $gateway->update(['is_active' => !$gateway->is_active]);
+        $updated = $this->gateways->toggle($gateway);
 
-        $message = $gateway->is_active ? 'Gateway activated.' : 'Gateway deactivated.';
+        $message = $updated->is_active ? 'Gateway activated.' : 'Gateway deactivated.';
 
-        return $this->success(new PaymentGatewayResource($gateway->fresh()), $message);
+        return $this->success(new PaymentGatewayResource($updated), $message);
     }
 }

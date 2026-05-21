@@ -2,54 +2,39 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Enums\OrderStatus;
-use App\Enums\StoreStatus;
-use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Admin\OrderResource;
-use App\Models\Order;
-use App\Models\Store;
-use App\Models\User;
+use App\Repositories\Contracts\AdminSellerRepositoryInterface;
+use App\Repositories\Contracts\AdminStoreRepositoryInterface;
+use App\Repositories\Contracts\OrderRepositoryInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
+    public function __construct(
+        private readonly OrderRepositoryInterface         $orders,
+        private readonly AdminStoreRepositoryInterface    $stores,
+        private readonly AdminSellerRepositoryInterface   $sellers,
+    ) {}
+
     public function dashboard(): JsonResponse
     {
         $data = Cache::tags(['admin:stats'])->remember('admin:dashboard', 300, function () {
-            $ordersToday     = Order::whereDate('created_at', today())->count();
-            $ordersYesterday = Order::whereDate('created_at', today()->subDay())->count();
+            $ordersToday     = $this->orders->countToday();
+            $ordersYesterday = $this->orders->countYesterday();
             $ordersChangePct = $ordersYesterday > 0
                 ? (int) round(($ordersToday - $ordersYesterday) / $ordersYesterday * 100)
                 : 0;
 
-            $revenueThisMonth = (float) Order::whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()])->sum('total');
-            $revenueLastMonth = (float) Order::whereBetween('created_at', [now()->subMonth()->startOfMonth(), now()->subMonth()->endOfMonth()])->sum('total');
+            $revenueThisMonth = $this->orders->revenueBetween(now()->startOfMonth(), now()->endOfMonth());
+            $revenueLastMonth = $this->orders->revenueBetween(now()->subMonth()->startOfMonth(), now()->subMonth()->endOfMonth());
             $revenueChangePct = $revenueLastMonth > 0
                 ? (int) round(($revenueThisMonth - $revenueLastMonth) / $revenueLastMonth * 100)
                 : 0;
 
-            $ordersChart = Order::selectRaw('DATE(created_at) as date, COUNT(*) as count')
-                ->whereBetween('created_at', [now()->subDays(29)->startOfDay(), now()->endOfDay()])
-                ->groupByRaw('DATE(created_at)')
-                ->orderBy('date')
-                ->get()
-                ->map(fn($row) => ['date' => $row->date, 'count' => (int) $row->count])
-                ->values();
-
-            $ordersByStatus = Order::selectRaw('status, COUNT(*) as count')
-                ->groupBy('status')
-                ->get()
-                ->map(fn($row) => ['status' => $row->status->value, 'count' => (int) $row->count])
-                ->values();
-
-            $pendingStores = Store::where('status', StoreStatus::Pending)
-                ->with('owner')
-                ->latest()
-                ->limit(20)
-                ->get()
+            $pendingStores = $this->stores->pendingWithOwner(20)
                 ->map(fn($store) => [
                     'id'                  => $store->id,
                     'slug'                => $store->slug,
@@ -70,10 +55,7 @@ class DashboardController extends Controller
                 ])
                 ->values();
 
-            $recentOrders = Order::with('store')
-                ->latest()
-                ->limit(10)
-                ->get()
+            $recentOrders = $this->orders->recentWithStore(10)
                 ->map(fn($order) => [
                     'uuid'          => $order->uuid,
                     'order_number'  => $order->order_number,
@@ -89,19 +71,17 @@ class DashboardController extends Controller
 
             return [
                 'stats' => [
-                    'total_sellers'      => User::where('role', UserRole::Seller)->count(),
-                    'sellers_this_month' => User::where('role', UserRole::Seller)
-                        ->whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()])
-                        ->count(),
-                    'active_stores'      => Store::where('status', StoreStatus::Active)->count(),
-                    'stores_this_month'  => Store::whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()])->count(),
+                    'total_sellers'      => $this->sellers->countTotal(),
+                    'sellers_this_month' => $this->sellers->countBetween(now()->startOfMonth(), now()->endOfMonth()),
+                    'active_stores'      => $this->stores->countActive(),
+                    'stores_this_month'  => $this->stores->countBetween(now()->startOfMonth(), now()->endOfMonth()),
                     'orders_today'       => $ordersToday,
                     'orders_change_pct'  => $ordersChangePct,
                     'revenue_this_month' => $revenueThisMonth,
                     'revenue_change_pct' => $revenueChangePct,
                 ],
-                'orders_chart'     => $ordersChart,
-                'orders_by_status' => $ordersByStatus,
+                'orders_chart'     => $this->orders->chartLast30Days(),
+                'orders_by_status' => $this->orders->countsByStatus(),
                 'pending_stores'   => $pendingStores,
                 'recent_orders'    => $recentOrders,
             ];
@@ -113,15 +93,7 @@ class DashboardController extends Controller
     public function stats(): JsonResponse
     {
         $data = Cache::tags(['admin:stats'])->remember('admin:dashboard:stats', 300, function () {
-            $revenueTotal     = Order::sum('total');
-            $revenueThisMonth = Order::whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()])->sum('total');
-
-            $topStores = Store::withCount('orders')
-                ->withSum('orders', 'total')
-                ->where('status', StoreStatus::Active)
-                ->orderByDesc('orders_count')
-                ->limit(5)
-                ->get()
+            $topStores = $this->stores->topByRevenue(5)
                 ->map(fn($store) => [
                     'slug'        => $store->slug,
                     'name'        => $store->getTranslations('name'),
@@ -129,20 +101,18 @@ class DashboardController extends Controller
                     'revenue'     => $store->orders_sum_total ?? 0,
                 ]);
 
-            $recentOrders = Order::with('store')->latest()->limit(10)->get();
+            $recentOrders = $this->orders->recentWithStore(10);
 
             return [
-                'total_sellers'          => User::where('role', UserRole::Seller)->count(),
-                'active_stores'          => Store::where('status', StoreStatus::Active)->count(),
-                'pending_stores'         => Store::where('status', StoreStatus::Pending)->count(),
+                'total_sellers'          => $this->sellers->countTotal(),
+                'active_stores'          => $this->stores->countActive(),
+                'pending_stores'         => $this->stores->countPending(),
                 'total_products'         => DB::table('products')->whereNull('deleted_at')->count(),
-                'total_orders'           => Order::count(),
-                'revenue_total'          => ['amount' => (float) $revenueTotal, 'currency' => 'AMD'],
-                'revenue_this_month'     => ['amount' => (float) $revenueThisMonth, 'currency' => 'AMD'],
-                'new_sellers_this_month' => User::where('role', UserRole::Seller)
-                    ->whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()])
-                    ->count(),
-                'orders_today'           => Order::whereDate('created_at', today())->count(),
+                'total_orders'           => $this->orders->countAll(),
+                'revenue_total'          => ['amount' => $this->orders->revenueTotal(), 'currency' => 'AMD'],
+                'revenue_this_month'     => ['amount' => $this->orders->revenueBetween(now()->startOfMonth(), now()->endOfMonth()), 'currency' => 'AMD'],
+                'new_sellers_this_month' => $this->sellers->countBetween(now()->startOfMonth(), now()->endOfMonth()),
+                'orders_today'           => $this->orders->countToday(),
                 'top_stores'             => $topStores,
                 'recent_orders'          => OrderResource::collection($recentOrders)->resolve(),
             ];

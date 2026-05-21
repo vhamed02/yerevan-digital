@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers\Seller;
 
-use App\Enums\OrderStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Seller\UpdateOrderStatusRequest;
 use App\Http\Resources\Seller\OrderDetailResource;
 use App\Http\Resources\Seller\OrderResource;
 use App\Jobs\ExportOrdersJob;
-use App\Models\Order;
 use App\Notifications\OrderStatusChangedNotification;
+use App\Repositories\Contracts\OrderRepositoryInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -26,6 +25,8 @@ class OrderController extends Controller
         'refunded'   => [],
     ];
 
+    public function __construct(private readonly OrderRepositoryInterface $orders) {}
+
     public function index(Request $request): JsonResponse
     {
         $store = $request->attributes->get('sellerStore');
@@ -33,18 +34,9 @@ class OrderController extends Controller
             return $this->error('You have not created a store yet.', 404);
         }
 
-        $query = Order::where('store_id', $store->id)
-            ->when($request->status, fn($q) => $q->where('status', $request->status))
-            ->when($request->payment_status, fn($q) => $q->where('payment_status', $request->payment_status))
-            ->when($request->date_from, fn($q) => $q->whereDate('created_at', '>=', $request->date_from))
-            ->when($request->date_to, fn($q) => $q->whereDate('created_at', '<=', $request->date_to))
-            ->when($request->search, fn($q) => $q->where(function ($q) use ($request) {
-                $q->where('order_number', 'like', "%{$request->search}%")
-                    ->orWhere('customer_name', 'like', "%{$request->search}%");
-            }))
-            ->latest();
+        $paginator = $this->orders->paginateByStore($store->id, $request->only(['status', 'payment_status', 'date_from', 'date_to', 'search']));
 
-        return $this->paginated(OrderResource::collection($query->paginate(20)));
+        return $this->paginated(OrderResource::collection($paginator));
     }
 
     public function show(Request $request, string $uuid): JsonResponse
@@ -54,10 +46,7 @@ class OrderController extends Controller
             return $this->error('You have not created a store yet.', 404);
         }
 
-        $order = Order::where('store_id', $store->id)
-            ->where('uuid', $uuid)
-            ->with(['items', 'transactions'])
-            ->firstOrFail();
+        $order = $this->orders->findByStoreAndUuid($store->id, $uuid, ['items', 'transactions']);
 
         return $this->success(new OrderDetailResource($order));
     }
@@ -69,7 +58,7 @@ class OrderController extends Controller
             return $this->error('You have not created a store yet.', 404);
         }
 
-        $order = Order::where('store_id', $store->id)->where('uuid', $uuid)->firstOrFail();
+        $order = $this->orders->findByStoreAndUuid($store->id, $uuid);
         $newStatus = $request->validated()['status'];
         $currentStatus = $order->status->value;
         $allowed = self::ALLOWED_TRANSITIONS[$currentStatus] ?? [];
@@ -86,7 +75,7 @@ class OrderController extends Controller
             'delivered' => ['delivered_at' => now()],
         ];
 
-        $order->update(array_merge(['status' => $newStatus], $timestamps[$newStatus] ?? []));
+        $this->orders->update($order, array_merge(['status' => $newStatus], $timestamps[$newStatus] ?? []));
 
         if ($order->customer) {
             $order->customer->notify(new OrderStatusChangedNotification($order));

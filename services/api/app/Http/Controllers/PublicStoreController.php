@@ -4,13 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Enums\StoreStatus;
 use App\Models\Store;
+use App\Repositories\Contracts\CategoryRepositoryInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
 
 class PublicStoreController extends Controller
 {
+    public function __construct(private readonly CategoryRepositoryInterface $categories) {}
+
     public function index(Request $request): JsonResponse
     {
         $sort    = $request->input('sort', 'newest');
@@ -75,10 +77,7 @@ class PublicStoreController extends Controller
 
     public function categories(): JsonResponse
     {
-        $categories = \App\Models\Category::active()
-            ->orderBy('sort_order')
-            ->orderBy('id')
-            ->get(['id', 'name', 'slug', 'parent_id', 'icon'])
+        $categories = $this->categories->allActive()
             ->map(fn($c) => [
                 'id'        => $c->id,
                 'name'      => $c->getTranslations('name'),
