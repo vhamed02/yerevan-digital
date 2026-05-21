@@ -380,6 +380,8 @@ export interface StoreTemplateConfig {
   show_hero_banner?: boolean
   show_categories_bar?: boolean
   show_featured_slider?: boolean
+  show_trust_strip?: boolean
+  announcement_text?: string
 }
 
 export interface StorefrontStore {
