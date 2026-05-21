@@ -26,8 +26,8 @@ export function ProductGrid({ products, storeSlug, isPreview }: ProductGridProps
           key={product.uuid}
           className={
             i === 0 && products.length >= 3
-              ? 'col-span-2 sm:col-span-1'
-              : ''
+              ? 'col-span-2 sm:col-span-1 h-full'
+              : 'h-full'
           }
         >
           <ProductCard product={product} storeSlug={storeSlug} isPreview={isPreview} />

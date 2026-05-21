@@ -125,7 +125,7 @@ function FeaturedSpotlight({ product, storeSlug, isPreview }: { product: Storefr
 
   return (
     <Link href={`/store/${storeSlug}/products/${product.slug}`} className="group block">
-      <div className="grid grid-cols-1 overflow-hidden rounded-3xl ring-1 ring-black/[0.06] transition-all duration-300 group-hover:shadow-2xl sm:grid-cols-2">
+      <div className="grid grid-cols-1 overflow-hidden rounded-3xl ring-1 ring-black/[0.06] transition-all duration-300 group-hover:shadow-xl sm:grid-cols-2">
         <div className="relative aspect-[4/3] overflow-hidden bg-gray-50 sm:aspect-auto sm:min-h-[360px]">
           {image ? (
             <Image
@@ -242,8 +242,6 @@ export function StoreHome({ store, featuredProducts, products, categories, slug,
               </div>
             </div>
           </div>
-          {/* Bottom fade to white */}
-          <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-white to-transparent" />
         </div>
       ) : (
         <div
@@ -264,7 +262,6 @@ export function StoreHome({ store, featuredProducts, products, categories, slug,
               Գնել հիմա <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
-          <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-white to-transparent" />
         </div>
       )}
 

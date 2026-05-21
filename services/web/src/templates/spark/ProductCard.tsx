@@ -35,8 +35,8 @@ export function ProductCard({ product, storeSlug, isPreview }: ProductCardProps)
   }
 
   return (
-    <Link href={`/store/${storeSlug}/products/${product.slug}`} className="group block">
-      <div className="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-black/[0.04] transition-all duration-300 group-hover:shadow-lg group-hover:ring-black/[0.08]">
+    <Link href={`/store/${storeSlug}/products/${product.slug}`} className="group flex h-full flex-col">
+      <div className="flex flex-1 flex-col overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-black/[0.04] transition-all duration-300 group-hover:shadow-lg group-hover:ring-black/[0.08]">
 
         {/* Image container */}
         <div className="relative aspect-[3/4] overflow-hidden bg-gray-50">
@@ -114,11 +114,11 @@ export function ProductCard({ product, storeSlug, isPreview }: ProductCardProps)
         </div>
 
         {/* Info */}
-        <div className="p-4">
+        <div className="flex flex-1 flex-col p-4">
           <p className="line-clamp-2 text-sm font-semibold leading-snug text-gray-900 group-hover:text-[var(--accent)] transition-colors">
             {name}
           </p>
-          <div className="mt-2.5 flex items-center gap-2">
+          <div className="mt-auto flex items-center gap-2 pt-2.5">
             <span className="text-base font-black text-gray-900">
               {product.price.toLocaleString()} ֏
             </span>
