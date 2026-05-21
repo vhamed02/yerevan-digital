@@ -119,22 +119,24 @@ export function ProductCard({ product, storeSlug, isPreview }: ProductCardProps)
             {name}
           </p>
           <div className="mt-auto pt-2.5">
-            <div className="flex items-center gap-2">
-              <span className="text-base font-black text-gray-900">
-                {product.price.toLocaleString()} ֏
-              </span>
-              {isOnSale && (
-                <span className="text-xs font-medium text-gray-400 line-through">
-                  {product.compare_price!.toLocaleString()} ֏
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <span className="text-base font-black text-gray-900">
+                  {product.price.toLocaleString()} ֏
                 </span>
+                {isOnSale && (
+                  <span className="text-xs font-medium text-gray-400 line-through">
+                    {product.compare_price!.toLocaleString()} ֏
+                  </span>
+                )}
+              </div>
+              {product.view_count > 0 && (
+                <div className="flex items-center gap-1 text-[11px] text-gray-400">
+                  <Eye className="h-3 w-3" />
+                  <span>{product.view_count.toLocaleString()}</span>
+                </div>
               )}
             </div>
-            {product.view_count > 0 && (
-              <div className="mt-1.5 flex items-center gap-1 text-[11px] text-gray-400">
-                <Eye className="h-3 w-3" />
-                <span>{product.view_count.toLocaleString()}</span>
-              </div>
-            )}
           </div>
         </div>
       </div>
