@@ -1,4 +1,4 @@
-import { cookies } from 'next/headers'
+import { cookies, headers } from 'next/headers'
 
 function baseUrl() {
   return (process.env.SERVER_API_URL ?? process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000') + '/api/v1'
@@ -11,9 +11,23 @@ function unwrap<T>(json: unknown): T | null {
   return json as T
 }
 
+async function clientIpHeaders(): Promise<Record<string, string>> {
+  try {
+    const h = await headers()
+    const ip = h.get('x-forwarded-for')?.split(',')[0]?.trim() ?? h.get('x-real-ip')
+    return ip ? { 'X-Client-IP': ip } : {}
+  } catch {
+    return {}
+  }
+}
+
 export async function serverGet<T>(path: string, init?: RequestInit): Promise<T | null> {
   try {
-    const res = await fetch(`${baseUrl()}${path}`, init)
+    const ipHeaders = await clientIpHeaders()
+    const res = await fetch(`${baseUrl()}${path}`, {
+      ...init,
+      headers: { ...ipHeaders, ...init?.headers },
+    })
     if (!res.ok) return null
     return unwrap<T>(await res.json())
   } catch {

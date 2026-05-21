@@ -78,7 +78,8 @@ class ProductController extends Controller
 
         $productId = Cache::get($idKey);
         if ($productId && !$request->boolean('preview')) {
-            event(new ProductViewed($productId, $request->ip()));
+            $ip = $request->header('X-Client-IP') ?: $request->ip();
+            event(new ProductViewed($productId, $ip));
         }
 
         return $this->success($payload);
