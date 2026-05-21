@@ -177,7 +177,7 @@ export default function ReviewSection({
             <div className="mt-1 flex items-center gap-2">
               <Stars value={Math.round(displayAvg)} />
               <span className="text-sm text-gray-600">
-                {displayAvg} · {ratingCount} {ratingCount === 1 ? 'կարծիք' : 'կարծիք'}
+                {displayAvg} · {ratingCount} կարծիք
               </span>
             </div>
           ) : (
@@ -289,7 +289,9 @@ export default function ReviewSection({
                   <p className="text-sm font-semibold text-gray-900">{r.reviewer_name}</p>
                   <Stars value={r.rating} />
                 </div>
-                <time className="shrink-0 text-xs text-gray-400">{r.created_at}</time>
+                <time className="shrink-0 text-xs text-gray-400">
+                  {new Date(r.created_at + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                </time>
               </div>
               {r.body && (
                 <p className="mt-3 text-sm text-gray-600 leading-relaxed">{r.body}</p>

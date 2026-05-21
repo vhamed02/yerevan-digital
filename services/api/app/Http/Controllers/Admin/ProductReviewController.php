@@ -6,12 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Models\ProductReview;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class ProductReviewController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
-        $status = $request->input('status', 'pending'); // pending | approved | all
+        $status = $request->input('status', 'pending');
         $page   = (int) $request->input('page', 1);
 
         $query = ProductReview::with(['product:id,name,slug', 'store:id,name,slug'])
@@ -52,6 +53,10 @@ class ProductReviewController extends Controller
     public function approve(ProductReview $review): JsonResponse
     {
         $review->update(['is_approved' => true]);
+
+        $review->loadMissing(['product', 'store']);
+        Cache::forget("store:{$review->store->slug}:product:{$review->product->slug}");
+
         return $this->success(null, 'Review approved.');
     }
 
