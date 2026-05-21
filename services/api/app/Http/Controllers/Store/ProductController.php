@@ -25,6 +25,8 @@ class ProductController extends Controller
             'category'  => $request->input('category'),
             'search'    => $request->input('search'),
             'featured'  => $request->boolean('featured'),
+            'in_stock'  => $request->boolean('in_stock'),
+            'on_sale'   => $request->boolean('on_sale'),
             'min_price' => $request->input('min_price') !== null ? (float) $request->input('min_price') : null,
             'max_price' => $request->input('max_price') !== null ? (float) $request->input('max_price') : null,
         ];

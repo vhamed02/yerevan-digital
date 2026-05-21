@@ -61,8 +61,8 @@ export function PriceRangeFilter({ storeSlug, initialMin, initialMax }: Props) {
     'pointer-events-none absolute inset-x-0 h-0 appearance-none bg-transparent',
     '[&::-webkit-slider-thumb]:pointer-events-auto',
     '[&::-webkit-slider-thumb]:appearance-none',
-    '[&::-webkit-slider-thumb]:h-[18px]',
-    '[&::-webkit-slider-thumb]:w-[18px]',
+    '[&::-webkit-slider-thumb]:h-[16px]',
+    '[&::-webkit-slider-thumb]:w-[16px]',
     '[&::-webkit-slider-thumb]:rounded-full',
     '[&::-webkit-slider-thumb]:bg-white',
     '[&::-webkit-slider-thumb]:border-2',
@@ -73,8 +73,8 @@ export function PriceRangeFilter({ storeSlug, initialMin, initialMax }: Props) {
     '[&::-webkit-slider-thumb]:hover:scale-110',
     '[&::-moz-range-thumb]:pointer-events-auto',
     '[&::-moz-range-thumb]:appearance-none',
-    '[&::-moz-range-thumb]:h-[18px]',
-    '[&::-moz-range-thumb]:w-[18px]',
+    '[&::-moz-range-thumb]:h-[16px]',
+    '[&::-moz-range-thumb]:w-[16px]',
     '[&::-moz-range-thumb]:rounded-full',
     '[&::-moz-range-thumb]:bg-white',
     '[&::-moz-range-thumb]:border-2',
@@ -84,29 +84,17 @@ export function PriceRangeFilter({ storeSlug, initialMin, initialMax }: Props) {
   ].join(' ')
 
   return (
-    <div className="w-full rounded-2xl border border-gray-100 bg-white px-4 py-4">
-      <div className="mb-3 flex items-center justify-between">
-        <span className="text-xs font-semibold uppercase tracking-wide text-gray-400">Գին</span>
-        {hasFilter && (
-          <button
-            onClick={clear}
-            className="text-xs text-gray-400 hover:text-gray-700 transition-colors"
-          >
-            Մաքրել
-          </button>
-        )}
-      </div>
-
-      {/* Slider track */}
-      <div className="relative flex items-center" style={{ height: 18 }}>
-        {/* Background track */}
-        <div className="absolute inset-x-0 top-1/2 h-1.5 -translate-y-1/2 rounded-full bg-gray-100" />
-        {/* Active fill */}
+    <div className="flex items-center gap-2.5">
+      <span className="text-xs font-semibold uppercase tracking-wide text-gray-400">Գին</span>
+      <span className="min-w-[44px] rounded-lg bg-gray-50 px-2 py-1 text-center text-xs font-semibold text-gray-700">
+        {min === 0 ? '0' : min.toLocaleString()} ֏
+      </span>
+      <div className="relative flex w-28 items-center" style={{ height: 16 }}>
+        <div className="absolute inset-x-0 top-1/2 h-1 -translate-y-1/2 rounded-full bg-gray-100" />
         <div
-          className="absolute top-1/2 h-1.5 -translate-y-1/2 rounded-full bg-gray-900 transition-all"
+          className="absolute top-1/2 h-1 -translate-y-1/2 rounded-full bg-gray-900 transition-all"
           style={{ left: `${minPct}%`, width: `${maxPct - minPct}%` }}
         />
-        {/* Min thumb */}
         <input
           type="range"
           min={0}
@@ -117,7 +105,6 @@ export function PriceRangeFilter({ storeSlug, initialMin, initialMax }: Props) {
           className={thumbClass}
           style={{ zIndex: min > RANGE_MAX - STEP * 2 ? 5 : 3 }}
         />
-        {/* Max thumb */}
         <input
           type="range"
           min={0}
@@ -129,16 +116,18 @@ export function PriceRangeFilter({ storeSlug, initialMin, initialMax }: Props) {
           style={{ zIndex: 4 }}
         />
       </div>
-
-      {/* Value labels */}
-      <div className="mt-3 flex items-center justify-between">
-        <span className="rounded-lg bg-gray-50 px-2.5 py-1 text-xs font-semibold text-gray-700">
-          {min === 0 ? '0' : min.toLocaleString()} ֏
-        </span>
-        <span className="rounded-lg bg-gray-50 px-2.5 py-1 text-xs font-semibold text-gray-700">
-          {max >= RANGE_MAX ? `${RANGE_MAX.toLocaleString()}+` : max.toLocaleString()} ֏
-        </span>
-      </div>
+      <span className="min-w-[56px] rounded-lg bg-gray-50 px-2 py-1 text-center text-xs font-semibold text-gray-700">
+        {max >= RANGE_MAX ? `300K+` : max.toLocaleString()} ֏
+      </span>
+      {hasFilter && (
+        <button
+          onClick={clear}
+          className="text-xs text-gray-400 transition-colors hover:text-gray-700"
+          aria-label="Clear price filter"
+        >
+          ×
+        </button>
+      )}
     </div>
   )
 }

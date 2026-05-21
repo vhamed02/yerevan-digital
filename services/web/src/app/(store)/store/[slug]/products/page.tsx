@@ -33,22 +33,39 @@ export default async function StoreProductsPage({
   const sp = await searchParams
 
   const category = sp.category ?? ''
-  const sort = sp.sort ?? 'newest'
-  const page = Number(sp.page ?? 1)
+  const sort     = sp.sort ?? 'newest'
+  const page     = Number(sp.page ?? 1)
   const isPreview = sp.preview === 'true'
   const minPrice = sp.min_price ?? ''
   const maxPrice = sp.max_price ?? ''
-  const search = sp.search ?? ''
+  const search   = sp.search ?? ''
+  const inStock  = sp.in_stock ?? ''
+  const onSale   = sp.on_sale ?? ''
+  const featured = sp.featured ?? ''
 
   const queryParams = new URLSearchParams({
     ...(category ? { category } : {}),
     sort,
     page: String(page),
     per_page: '24',
-    ...(minPrice ? { min_price: minPrice } : {}),
-    ...(maxPrice ? { max_price: maxPrice } : {}),
-    ...(search ? { search } : {}),
+    ...(minPrice  ? { min_price: minPrice }   : {}),
+    ...(maxPrice  ? { max_price: maxPrice }   : {}),
+    ...(search    ? { search }                : {}),
+    ...(inStock   ? { in_stock: inStock }     : {}),
+    ...(onSale    ? { on_sale: onSale }       : {}),
+    ...(featured  ? { featured }              : {}),
   })
+
+  function toggleParam(key: string): string {
+    const p = new URLSearchParams(sp as Record<string, string>)
+    p.delete('page')
+    if (p.has(key)) p.delete(key)
+    else p.set(key, '1')
+    const str = p.toString()
+    return `/store/${slug}/products${str ? `?${str}` : ''}`
+  }
+
+  const hasActiveFilters = !!(minPrice || maxPrice || inStock || onSale || featured)
 
   const [storeData, productsData, categoriesData] = await Promise.all([
     serverGet<StorefrontStore>(`/store/${slug}/info`),
@@ -108,8 +125,36 @@ export default async function StoreProductsPage({
         </div>
       </div>
 
-      <div className="mb-5 w-64">
+      <div className="mb-5 flex flex-wrap items-center gap-2 rounded-2xl border border-gray-100 bg-white px-4 py-3">
         <PriceRangeFilter storeSlug={slug} initialMin={minPrice} initialMax={maxPrice} />
+        <div className="mx-1 h-5 w-px bg-gray-200" />
+        {(
+          [
+            { key: 'in_stock', value: inStock,  label: 'Առկա'      },
+            { key: 'on_sale',  value: onSale,   label: 'Զեղչ %'    },
+            { key: 'featured', value: featured, label: 'Ուշագրավ'  },
+          ] as const
+        ).map(({ key, value, label }) => (
+          <Link
+            key={key}
+            href={toggleParam(key)}
+            className={`rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-colors ${
+              value === '1'
+                ? 'border-gray-900 bg-gray-900 text-white'
+                : 'border-gray-200 text-gray-600 hover:border-gray-400'
+            }`}
+          >
+            {label}
+          </Link>
+        ))}
+        {hasActiveFilters && (
+          <Link
+            href={`/store/${slug}/products${sort !== 'newest' ? `?sort=${sort}` : ''}${category ? `${sort !== 'newest' ? '&' : '?'}category=${category}` : ''}`}
+            className="ml-auto rounded-full border border-gray-200 px-3.5 py-1.5 text-xs font-medium text-gray-500 transition-colors hover:border-gray-400 hover:text-gray-700"
+          >
+            Մաքրել ×
+          </Link>
+        )}
       </div>
 
       {meta && (

@@ -117,6 +117,44 @@ class StorePublicTest extends TestCase
         $this->assertEquals(2, $response->json('data.meta.total'));
     }
 
+    public function test_products_list_filters_by_in_stock(): void
+    {
+        Product::factory()->count(2)->create([
+            'store_id'     => $this->store->id,
+            'manage_stock' => true,
+            'stock'        => 5,
+        ]);
+        Product::factory()->count(3)->create([
+            'store_id'     => $this->store->id,
+            'manage_stock' => true,
+            'stock'        => 0,
+        ]);
+
+        $response = $this->getJson("/api/v1/store/{$this->store->slug}/products?in_stock=1")
+            ->assertOk();
+
+        $this->assertEquals(2, $response->json('data.meta.total'));
+    }
+
+    public function test_products_list_filters_by_on_sale(): void
+    {
+        Product::factory()->count(2)->create([
+            'store_id'      => $this->store->id,
+            'price'         => 5000,
+            'compare_price' => 8000,
+        ]);
+        Product::factory()->count(3)->create([
+            'store_id'      => $this->store->id,
+            'price'         => 5000,
+            'compare_price' => null,
+        ]);
+
+        $response = $this->getJson("/api/v1/store/{$this->store->slug}/products?on_sale=1")
+            ->assertOk();
+
+        $this->assertEquals(2, $response->json('data.meta.total'));
+    }
+
     public function test_product_detail_returns_active_product(): void
     {
         $product = Product::factory()->create([

@@ -92,6 +92,12 @@ class ProductRepository implements ProductRepositoryInterface
                     ->orWhere('name->hy', 'like', "%{$v}%");
             }))
             ->when($filters['featured'] ?? false, fn($q) => $q->where('is_featured', true))
+            ->when($filters['in_stock'] ?? false, fn($q) => $q->where(fn($q) =>
+                $q->where('manage_stock', false)->orWhere('stock', '>', 0)
+            ))
+            ->when($filters['on_sale'] ?? false, fn($q) =>
+                $q->whereNotNull('compare_price')->whereColumn('compare_price', '>', 'price')
+            )
             ->when(isset($filters['min_price']), fn($q) => $q->where('price', '>=', $filters['min_price']))
             ->when(isset($filters['max_price']), fn($q) => $q->where('price', '<=', $filters['max_price']));
 
