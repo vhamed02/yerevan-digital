@@ -37,7 +37,7 @@ class ProductObserver
 
     private function flushProductListCaches(string $slug): void
     {
-        $pattern = "store:{$slug}:products:*";
+        $pattern = "*store:{$slug}:products:*";
         $redis   = Cache::getStore();
 
         if (method_exists($redis, 'connection')) {
