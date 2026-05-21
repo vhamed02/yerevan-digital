@@ -114,7 +114,7 @@ export default function SellerTopNav({ onMenuClick }: SellerTopNavProps) {
               <DropdownMenu.Separator className="my-1 h-px bg-border" />
               <DropdownMenu.Item asChild>
                 <Link
-                  href="/seller/store"
+                  href="/seller/profile"
                   className="flex cursor-pointer items-center gap-2 rounded px-3 py-2 text-sm text-content-primary hover:bg-surface-secondary outline-none"
                 >
                   <User className="h-3.5 w-3.5" />

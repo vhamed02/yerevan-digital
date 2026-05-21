@@ -133,6 +133,10 @@ Route::prefix('v1')->group(function () {
         Route::patch('products/{uuid}/variants/{variant}', [Seller\ProductVariantController::class, 'update']);
         Route::delete('products/{uuid}/variants/{variant}', [Seller\ProductVariantController::class, 'destroy']);
 
+        Route::get('profile', [Seller\ProfileController::class, 'show']);
+        Route::patch('profile', [Seller\ProfileController::class, 'update']);
+        Route::patch('profile/password', [Seller\ProfileController::class, 'updatePassword']);
+
         Route::get('orders/export', [Seller\OrderController::class, 'export']);
         Route::get('orders', [Seller\OrderController::class, 'index']);
         Route::get('orders/{uuid}', [Seller\OrderController::class, 'show']);
