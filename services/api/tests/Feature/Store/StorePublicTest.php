@@ -170,50 +170,21 @@ class StorePublicTest extends TestCase
             ->assertJsonPath('data.uuid', $product->uuid);
     }
 
-    public function test_product_view_increments_on_first_visit(): void
+    public function test_product_detail_does_not_count_view_on_fetch(): void
     {
         $product = Product::factory()->create([
-            'store_id'    => $this->store->id,
-            'status'      => ProductStatus::Active,
-            'view_count'  => 0,
+            'store_id'   => $this->store->id,
+            'status'     => ProductStatus::Active,
+            'view_count' => 0,
         ]);
 
         $this->getJson("/api/v1/store/{$this->store->slug}/products/{$product->slug}");
-
-        $this->assertEquals(1, $product->fresh()->view_count);
-    }
-
-    public function test_product_view_deduplicates_same_ip_within_12_hours(): void
-    {
-        $product = Product::factory()->create([
-            'store_id'   => $this->store->id,
-            'status'     => ProductStatus::Active,
-            'view_count' => 0,
-        ]);
-
-        $url = "/api/v1/store/{$this->store->slug}/products/{$product->slug}";
-
-        $this->getJson($url);
-        $this->getJson($url);
-        $this->getJson($url);
-
-        $this->assertEquals(1, $product->fresh()->view_count);
-    }
-
-    public function test_product_view_not_counted_in_preview_mode(): void
-    {
-        $product = Product::factory()->create([
-            'store_id'   => $this->store->id,
-            'status'     => ProductStatus::Active,
-            'view_count' => 0,
-        ]);
-
-        $this->getJson("/api/v1/store/{$this->store->slug}/products/{$product->slug}?preview=true");
+        $this->getJson("/api/v1/store/{$this->store->slug}/products/{$product->slug}");
 
         $this->assertEquals(0, $product->fresh()->view_count);
     }
 
-    public function test_product_detail_includes_view_count(): void
+    public function test_product_detail_returns_fresh_view_count(): void
     {
         $product = Product::factory()->create([
             'store_id'   => $this->store->id,
@@ -221,9 +192,91 @@ class StorePublicTest extends TestCase
             'view_count' => 42,
         ]);
 
-        $this->getJson("/api/v1/store/{$this->store->slug}/products/{$product->slug}?preview=true")
+        $this->getJson("/api/v1/store/{$this->store->slug}/products/{$product->slug}")
             ->assertOk()
             ->assertJsonPath('data.view_count', 42);
+    }
+
+    public function test_product_list_returns_fresh_view_counts(): void
+    {
+        $product = Product::factory()->create([
+            'store_id'   => $this->store->id,
+            'status'     => ProductStatus::Active,
+            'view_count' => 77,
+        ]);
+
+        $response = $this->getJson("/api/v1/store/{$this->store->slug}/products")->assertOk();
+
+        $found = collect($response->json('data.data'))->firstWhere('uuid', $product->uuid);
+        $this->assertEquals(77, $found['view_count']);
+    }
+
+    public function test_view_endpoint_increments_count(): void
+    {
+        $product = Product::factory()->create([
+            'store_id'   => $this->store->id,
+            'status'     => ProductStatus::Active,
+            'view_count' => 0,
+        ]);
+
+        $this->postJson("/api/v1/store/{$this->store->slug}/products/{$product->slug}/view")
+            ->assertOk();
+
+        $this->assertEquals(1, $product->fresh()->view_count);
+    }
+
+    public function test_view_endpoint_deduplicates_same_ip_within_12_hours(): void
+    {
+        $product = Product::factory()->create([
+            'store_id'   => $this->store->id,
+            'status'     => ProductStatus::Active,
+            'view_count' => 0,
+        ]);
+
+        $url = "/api/v1/store/{$this->store->slug}/products/{$product->slug}/view";
+
+        $this->postJson($url);
+        $this->postJson($url);
+        $this->postJson($url);
+
+        $this->assertEquals(1, $product->fresh()->view_count);
+    }
+
+    public function test_view_endpoint_counts_different_ips(): void
+    {
+        $product = Product::factory()->create([
+            'store_id'   => $this->store->id,
+            'status'     => ProductStatus::Active,
+            'view_count' => 0,
+        ]);
+
+        $url = "/api/v1/store/{$this->store->slug}/products/{$product->slug}/view";
+
+        $this->postJson($url)->assertOk();
+        $this->postJson($url, [], ['REMOTE_ADDR' => '10.0.0.2'])->assertOk();
+
+        $this->assertEquals(2, $product->fresh()->view_count);
+    }
+
+    public function test_view_endpoint_not_counted_in_preview_mode(): void
+    {
+        $product = Product::factory()->create([
+            'store_id'   => $this->store->id,
+            'status'     => ProductStatus::Active,
+            'view_count' => 0,
+        ]);
+
+        $this->postJson("/api/v1/store/{$this->store->slug}/products/{$product->slug}/view?preview=true");
+
+        $this->assertEquals(0, $product->fresh()->view_count);
+    }
+
+    public function test_view_endpoint_returns_404_for_draft(): void
+    {
+        $product = Product::factory()->draft()->create(['store_id' => $this->store->id]);
+
+        $this->postJson("/api/v1/store/{$this->store->slug}/products/{$product->slug}/view")
+            ->assertNotFound();
     }
 
     public function test_product_detail_returns_404_for_draft(): void

@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { serverGet } from '@/lib/server-api'
 import { loadTemplate } from '@/lib/templates'
+import { ViewRecorder } from '@/components/store/ViewRecorder'
 import type { StorefrontStore, StorefrontProduct } from '@/types'
 
 export const dynamic = 'force-dynamic'
@@ -50,6 +51,9 @@ export default async function ProductPage({
   const Template = await loadTemplate(store.active_template_key)
 
   return (
-    <Template.ProductDetail product={product} storeSlug={slug} isPreview={isPreview} />
+    <>
+      <Template.ProductDetail product={product} storeSlug={slug} isPreview={isPreview} />
+      {!isPreview && <ViewRecorder storeSlug={slug} productSlug={productSlug} />}
+    </>
   )
 }

@@ -37,7 +37,7 @@ class ProductController extends Controller
         $cacheKey  = "store:{$slug}:products:{$queryHash}";
         $maxKey    = "store:{$slug}:max_price";
 
-        $payload  = Cache::remember($cacheKey, 120, function () use ($store, $filters, $sort, $perPage, $page) {
+        $payload = Cache::remember($cacheKey, 120, function () use ($store, $filters, $sort, $perPage, $page) {
             $paginator = $this->products->paginatePublicByStore($store->id, $filters, $sort, $perPage, $page);
 
             return [
@@ -51,8 +51,17 @@ class ProductController extends Controller
             ];
         });
 
-        $maxPrice = Cache::remember($maxKey, 300, fn() => $this->products->maxPriceForStore($store->id));
+        // Always inject fresh view counts — cache may be stale
+        if (!empty($payload['data'])) {
+            $uuids  = array_column($payload['data'], 'uuid');
+            $counts = Product::whereIn('uuid', $uuids)->pluck('view_count', 'uuid');
+            foreach ($payload['data'] as &$item) {
+                $item['view_count'] = (int) ($counts[$item['uuid']] ?? 0);
+            }
+            unset($item);
+        }
 
+        $maxPrice = Cache::remember($maxKey, 300, fn() => $this->products->maxPriceForStore($store->id));
         $payload['meta']['price_max'] = $maxPrice;
 
         return $this->success($payload);
@@ -63,7 +72,6 @@ class ProductController extends Controller
         $store    = $request->attributes->get('currentStore');
         $cacheKey = "store:{$slug}:product:{$productSlug}";
 
-        // Cache everything except view_count (which must always be fresh)
         $cached = Cache::remember($cacheKey, 300, function () use ($store, $productSlug) {
             $product = $this->products->findPublicByStoreAndSlug($store->id, $productSlug, [
                 'images',
@@ -78,17 +86,21 @@ class ProductController extends Controller
             return ['_id' => $product->id, 'data' => $data];
         });
 
-        $productId = $cached['_id'];
-        $payload   = $cached['data'];
-
-        // Always read view_count fresh from DB so the counter reflects immediately
-        $payload['view_count'] = (int) Product::where('id', $productId)->value('view_count');
-
-        if (!$request->boolean('preview')) {
-            $ip = $request->header('X-Client-IP') ?: $request->ip();
-            event(new ProductViewed($productId, $ip));
-        }
+        $payload                = $cached['data'];
+        $payload['view_count']  = (int) Product::where('id', $cached['_id'])->value('view_count');
 
         return $this->success($payload);
+    }
+
+    public function recordView(Request $request, string $slug, string $productSlug): JsonResponse
+    {
+        $store   = $request->attributes->get('currentStore');
+        $product = $this->products->findPublicByStoreAndSlug($store->id, $productSlug, []);
+
+        if (!$request->boolean('preview')) {
+            event(new ProductViewed($product->id, $request->ip()));
+        }
+
+        return $this->success(null);
     }
 }

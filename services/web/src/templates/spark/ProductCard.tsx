@@ -5,6 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { ShoppingBag, Check, Heart, Eye } from 'lucide-react'
 import { useStoreCart } from '@/stores/cart.store'
+import { formatViewCount } from '@/lib/formatViewCount'
 import type { ProductCardProps } from '../types'
 
 export function ProductCard({ product, storeSlug, isPreview }: ProductCardProps) {
@@ -133,7 +134,7 @@ export function ProductCard({ product, storeSlug, isPreview }: ProductCardProps)
               {product.view_count > 0 && (
                 <div className="flex items-center gap-1 text-[11px] text-gray-400">
                   <Eye className="h-3 w-3" />
-                  <span>{product.view_count.toLocaleString()}</span>
+                  <span>{formatViewCount(product.view_count)}</span>
                 </div>
               )}
             </div>

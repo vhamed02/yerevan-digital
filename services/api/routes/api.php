@@ -159,6 +159,7 @@ Route::prefix('v1')->group(function () {
         Route::post('{slug}/checkout', [Store\CheckoutController::class, 'checkout'])->middleware('throttle:checkout');
         Route::post('{slug}/payments/initiate', [Store\PaymentController::class, 'initiate']);
         Route::post('{slug}/payments/callback/{gateway}', [Store\PaymentController::class, 'callback']);
+        Route::post('{slug}/products/{productSlug}/view', [Store\ProductController::class, 'recordView'])->middleware('throttle:30,1');
         Route::post('{slug}/products/{productSlug}/reviews', [Store\ProductReviewController::class, 'store'])->middleware('throttle:review');
     });
 });
