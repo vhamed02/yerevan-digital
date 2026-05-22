@@ -6,6 +6,7 @@ use App\Events\ProductViewed;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Store\PublicProductDetailResource;
 use App\Http\Resources\Store\PublicProductResource;
+use App\Models\Product;
 use App\Repositories\Contracts\ProductRepositoryInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -61,9 +62,9 @@ class ProductController extends Controller
     {
         $store    = $request->attributes->get('currentStore');
         $cacheKey = "store:{$slug}:product:{$productSlug}";
-        $idKey    = "store:{$slug}:product:{$productSlug}:id";
 
-        $payload = Cache::remember($cacheKey, 60, function () use ($store, $productSlug, $idKey) {
+        // Cache everything except view_count (which must always be fresh)
+        $cached = Cache::remember($cacheKey, 300, function () use ($store, $productSlug) {
             $product = $this->products->findPublicByStoreAndSlug($store->id, $productSlug, [
                 'images',
                 'variants' => fn($q) => $q->where('is_active', true),
@@ -71,13 +72,19 @@ class ProductController extends Controller
                 'reviews'  => fn($q) => $q->where('is_approved', true)->latest()->limit(50),
             ]);
 
-            Cache::put($idKey, $product->id, 3600);
+            $data = (new PublicProductDetailResource($product))->resolve();
+            unset($data['view_count']);
 
-            return (new PublicProductDetailResource($product))->resolve();
+            return ['_id' => $product->id, 'data' => $data];
         });
 
-        $productId = Cache::get($idKey);
-        if ($productId && !$request->boolean('preview')) {
+        $productId = $cached['_id'];
+        $payload   = $cached['data'];
+
+        // Always read view_count fresh from DB so the counter reflects immediately
+        $payload['view_count'] = (int) Product::where('id', $productId)->value('view_count');
+
+        if (!$request->boolean('preview')) {
             $ip = $request->header('X-Client-IP') ?: $request->ip();
             event(new ProductViewed($productId, $ip));
         }
