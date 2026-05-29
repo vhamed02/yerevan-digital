@@ -283,9 +283,97 @@ not in the HTTP layer.
 
 ---
 
+---
+
+## Improvement #4 — Extracted Checkout Business Logic into `CreateOrderAction`
+
+**Date:** 2026-05-29
+**Files changed:**
+- `services/api/app/Actions/CreateOrderAction.php` — new action class owns the full order creation workflow
+- `services/api/app/Data/CheckoutData.php` — new readonly DTO carries validated checkout input (created `app/Data/` directory)
+- `services/api/app/Http/Requests/Store/CheckoutRequest.php` — new Form Request moves inline validation out of the controller (created `app/Http/Requests/Store/` directory)
+- `services/api/app/Http/Controllers/Store/CheckoutController.php` — reduced from 140 lines to 38 lines
+
+### What was wrong
+
+`CheckoutController::checkout()` was a 115-line method that did everything:
+
+1. Validated the HTTP request inline with `$request->validate()`
+2. For each cart item: resolved the product from the DB (with a row lock), resolved the variant, checked stock availability, threw a `ValidationException` on failure
+3. Computed the order subtotal
+4. Created the `Order` record
+5. Created each `OrderItem` record with a product snapshot
+6. Decremented stock on the product or variant
+7. Wrapped steps 2–6 in a `DB::transaction()` closure
+8. Built and returned the JSON response
+
+All of this was inside a single controller method, bound to the HTTP layer via `$request->input()` calls scattered throughout the transaction closure. The business logic was completely untestable without firing a real HTTP request with a real database.
+
+Two specific problems:
+
+- **No Form Request**: validation lived inline (`$request->validate([...])`) — the only controller in the codebase without a dedicated Form Request, breaking the project's own convention.
+- **Business logic in HTTP context**: the DB transaction closure directly read from `$request`, meaning the checkout flow could not be called from a console command, an admin "create order on behalf of" feature, or a test without constructing a full `Request` object.
+
+### What was fixed
+
+**`CheckoutData` DTO** (`app/Data/CheckoutData.php`) — a PHP 8.2 `readonly` class that carries all checkout input as typed properties, decoupling the action from the HTTP layer entirely:
+
+```php
+readonly class CheckoutData
+{
+    public function __construct(
+        public int     $storeId,
+        public array   $items,
+        public string  $customerName,
+        public string  $customerEmail,
+        public ?string $customerPhone,
+        public array   $shippingAddress,
+        public ?string $notes,
+        public string  $paymentMethod,
+    ) {}
+}
+```
+
+**`CreateOrderAction`** (`app/Actions/CreateOrderAction.php`) — owns the full transactional workflow: stock validation, subtotal calculation, order record creation, order items creation, stock decrement. Receives a `CheckoutData`, returns an `Order`. No knowledge of HTTP.
+
+**`CheckoutRequest`** (`app/Http/Requests/Store/CheckoutRequest.php`) — moves the 13-rule validation block into a proper Form Request, consistent with every other write endpoint in the API.
+
+**`CheckoutController`** — reduced from 140 to 38 lines. It now only resolves the store from the request, constructs the DTO, calls the action, and formats the response:
+
+```php
+public function checkout(CheckoutRequest $request, string $slug): JsonResponse
+{
+    $store = $request->attributes->get('currentStore');
+
+    $order = $this->createOrder->execute(new CheckoutData(
+        storeId:         $store->id,
+        items:           $request->validated('items'),
+        customerName:    $request->validated('full_name'),
+        // ...
+    ));
+
+    return $this->success([...], 'Order created.', 201);
+}
+```
+
+### Why this matters
+
+- The entire order creation workflow — stock locking, subtotal calculation, item snapshotting, stock decrement — can now be unit-tested by constructing a `CheckoutData` object and calling `$action->execute()` directly, with no HTTP stack involved.
+- The same action can be called from any context: an admin "place order on behalf" feature, a CLI import command, or a future API version — without touching the HTTP controller.
+- `app/Data/` establishes a dedicated directory for typed DTOs, complementing the `app/Actions/` layer introduced in improvement #3.
+
+### CV-ready bullets
+
+- **Reduced a 140-line controller method to 38 lines** by extracting the full checkout business logic — product resolution with row locking, stock validation, subtotal calculation, order and order-item creation, and stock decrement — into a dedicated `CreateOrderAction` class, making the checkout workflow independently testable without an HTTP context.
+
+- **Introduced a typed DTO layer** (`app/Data/CheckoutData.php`) using PHP 8.2 `readonly` classes to carry validated checkout input into the action, fully decoupling the order creation workflow from the Laravel `Request` object and enabling the same logic to be invoked from HTTP controllers, console commands, or test cases interchangeably.
+
+- **Resolved a validation consistency gap** across a Laravel REST API by extracting 13 inline `$request->validate()` rules from `CheckoutController` into a dedicated `CheckoutRequest` Form Request class, bringing the checkout endpoint in line with the project-wide convention used across all other write endpoints and centralising input contract documentation.
+
+---
+
 ## Upcoming Improvements (Planned)
 
 | # | Title | Priority |
 |---|-------|----------|
-| 4 | Extract `CreateOrderAction` — move checkout business logic out of `CheckoutController` into a testable Action class | HIGH |
 | 5 | Introduce domain events (`OrderCreated`, `PaymentSucceeded`, `OrderStatusChanged`) — decouple notification dispatch from HTTP handlers | MEDIUM |
