@@ -495,7 +495,7 @@ After this change, `grep -rn "env(" app/` returns zero results — the entire ap
 ## Improvement #7 — Extract Dashboard Stats Queries into Repository Layer
 
 **Date:** 2026-05-29
-**Commit:** TBD
+**Commit:** `769a23e`
 
 **Files changed:**
 - `services/api/app/Http/Controllers/Seller/DashboardController.php` — reduced from 110 to 39 lines; removed all inline `DB::` calls
@@ -571,7 +571,7 @@ return $this->success([
 | 4 | Extract `CreateOrderAction` + `CheckoutData` DTO | `84c9551` |
 | 5 | Introduce domain events + listeners | `b2b2375` |
 | 6 | Eliminate last `env()` call — password reset URL | `91a6b97` |
-| 7 | Extract dashboard stats into repository layer | TBD |
+| 7 | Extract dashboard stats into repository layer | `769a23e` |
 
 ## Upcoming Improvements (Planned)
 
