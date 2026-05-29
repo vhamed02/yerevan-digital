@@ -566,7 +566,7 @@ return $this->success([
 ## Improvement #8 — Feature Tests for Checkout Actions (and a Latent Event Bug They Exposed)
 
 **Date:** 2026-05-29
-**Commit:** TBD
+**Commit:** `b0c43ca`
 
 **Files changed:**
 - `services/api/app/Actions/CreateOrderAction.php` — **fixed unreachable event dispatch**
@@ -635,7 +635,7 @@ All 13 tests pass; the existing dashboard and checkout suites (18 tests, 75 asse
 | 5 | Introduce domain events + listeners | `b2b2375` |
 | 6 | Eliminate last `env()` call — password reset URL | `91a6b97` |
 | 7 | Extract dashboard stats into repository layer | `769a23e` |
-| 8 | Feature tests for checkout actions + dead-code event fix | TBD |
+| 8 | Feature tests for checkout actions + dead-code event fix | `b0c43ca` |
 
 ## Upcoming Improvements (Planned)
 
