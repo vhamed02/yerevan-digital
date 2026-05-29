@@ -88,7 +88,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         ResetPasswordNotification::createUrlUsing(function (User $user, string $token) {
-            $frontend = rtrim(env('NEXT_PUBLIC_APP_URL', config('app.url')), '/');
+            $frontend = rtrim(config('app.frontend_url'), '/');
             return $frontend . '/auth/reset-password?token=' . $token . '&email=' . urlencode($user->email);
         });
 
