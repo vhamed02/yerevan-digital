@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Seller;
 
+use App\Enums\OrderStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Seller\UpdateOrderStatusRequest;
 use App\Http\Resources\Seller\OrderDetailResource;
@@ -15,16 +16,6 @@ use Illuminate\Support\Str;
 
 class OrderController extends Controller
 {
-    private const ALLOWED_TRANSITIONS = [
-        'pending'    => ['paid', 'processing', 'cancelled'],
-        'paid'       => ['processing', 'cancelled'],
-        'processing' => ['shipped', 'cancelled'],
-        'shipped'    => ['delivered'],
-        'delivered'  => [],
-        'cancelled'  => [],
-        'refunded'   => [],
-    ];
-
     public function __construct(private readonly OrderRepositoryInterface $orders) {}
 
     public function index(Request $request): JsonResponse
@@ -58,24 +49,23 @@ class OrderController extends Controller
             return $this->error('You have not created a store yet.', 404);
         }
 
-        $order = $this->orders->findByStoreAndUuid($store->id, $uuid);
-        $newStatus = $request->validated()['status'];
-        $currentStatus = $order->status->value;
-        $allowed = self::ALLOWED_TRANSITIONS[$currentStatus] ?? [];
+        $order     = $this->orders->findByStoreAndUuid($store->id, $uuid);
+        $newStatus = OrderStatus::from($request->validated()['status']);
 
-        if (!in_array($newStatus, $allowed, true)) {
+        if (!$order->status->canTransitionTo($newStatus)) {
             return $this->error(
-                "Cannot transition order from '{$currentStatus}' to '{$newStatus}'.",
+                "Cannot transition order from '{$order->status->value}' to '{$newStatus->value}'.",
                 422
             );
         }
 
-        $timestamps = [
-            'shipped'   => ['shipped_at' => now()],
-            'delivered' => ['delivered_at' => now()],
-        ];
+        $extra = match($newStatus) {
+            OrderStatus::Shipped   => ['shipped_at' => now()],
+            OrderStatus::Delivered => ['delivered_at' => now()],
+            default                => [],
+        };
 
-        $this->orders->update($order, array_merge(['status' => $newStatus], $timestamps[$newStatus] ?? []));
+        $this->orders->update($order, array_merge(['status' => $newStatus], $extra));
 
         if ($order->customer) {
             $order->customer->notify(new OrderStatusChangedNotification($order));
