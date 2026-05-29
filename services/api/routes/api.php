@@ -25,7 +25,7 @@ RateLimiter::for('slug-check', fn($request) => Limit::perMinute(20)->by($request
 RateLimiter::for('contact', fn($request) => Limit::perMinute(3)->by($request->ip()));
 RateLimiter::for('review',  fn($request) => Limit::perMinute(3)->by($request->ip()));
 
-Route::prefix('v1')->group(function () {
+Route::prefix('v1')->middleware('throttle:api')->group(function () {
     Route::get('health', [HealthController::class, 'check']);
     Route::get('stats', [StatsController::class, 'index']);
     Route::get('pages/{slug}', [PageController::class, 'show']);
@@ -37,10 +37,12 @@ Route::prefix('v1')->group(function () {
     Route::get('captcha', [CaptchaController::class, 'generate']);
 
     Route::prefix('auth')->group(function () {
-        Route::post('register', [AuthController::class, 'register']);
-        Route::post('login', [AuthController::class, 'login']);
-        Route::post('forgot-password', [AuthController::class, 'forgotPassword']);
-        Route::post('reset-password', [AuthController::class, 'resetPassword']);
+        Route::middleware('throttle:auth')->group(function () {
+            Route::post('register', [AuthController::class, 'register']);
+            Route::post('login', [AuthController::class, 'login']);
+            Route::post('forgot-password', [AuthController::class, 'forgotPassword']);
+            Route::post('reset-password', [AuthController::class, 'resetPassword']);
+        });
         Route::middleware('auth:sanctum')->group(function () {
             Route::post('logout', [AuthController::class, 'logout']);
             Route::get('me', [AuthController::class, 'me']);

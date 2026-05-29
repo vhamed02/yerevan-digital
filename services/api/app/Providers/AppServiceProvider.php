@@ -8,11 +8,14 @@ use GuzzleHttp\Client;
 use Illuminate\Auth\Notifications\ResetPassword as ResetPasswordNotification;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Validation\Rules\Password;
 
 class AppServiceProvider extends ServiceProvider
 {
     public function boot(): void
     {
+        Password::defaults(fn () => Password::min(10)->mixedCase()->numbers()->symbols());
+
         Mail::extend('brevo', function (array $config) {
             return new BrevoTransport($config['api_key'], new Client());
         });

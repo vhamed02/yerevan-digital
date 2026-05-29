@@ -30,8 +30,8 @@ class AuthTest extends TestCase
         $response = $this->postJson('/api/v1/auth/register', [
             'name'                  => 'Anna Hakobyan',
             'email'                 => 'anna@example.com',
-            'password'              => 'password123',
-            'password_confirmation' => 'password123',
+            'password'              => 'Str0ng!Pass',
+            'password_confirmation' => 'Str0ng!Pass',
         ]);
 
         $response->assertStatus(201)
@@ -228,8 +228,8 @@ class AuthTest extends TestCase
         $response = $this->postJson('/api/v1/auth/reset-password', [
             'token'                 => $token,
             'email'                 => 'seller@example.com',
-            'password'              => 'newpassword123',
-            'password_confirmation' => 'newpassword123',
+            'password'              => 'Str0ng!Pass',
+            'password_confirmation' => 'Str0ng!Pass',
         ]);
 
         $response->assertStatus(200)
@@ -256,5 +256,31 @@ class AuthTest extends TestCase
         $response = $this->withToken($token)->getJson('/api/v1/admin/dashboard/stats');
 
         $response->assertStatus(403);
+    }
+
+    public function test_register_rejects_weak_password(): void
+    {
+        $response = $this->postJson('/api/v1/auth/register', [
+            'name'                  => 'Weak Password',
+            'email'                 => 'weak@example.com',
+            'password'              => 'password123',
+            'password_confirmation' => 'password123',
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['password']);
+
+        $this->assertDatabaseMissing('users', ['email' => 'weak@example.com']);
+    }
+
+    public function test_auth_endpoints_are_rate_limited(): void
+    {
+        $payload = ['email' => 'nobody@example.com', 'password' => 'whatever'];
+
+        for ($i = 0; $i < 5; $i++) {
+            $this->postJson('/api/v1/auth/login', $payload)->assertStatus(401);
+        }
+
+        $this->postJson('/api/v1/auth/login', $payload)->assertStatus(429);
     }
 }

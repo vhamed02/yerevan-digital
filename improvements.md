@@ -747,6 +747,64 @@ Added `ProductImageActionsTest` (5 tests) covering primary-image election on fir
 
 ---
 
+## Improvement #11 — Backend Security Hardening (Rate Limiting, Token Expiry, Password Policy, Timing-Safe Webhooks)
+
+**Date:** 2026-05-29
+**Commit:** TBD
+
+**Files changed:**
+- `services/api/routes/api.php` — applied `throttle:api` to the v1 group and `throttle:auth` to public auth routes
+- `services/api/config/sanctum.php` — token expiration set to 7 days (was infinite)
+- `services/api/app/Providers/AppServiceProvider.php` — centralized password policy via `Password::defaults()`
+- `services/api/app/Http/Requests/Auth/RegisterRequest.php`, `Auth/ResetPasswordRequest.php`, `Seller/UpdatePasswordRequest.php`, `Admin/SellerController.php` — adopted the shared policy
+- `services/api/app/Services/PaymentGateway/Gateways/IdramGateway.php` — timing-safe checksum comparison
+- `services/api/tests/Feature/Auth/AuthTest.php` — added 2 security tests (+ updated 2 to use compliant passwords)
+
+### What was wrong
+
+A security review surfaced four issues, all confirmed in code:
+
+1. **Rate limiting was dead code.** Named limiters `api` (100/min) and `auth` (5/min) were *defined* in `routes/api.php` but **never applied to any route** — Laravel 11+'s `api` middleware group is empty by default, and only `SetLocale` had been appended. Login, register, and forgot-password ran with **no throttle**, leaving them open to brute-force, credential-stuffing, and password-reset email bombing.
+2. **Sanctum tokens never expired** (`'expiration' => null`) — a leaked API token (logs, device theft, XSS) was valid forever, with no rotation.
+3. **Weak, inconsistent password policy** — every entry point used a bare `min:8`, with no complexity requirement, duplicated across five locations.
+4. **Non-timing-safe webhook verification** — the Idram payment callback compared HMAC checksums with `!==` on an unauthenticated, CSRF-exempt route.
+
+### What was fixed
+
+```php
+// routes/api.php — limiters were defined but unused; now wired up
+Route::prefix('v1')->middleware('throttle:api')->group(function () {
+    // ...
+    Route::prefix('auth')->group(function () {
+        Route::middleware('throttle:auth')->group(function () {   // 5/min by IP
+            Route::post('register', ...);
+            Route::post('login', ...);
+            Route::post('forgot-password', ...);
+            Route::post('reset-password', ...);
+        });
+    });
+});
+```
+
+```php
+// AppServiceProvider::boot() — single source of truth for password strength
+Password::defaults(fn () => Password::min(10)->mixedCase()->numbers()->symbols());
+```
+
+All five password rules now reference `Password::defaults()`; `config/sanctum.php` sets a 7-day expiry (env-overridable); and the Idram gateway uses `hash_equals($expected, $provided)`.
+
+Two new tests (`test_register_rejects_weak_password`, `test_auth_endpoints_are_rate_limited`) prove the policy rejects weak passwords and that the 6th auth request in a window returns HTTP 429. Full suite: **230 tests / 644 assertions** pass.
+
+### CV-ready bullets
+
+- **Closed a brute-force / credential-stuffing exposure** on a production Laravel API: discovered that rate limiters were defined but never attached to any route (a no-op since Laravel 11's `api` group ships empty), then wired a global 100 req/min IP throttle plus a stricter 5 req/min limit on all authentication endpoints — verified with a test asserting HTTP 429 on the 6th attempt.
+
+- **Hardened authentication and credential handling**: introduced a 7-day Sanctum token expiry (previously infinite-lived), and centralized a strong password policy (`min 10, mixed case, numbers, symbols`) through Laravel's `Password::defaults()` so all five password entry points enforce one consistent rule instead of a duplicated `min:8`.
+
+- **Eliminated a timing-side-channel in payment webhook verification** by switching the Idram gateway's checksum comparison to the constant-time `hash_equals()`, protecting an unauthenticated, CSRF-exempt callback endpoint from checksum-forgery probing.
+
+---
+
 ## Improvements Log
 
 | # | Title | Commit |
@@ -761,5 +819,6 @@ Added `ProductImageActionsTest` (5 tests) covering primary-image election on fir
 | 8 | Feature tests for checkout actions + dead-code event fix | `b0c43ca` |
 | 9 | Split `AppServiceProvider` into domain service providers | `fada080` |
 | 10 | Extract `ProductController` image management into action classes | `cb9a8ba` |
+| 11 | Backend security hardening (rate limiting, token expiry, password policy, timing-safe webhooks) | TBD |
 
-_All 10 planned improvements complete. Full test suite: 228 tests / 634 assertions passing._
+_Full test suite: 230 tests / 644 assertions passing._

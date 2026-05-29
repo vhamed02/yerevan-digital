@@ -82,7 +82,7 @@ class IdramGateway implements PaymentGatewayInterface
 
         $provided = strtoupper($callbackData['EDP_CHECKSUM'] ?? '');
 
-        if ($expected !== $provided) {
+        if (!hash_equals($expected, $provided)) {
             return new PaymentVerifyResponse(
                 success: false,
                 status: 'failed',

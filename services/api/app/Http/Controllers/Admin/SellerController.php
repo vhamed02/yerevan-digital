@@ -11,6 +11,7 @@ use App\Notifications\StoreSuspendedNotification;
 use App\Repositories\Contracts\AdminSellerRepositoryInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rules\Password;
 
 class SellerController extends Controller
 {
@@ -29,7 +30,7 @@ class SellerController extends Controller
         $data = $request->validate([
             'name'     => ['required', 'string', 'max:255'],
             'email'    => ['required', 'email', 'unique:users,email'],
-            'password' => ['required', 'string', 'min:8'],
+            'password' => ['required', Password::defaults()],
             'phone'    => ['sometimes', 'nullable', 'string', 'max:50'],
             'status'   => ['sometimes', 'in:active,pending'],
             'locale'   => ['sometimes', 'in:hy,en'],
@@ -62,7 +63,7 @@ class SellerController extends Controller
     public function updatePassword(Request $request, int $seller): JsonResponse
     {
         $data = $request->validate([
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'password' => ['required', 'confirmed', Password::defaults()],
         ]);
 
         $this->sellers->updatePassword($seller, $data['password']);
