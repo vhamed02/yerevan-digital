@@ -165,10 +165,127 @@ Timestamp side-effects (`shipped_at`, `delivered_at`) were also moved from a str
 
 ---
 
+---
+
+## Improvement #3 — Extracted Duplicate Post-Payment Logic into `HandlePaymentSuccessAction`
+
+**Date:** 2026-05-29
+**Files changed:**
+- `services/api/app/Actions/HandlePaymentSuccessAction.php` — new action class (created `app/Actions/` directory)
+- `services/api/app/Http/Controllers/Store/PaymentController.php` — removed 3 dead imports, injected action, replaced 2 duplicated blocks
+
+### What was wrong
+
+`PaymentController` had two methods that handled a successful payment — `callback()` for live
+gateway callbacks and `sandboxComplete()` for the sandbox simulation flow. Both contained the
+exact same 11-line block:
+
+```php
+// in callback() — lines 153–168
+$order->update([
+    'payment_status' => PaymentStatus::Paid,
+    'status'         => OrderStatus::Processing,
+    'paid_at'        => now(),
+    'payment_method' => $gateway,
+]);
+$freshOrder = $order->fresh();
+$order->store->owner->notify(new NewOrderNotification($freshOrder));
+Notification::route('mail', [
+    $freshOrder->customer_email => $freshOrder->customer_name,
+])->notify(new CustomerOrderConfirmationNotification($freshOrder));
+
+// in sandboxComplete() — lines 208–221
+// identical, only 'sandbox' instead of $gateway
+```
+
+The only difference between the two copies was the value of `payment_method`. This created
+two concrete problems:
+
+1. **Divergence risk.** Any change to what "payment success" means — adding a webhook, an
+   audit log entry, a push notification — had to be applied in two places. A future developer
+   updating one path would likely miss the other, causing the sandbox and live flows to behave
+   differently.
+
+2. **Untestable logic.** The post-payment side effects (order state update + two notifications)
+   were locked inside an HTTP controller, making it impossible to unit-test them in isolation
+   without bootstrapping a full request lifecycle.
+
+### What was fixed
+
+Created `app/Actions/HandlePaymentSuccessAction.php` — the first class in a new `app/Actions/`
+layer — which owns the entire post-payment workflow:
+
+```php
+class HandlePaymentSuccessAction
+{
+    public function execute(Order $order, string $paymentMethod): Order
+    {
+        $order->update([
+            'payment_status' => PaymentStatus::Paid,
+            'status'         => OrderStatus::Processing,
+            'paid_at'        => now(),
+            'payment_method' => $paymentMethod,
+        ]);
+
+        $freshOrder = $order->fresh();
+
+        $order->store->owner->notify(new NewOrderNotification($freshOrder));
+
+        Notification::route('mail', [
+            $freshOrder->customer_email => $freshOrder->customer_name,
+        ])->notify(new CustomerOrderConfirmationNotification($freshOrder));
+
+        return $freshOrder;
+    }
+}
+```
+
+Both controller methods now delegate to the action in one line:
+
+```php
+// callback()
+$this->handlePaymentSuccess->execute($transaction->order, $gateway);
+
+// sandboxComplete()
+$this->handlePaymentSuccess->execute($order, 'sandbox');
+```
+
+`PaymentController` also lost 3 imports (`NewOrderNotification`,
+`CustomerOrderConfirmationNotification`, `Notification` facade) that belonged in the action,
+not in the HTTP layer.
+
+### Why this matters
+
+- Post-payment business logic now lives in exactly one place. Adding a webhook call,
+  a revenue tracking event, or a push notification requires one edit to one class.
+- The action can be instantiated and tested directly with a mock `Order` — no HTTP request,
+  no middleware, no route resolution needed.
+- The `app/Actions/` directory establishes a pattern for the remaining controller-embedded
+  business logic to follow (see improvements #4 and #5).
+
+### CV-ready bullets
+
+- **Eliminated code duplication in a payment gateway integration** by extracting shared
+  post-payment logic (order status update, seller notification, customer email confirmation)
+  from two diverging controller methods into a single `HandlePaymentSuccessAction` class,
+  reducing the PaymentController by 22 lines and establishing a single code path for all
+  successful payment outcomes regardless of gateway (live or sandbox).
+
+- **Introduced an Actions layer** (`app/Actions/`) to a Laravel e-commerce API to house
+  multi-step business operations that do not belong in HTTP controllers, improving
+  testability by making core payment fulfillment logic exercisable without bootstrapping
+  the full request lifecycle.
+
+- **Reduced maintenance surface for a critical payment flow**: prior to the refactor, any
+  change to post-payment behaviour (adding webhooks, audit logging, push notifications)
+  required synchronised edits to two separate controller methods — a pattern that historically
+  leads to silent divergence between live and sandbox environments.
+
+---
+
 ## Upcoming Improvements (Planned)
 
 | # | Title | Priority |
 |---|-------|----------|
-| 3 | Extract `HandlePaymentSuccessAction` — eliminate duplicated post-payment code in `callback()` and `sandboxComplete()` | HIGH |
 | 4 | Extract `CreateOrderAction` — move checkout business logic out of `CheckoutController` into a testable Action class | HIGH |
 | 5 | Introduce domain events (`OrderCreated`, `PaymentSucceeded`, `OrderStatusChanged`) — decouple notification dispatch from HTTP handlers | MEDIUM |

@@ -2,25 +2,26 @@
 
 namespace App\Http\Controllers\Store;
 
+use App\Actions\HandlePaymentSuccessAction;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentStatus;
 use App\Enums\TransactionStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\Transaction;
-use App\Notifications\CustomerOrderConfirmationNotification;
-use App\Notifications\NewOrderNotification;
 use App\Services\PaymentGateway\DTOs\PaymentRequest;
 use App\Services\PaymentGateway\PaymentGatewayRegistry;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Notification;
 
 class PaymentController extends Controller
 {
-    public function __construct(private readonly PaymentGatewayRegistry $registry) {}
+    public function __construct(
+        private readonly PaymentGatewayRegistry       $registry,
+        private readonly HandlePaymentSuccessAction    $handlePaymentSuccess,
+    ) {}
 
     public function initiate(Request $request, string $slug): JsonResponse
     {
@@ -151,20 +152,7 @@ class PaymentController extends Controller
         ]);
 
         if ($verifyResponse->success) {
-            $order = $transaction->order;
-            $order->update([
-                'payment_status' => PaymentStatus::Paid,
-                'status'         => OrderStatus::Processing,
-                'paid_at'        => now(),
-                'payment_method' => $gateway,
-            ]);
-
-            $freshOrder = $order->fresh();
-            $order->store->owner->notify(new NewOrderNotification($freshOrder));
-
-            Notification::route('mail', [
-                $freshOrder->customer_email => $freshOrder->customer_name,
-            ])->notify(new CustomerOrderConfirmationNotification($freshOrder));
+            $this->handlePaymentSuccess->execute($transaction->order, $gateway);
         }
 
         if ($gateway === 'idram') {
@@ -206,19 +194,7 @@ class PaymentController extends Controller
         $frontendUrl = rtrim(config('app.frontend_url'), '/');
 
         if ($success) {
-            $order->update([
-                'payment_status' => PaymentStatus::Paid,
-                'status'         => OrderStatus::Processing,
-                'paid_at'        => now(),
-                'payment_method' => 'sandbox',
-            ]);
-
-            $freshOrder = $order->fresh();
-            $order->store->owner->notify(new NewOrderNotification($freshOrder));
-
-            Notification::route('mail', [
-                $freshOrder->customer_email => $freshOrder->customer_name,
-            ])->notify(new CustomerOrderConfirmationNotification($freshOrder));
+            $this->handlePaymentSuccess->execute($order, 'sandbox');
 
             return $this->success(['redirect' => "{$frontendUrl}/store/{$slug}/checkout/success?order={$order->uuid}"]);
         }
