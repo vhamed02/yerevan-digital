@@ -624,6 +624,71 @@ All 13 tests pass; the existing dashboard and checkout suites (18 tests, 75 asse
 
 ---
 
+---
+
+## Improvement #9 — Split the God-Object `AppServiceProvider` into Domain Providers
+
+**Date:** 2026-05-29
+**Commit:** TBD
+
+**Files changed:**
+- `services/api/app/Providers/AppServiceProvider.php` — slimmed from 104 to 25 lines
+- `services/api/app/Providers/RepositoryServiceProvider.php` — new (13 repository bindings)
+- `services/api/app/Providers/EventServiceProvider.php` — new (3 listeners + 4 model observers)
+- `services/api/app/Providers/PaymentServiceProvider.php` — new (payment gateway registry singleton)
+- `services/api/bootstrap/providers.php` — registered the three new providers
+
+### What was wrong
+
+A single `AppServiceProvider` had accreted five unrelated responsibilities across 104 lines and 50 import statements:
+
+1. 13 repository interface→implementation container bindings
+2. The `PaymentGatewayRegistry` singleton (wiring three bank gateways)
+3. 3 domain event → listener registrations
+4. 4 Eloquent model observer registrations
+5. The Brevo mail transport extension + password-reset URL generator
+
+Any change to payment wiring, a new repository, or a new event listener forced a diff against the same file — a textbook God-object violating the single-responsibility principle, with a 50-line import block that made the file hard to scan.
+
+### What was fixed
+
+Decomposed by domain into three focused providers, each registered in `bootstrap/providers.php`:
+
+```php
+// bootstrap/providers.php
+return [
+    AppServiceProvider::class,          // mail transport + reset-password URL only
+    RepositoryServiceProvider::class,   // 13 repository bindings
+    PaymentServiceProvider::class,      // PaymentGatewayRegistry singleton
+    EventServiceProvider::class,        // event listeners + model observers
+];
+```
+
+`RepositoryServiceProvider` uses Laravel's first-class `public array $bindings` convention, letting the framework register all 13 contract→implementation pairs without an imperative `register()` body:
+
+```php
+class RepositoryServiceProvider extends ServiceProvider
+{
+    public array $bindings = [
+        OrderRepositoryInterface::class   => OrderRepository::class,
+        ProductRepositoryInterface::class => ProductRepository::class,
+        // ... 11 more
+    ];
+}
+```
+
+`AppServiceProvider` now holds only the two mail/notification concerns (25 lines, 9 imports). The full PHPUnit suite (**223 tests / 619 assertions**) passes unchanged, proving DI resolution, event dispatch, and model observers all remain correctly wired after the split.
+
+### CV-ready bullets
+
+- **Refactored a 104-line God-object service provider into four single-responsibility providers** (repositories, payment gateways, events/observers, and mail) on a production Laravel API, isolating each subsystem's bootstrap wiring so unrelated features no longer share a single high-churn file.
+
+- **Adopted Laravel's declarative `$bindings` provider convention** to register 13 repository contract→implementation pairs as a static map rather than an imperative method body, cutting boilerplate and making the dependency graph readable at a glance.
+
+- **Verified zero behavioural regression across a 223-test suite** after relocating all container bindings, three domain-event listeners, four Eloquent observers, and a service singleton between providers — confirming the decomposition preserved the application's complete bootstrap contract.
+
+---
+
 ## Improvements Log
 
 | # | Title | Commit |
@@ -636,10 +701,10 @@ All 13 tests pass; the existing dashboard and checkout suites (18 tests, 75 asse
 | 6 | Eliminate last `env()` call — password reset URL | `91a6b97` |
 | 7 | Extract dashboard stats into repository layer | `769a23e` |
 | 8 | Feature tests for checkout actions + dead-code event fix | `b0c43ca` |
+| 9 | Split `AppServiceProvider` into domain service providers | TBD |
 
 ## Upcoming Improvements (Planned)
 
 | # | Title | Priority |
 |---|-------|----------|
-| 9 | Split `AppServiceProvider` into domain service providers | MEDIUM |
 | 10 | Extract `ProductController` image management into action classes | MEDIUM |
