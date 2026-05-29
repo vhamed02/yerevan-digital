@@ -561,6 +561,69 @@ return $this->success([
 
 ---
 
+---
+
+## Improvement #8 — Feature Tests for Checkout Actions (and a Latent Event Bug They Exposed)
+
+**Date:** 2026-05-29
+**Commit:** TBD
+
+**Files changed:**
+- `services/api/app/Actions/CreateOrderAction.php` — **fixed unreachable event dispatch**
+- `services/api/tests/Feature/Actions/CreateOrderActionTest.php` — new (8 tests)
+- `services/api/tests/Feature/Actions/HandlePaymentSuccessActionTest.php` — new (5 tests)
+
+### Bug found and fixed
+
+Writing tests for `CreateOrderAction` (introduced in improvement #4) immediately surfaced a real production bug. The method body was:
+
+```php
+public function execute(CheckoutData $data): Order
+{
+    return DB::transaction(function () use ($data) {
+        // ... build order, items, decrement stock ...
+        return $order;
+    });
+
+    event(new OrderCreated($order));   // ← UNREACHABLE: function already returned
+    return $order;
+}
+```
+
+Because `return DB::transaction(...)` returns immediately, the `event(new OrderCreated(...))` line was **dead code that had never executed**. The `OrderCreated` domain event — added in improvement #5 to decouple post-order side effects — was silently never firing for any checkout. Fixed by capturing the transaction result and dispatching the event after the transaction commits:
+
+```php
+$order = DB::transaction(function () use ($data) {
+    // ...
+    return $order;
+});
+
+event(new OrderCreated($order));   // now fires, post-commit
+
+return $order;
+```
+
+A test (`test_fires_order_created_event`) now asserts the event dispatches, locking the fix in place.
+
+### What was added
+
+Two feature-test suites exercising the action layer directly (resolved from the container, not via HTTP), running against the in-memory SQLite database:
+
+- **`CreateOrderActionTest`** (8 tests): correct total calculation, order-item field mapping, stock decrement for managed products, no-decrement for unmanaged products, `ValidationException` on insufficient stock, stock left intact after a failed checkout, full transaction rollback when a later line item fails, and `OrderCreated` event dispatch.
+- **`HandlePaymentSuccessActionTest`** (5 tests): status → `Processing`, payment status → `Paid`, `payment_method` + `paid_at` persistence, database persistence, and `PaymentSucceeded` event dispatch.
+
+All 13 tests pass; the existing dashboard and checkout suites (18 tests, 75 assertions) remain green, confirming improvements #4, #5, and #7 are regression-safe.
+
+### CV-ready bullets
+
+- **Discovered and fixed a silent production bug through test-driven verification**: writing a test for a domain-event dispatch revealed that an `OrderCreated` event was placed after a `return DB::transaction()` statement, making it unreachable dead code — the event had never fired since its introduction. Relocated the dispatch to after transaction commit and added a regression test asserting the dispatch.
+
+- **Authored 13 feature tests covering the order-creation and payment-success action classes**, exercising stock management, transactional rollback on partial failure, validation errors, and domain-event emission — proving the testability gained by extracting business logic into single-responsibility action classes (improvements #3–#4).
+
+- **Validated database-agnostic query design** by running the full action and dashboard suites against an in-memory SQLite engine (the project's CI database), confirming the MySQL-to-portable query migration from improvement #7 introduced no regressions across 31 tests / 100 assertions.
+
+---
+
 ## Improvements Log
 
 | # | Title | Commit |
@@ -572,11 +635,11 @@ return $this->success([
 | 5 | Introduce domain events + listeners | `b2b2375` |
 | 6 | Eliminate last `env()` call — password reset URL | `91a6b97` |
 | 7 | Extract dashboard stats into repository layer | `769a23e` |
+| 8 | Feature tests for checkout actions + dead-code event fix | TBD |
 
 ## Upcoming Improvements (Planned)
 
 | # | Title | Priority |
 |---|-------|----------|
-| 8 | Unit tests for `CreateOrderAction` and `HandlePaymentSuccessAction` — prove testability claims | HIGH |
 | 9 | Split `AppServiceProvider` into domain service providers | MEDIUM |
 | 10 | Extract `ProductController` image management into action classes | MEDIUM |

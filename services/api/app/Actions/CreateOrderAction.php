@@ -23,7 +23,7 @@ class CreateOrderAction
 
     public function execute(CheckoutData $data): Order
     {
-        return DB::transaction(function () use ($data) {
+        $order = DB::transaction(function () use ($data) {
             $subtotal      = 0;
             $resolvedItems = [];
 
@@ -107,4 +107,5 @@ class CreateOrderAction
 
         return $order;
     }
+
 }
