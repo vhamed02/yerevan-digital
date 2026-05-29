@@ -629,7 +629,7 @@ All 13 tests pass; the existing dashboard and checkout suites (18 tests, 75 asse
 ## Improvement #9 — Split the God-Object `AppServiceProvider` into Domain Providers
 
 **Date:** 2026-05-29
-**Commit:** TBD
+**Commit:** `fada080`
 
 **Files changed:**
 - `services/api/app/Providers/AppServiceProvider.php` — slimmed from 104 to 25 lines
@@ -701,7 +701,7 @@ class RepositoryServiceProvider extends ServiceProvider
 | 6 | Eliminate last `env()` call — password reset URL | `91a6b97` |
 | 7 | Extract dashboard stats into repository layer | `769a23e` |
 | 8 | Feature tests for checkout actions + dead-code event fix | `b0c43ca` |
-| 9 | Split `AppServiceProvider` into domain service providers | TBD |
+| 9 | Split `AppServiceProvider` into domain service providers | `fada080` |
 
 ## Upcoming Improvements (Planned)
 
