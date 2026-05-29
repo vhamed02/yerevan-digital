@@ -805,6 +805,57 @@ Two new tests (`test_register_rejects_weak_password`, `test_auth_endpoints_are_r
 
 ---
 
+## Improvement #12 — Database Indexing & Sargable Date Queries
+
+**Date:** 2026-05-29
+**Commit:** TBD
+
+**Files changed:**
+- `services/api/database/migrations/2026_05_29_000001_add_performance_indexes_to_orders_and_products.php` — new (3 indexes)
+- `services/api/app/Repositories/Eloquent/OrderRepository.php` — converted 4 `whereDate()` calls to sargable range bounds
+- `services/api/app/Jobs/ExportOrdersJob.php` — same conversion for the export date filters
+
+### What was wrong
+
+Two compounding problems on the orders table, confirmed with `EXPLAIN` against the production MySQL database:
+
+1. **Missing indexes.** `orders` had `(store_id, status)` and `(store_id, payment_status)` but **no index covering `created_at`**. The seller order list (`WHERE store_id = ? ORDER BY created_at DESC`) used the `store_id` index for the filter then did a **`Using filesort`** for the ordering; the admin dashboard's cross-store date stats (today / this-month / 30-day chart) did a **full table scan** (`type=ALL`).
+2. **Non-sargable date predicates.** Six queries used `whereDate('created_at', X)`, which compiles to `DATE(created_at) = X` on MySQL — wrapping the column in a function so **no index on `created_at` can ever be used**, regardless of what indexes exist.
+
+```
+-- BEFORE (production EXPLAIN)
+Seller order list:  type=ref  key=orders_store_id_status_index  Extra=Using filesort
+Admin today count:  type=ALL  key=NULL  rows=390  Extra=Using where
+```
+
+### What was fixed
+
+Added three indexes in one migration and rewrote every `whereDate()` as a half-open range that the optimizer can use:
+
+```php
+// migration
+$table->index(['store_id', 'created_at']);                 // seller list + per-store date ranges
+$table->index('created_at');                                // admin cross-store date stats
+$table->index(['category_id', 'store_id', 'status']);       // storefront category nav + seller category filter
+
+// OrderRepository — was: ->whereDate('created_at', today())
+->whereBetween('created_at', [today(), today()->endOfDay()])
+// was: ->whereDate('created_at', '>=', $v)
+->where('created_at', '>=', Carbon::parse($v)->startOfDay())
+```
+
+The conversions are behavior-identical (full-day inclusive bounds) and remain SQLite-compatible for the test suite (CLAUDE.md pitfall #6). Full suite: **230 tests / 644 assertions** pass.
+
+### CV-ready bullets
+
+- **Diagnosed and eliminated a `filesort` and a full-table-scan** on the busiest query paths of a production Laravel/MySQL e-commerce API using `EXPLAIN`: added a composite `(store_id, created_at)` index that converted the seller order list from a ref-scan-plus-filesort into a pure index range scan, and a `created_at` index that turned the admin dashboard's date aggregates from `type=ALL` table scans into index range scans.
+
+- **Made six date-filter queries sargable** by replacing `whereDate('created_at', …)` (which forces `DATE(created_at)` and defeats every index) with half-open `created_at` range bounds via Carbon — a behaviour-preserving change that lets the new indexes actually be used while staying database-agnostic for the SQLite-backed test suite.
+
+- **Added a `(category_id, store_id, status)` composite index** to support storefront category navigation (active-product counts per category) and the seller product-list category filter, replacing correlated-subquery table scans with indexed lookups.
+
+---
+
 ## Improvements Log
 
 | # | Title | Commit |
@@ -820,5 +871,6 @@ Two new tests (`test_register_rejects_weak_password`, `test_auth_endpoints_are_r
 | 9 | Split `AppServiceProvider` into domain service providers | `fada080` |
 | 10 | Extract `ProductController` image management into action classes | `cb9a8ba` |
 | 11 | Backend security hardening (rate limiting, token expiry, password policy, timing-safe webhooks) | `e8e7ac1` |
+| 12 | Database indexing & sargable date queries | TBD |
 
 _Full test suite: 230 tests / 644 assertions passing._

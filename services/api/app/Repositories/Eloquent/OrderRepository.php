@@ -6,6 +6,7 @@ use App\Models\Order;
 use App\Repositories\Contracts\OrderRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Carbon;
 
 class OrderRepository implements OrderRepositoryInterface
 {
@@ -14,8 +15,8 @@ class OrderRepository implements OrderRepositoryInterface
         return Order::where('store_id', $storeId)
             ->when($filters['status'] ?? null, fn($q, $v) => $q->where('status', $v))
             ->when($filters['payment_status'] ?? null, fn($q, $v) => $q->where('payment_status', $v))
-            ->when($filters['date_from'] ?? null, fn($q, $v) => $q->whereDate('created_at', '>=', $v))
-            ->when($filters['date_to'] ?? null, fn($q, $v) => $q->whereDate('created_at', '<=', $v))
+            ->when($filters['date_from'] ?? null, fn($q, $v) => $q->where('created_at', '>=', Carbon::parse($v)->startOfDay()))
+            ->when($filters['date_to'] ?? null, fn($q, $v) => $q->where('created_at', '<=', Carbon::parse($v)->endOfDay()))
             ->when($filters['search'] ?? null, fn($q, $v) => $q->where(function ($q) use ($v) {
                 $q->where('order_number', 'like', "%{$v}%")
                     ->orWhere('customer_name', 'like', "%{$v}%");
@@ -61,12 +62,12 @@ class OrderRepository implements OrderRepositoryInterface
 
     public function countToday(): int
     {
-        return Order::whereDate('created_at', today())->count();
+        return Order::whereBetween('created_at', [today(), today()->endOfDay()])->count();
     }
 
     public function countYesterday(): int
     {
-        return Order::whereDate('created_at', today()->subDay())->count();
+        return Order::whereBetween('created_at', [today()->subDay(), today()->subDay()->endOfDay()])->count();
     }
 
     public function revenueBetween(\Carbon\Carbon $from, \Carbon\Carbon $to): float
@@ -119,7 +120,7 @@ class OrderRepository implements OrderRepositoryInterface
             'total_orders'       => (clone $base)->count(),
             'orders_this_month'  => (clone $base)->whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()])->count(),
             'revenue_this_month' => (float) (clone $base)->whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()])->sum('total'),
-            'revenue_today'      => (float) (clone $base)->whereDate('created_at', today())->sum('total'),
+            'revenue_today'      => (float) (clone $base)->whereBetween('created_at', [today(), today()->endOfDay()])->sum('total'),
         ];
     }
 

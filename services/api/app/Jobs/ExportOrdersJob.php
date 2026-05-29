@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Carbon;
 
 class ExportOrdersJob implements ShouldQueue
 {
@@ -37,8 +38,8 @@ class ExportOrdersJob implements ShouldQueue
         $orders = Order::where('store_id', $this->storeId)
             ->when($this->filters['status'] ?? null, fn($q, $v) => $q->where('status', $v))
             ->when($this->filters['payment_status'] ?? null, fn($q, $v) => $q->where('payment_status', $v))
-            ->when($this->filters['date_from'] ?? null, fn($q, $v) => $q->whereDate('created_at', '>=', $v))
-            ->when($this->filters['date_to'] ?? null, fn($q, $v) => $q->whereDate('created_at', '<=', $v))
+            ->when($this->filters['date_from'] ?? null, fn($q, $v) => $q->where('created_at', '>=', Carbon::parse($v)->startOfDay()))
+            ->when($this->filters['date_to'] ?? null, fn($q, $v) => $q->where('created_at', '<=', Carbon::parse($v)->endOfDay()))
             ->latest()
             ->get();
 
