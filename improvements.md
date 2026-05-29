@@ -452,4 +452,4 @@ SendOrderStatusNotification — handles OrderStatusChanged
 | 2 | Extract Order State Machine into `OrderStatus` enum | `96cb79a` |
 | 3 | Extract `HandlePaymentSuccessAction` | `02314d5` |
 | 4 | Extract `CreateOrderAction` + `CheckoutData` DTO | `84c9551` |
-| 5 | Introduce domain events + listeners | `TBD` |
+| 5 | Introduce domain events + listeners | `b2b2375` |
