@@ -30,4 +30,6 @@ interface ProductRepositoryInterface
     public function findActiveByStoreAndUuid(int $storeId, string $uuid, bool $lock = false): Product;
 
     public function maxPriceForStore(int $storeId): float;
+
+    public function countStatsByStore(int $storeId): array;
 }

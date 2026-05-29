@@ -110,4 +110,47 @@ class OrderRepository implements OrderRepositoryInterface
     {
         return Order::count();
     }
+
+    public function statsByStore(int $storeId): array
+    {
+        $base = Order::where('store_id', $storeId);
+
+        return [
+            'total_orders'       => (clone $base)->count(),
+            'orders_this_month'  => (clone $base)->whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()])->count(),
+            'revenue_this_month' => (float) (clone $base)->whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()])->sum('total'),
+            'revenue_today'      => (float) (clone $base)->whereDate('created_at', today())->sum('total'),
+        ];
+    }
+
+    public function revenueChartByStore(int $storeId): array
+    {
+        $rows = Order::where('store_id', $storeId)
+            ->where('created_at', '>=', now()->subDays(13)->startOfDay())
+            ->select('created_at', 'total')
+            ->get()
+            ->groupBy(fn($row) => substr($row->created_at, 0, 10));
+
+        $chart = [];
+        for ($i = 13; $i >= 0; $i--) {
+            $date    = now()->subDays($i)->toDateString();
+            $chart[] = [
+                'date'    => $date,
+                'revenue' => (float) ($rows->get($date)?->sum('total') ?? 0),
+            ];
+        }
+
+        return $chart;
+    }
+
+    public function ordersByStatusByStore(int $storeId): array
+    {
+        return Order::where('store_id', $storeId)
+            ->selectRaw('status, COUNT(*) as count')
+            ->groupBy('status')
+            ->get()
+            ->map(fn($row) => ['status' => $row->status->value, 'count' => (int) $row->count])
+            ->values()
+            ->all();
+    }
 }

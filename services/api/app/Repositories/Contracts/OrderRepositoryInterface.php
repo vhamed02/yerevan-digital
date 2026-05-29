@@ -35,4 +35,10 @@ interface OrderRepositoryInterface
     public function recentWithStore(int $limit): Collection;
 
     public function countAll(): int;
+
+    public function statsByStore(int $storeId): array;
+
+    public function revenueChartByStore(int $storeId): array;
+
+    public function ordersByStatusByStore(int $storeId): array;
 }

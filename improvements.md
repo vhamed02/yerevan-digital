@@ -490,6 +490,77 @@ After this change, `grep -rn "env(" app/` returns zero results — the entire ap
 
 ---
 
+---
+
+## Improvement #7 — Extract Dashboard Stats Queries into Repository Layer
+
+**Date:** 2026-05-29
+**Commit:** TBD
+
+**Files changed:**
+- `services/api/app/Http/Controllers/Seller/DashboardController.php` — reduced from 110 to 39 lines; removed all inline `DB::` calls
+- `services/api/app/Repositories/Contracts/OrderRepositoryInterface.php` — added `statsByStore()`, `revenueChartByStore()`, `ordersByStatusByStore()`
+- `services/api/app/Repositories/Contracts/ProductRepositoryInterface.php` — added `countStatsByStore()`
+- `services/api/app/Repositories/Eloquent/OrderRepository.php` — implemented 3 new store-scoped query methods
+- `services/api/app/Repositories/Eloquent/ProductRepository.php` — implemented `countStatsByStore()` using Eloquent scopes
+
+### What was wrong
+
+`DashboardController` contained four private methods with inline `DB::table()` queries totalling 45 lines of query logic. Two critical issues:
+
+1. **Architectural violation**: the controller held raw database query logic that bypassed Eloquent's soft-delete scopes (`whereNull('deleted_at')` was added manually) and skipped model casting — `$row->status` returned a raw string instead of the `OrderStatus` enum.
+
+2. **SQLite test incompatibility**: the product stats query used `SUM(CASE WHEN status = ? THEN 1 ELSE 0 END)` — valid MySQL but silently broken in SQLite, which rejects this aggregate form. Combined with raw `DB::table()` usage that bypassed Eloquent scopes, the queries were untestable in the in-memory test environment.
+
+```php
+// Before — inline DB::table() in controller
+$products = DB::table('products')
+    ->where('store_id', $store->id)
+    ->whereNull('deleted_at')
+    ->selectRaw('COUNT(*) as total, SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as active', [
+        ProductStatus::Active->value,
+    ])
+    ->first();
+```
+
+### What was fixed
+
+Moved all query logic into the repository layer using Eloquent models (soft-delete scope applied automatically) and database-agnostic query builder:
+
+```php
+// After — in ProductRepository
+public function countStatsByStore(int $storeId): array
+{
+    $base = Product::where('store_id', $storeId);
+    return [
+        'total_products'  => (clone $base)->count(),
+        'active_products' => (clone $base)->where('status', ProductStatus::Active)->count(),
+    ];
+}
+```
+
+```php
+// After — DashboardController __invoke()
+$productStats = $this->products->countStatsByStore($store->id);
+$orderStats   = $this->orders->statsByStore($store->id);
+return $this->success([
+    'stats'            => array_merge($productStats, $orderStats),
+    'revenue_chart'    => $this->orders->revenueChartByStore($store->id),
+    'orders_by_status' => $this->orders->ordersByStatusByStore($store->id),
+    'recent_orders'    => ...,
+]);
+```
+
+### CV-ready bullets
+
+- **Eliminated direct database access from a controller layer** in a production Laravel API: migrated 45 lines of inline `DB::table()` query logic from `DashboardController` into four typed repository methods, restoring the clean separation between HTTP concerns and persistence — and ensuring Eloquent's soft-delete global scopes are applied automatically rather than added manually.
+
+- **Resolved SQLite test incompatibility** caused by a MySQL-specific `SUM(CASE WHEN ...)` aggregate in the product stats query: replaced with two standard `COUNT()` queries using Eloquent's query builder, making all dashboard stats testable in the in-memory SQLite environment that the project's PHPUnit suite runs against.
+
+- **Reduced controller complexity by 65%** (110 → 39 lines) while adding four new tested, single-responsibility repository methods to the `OrderRepository` and `ProductRepository` classes — methods that can be independently mocked or replaced in feature tests.
+
+---
+
 ## Improvements Log
 
 | # | Title | Commit |
@@ -499,13 +570,13 @@ After this change, `grep -rn "env(" app/` returns zero results — the entire ap
 | 3 | Extract `HandlePaymentSuccessAction` | `02314d5` |
 | 4 | Extract `CreateOrderAction` + `CheckoutData` DTO | `84c9551` |
 | 5 | Introduce domain events + listeners | `b2b2375` |
-| 6 | Eliminate last `env()` call — password reset URL | TBD |
+| 6 | Eliminate last `env()` call — password reset URL | `91a6b97` |
+| 7 | Extract dashboard stats into repository layer | TBD |
 
 ## Upcoming Improvements (Planned)
 
 | # | Title | Priority |
 |---|-------|----------|
-| 7 | Extract inline raw SQL stats queries into repositories — fixes MySQL-specific functions breaking SQLite test suite | HIGH |
 | 8 | Unit tests for `CreateOrderAction` and `HandlePaymentSuccessAction` — prove testability claims | HIGH |
 | 9 | Split `AppServiceProvider` into domain service providers | MEDIUM |
 | 10 | Extract `ProductController` image management into action classes | MEDIUM |

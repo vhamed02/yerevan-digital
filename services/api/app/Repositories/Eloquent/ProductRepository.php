@@ -137,4 +137,14 @@ class ProductRepository implements ProductRepositoryInterface
             ->where('status', ProductStatus::Active)
             ->max('price') ?? 0;
     }
+
+    public function countStatsByStore(int $storeId): array
+    {
+        $base = Product::where('store_id', $storeId);
+
+        return [
+            'total_products'  => (clone $base)->count(),
+            'active_products' => (clone $base)->where('status', ProductStatus::Active)->count(),
+        ];
+    }
 }
