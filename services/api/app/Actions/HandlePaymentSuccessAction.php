@@ -4,10 +4,8 @@ namespace App\Actions;
 
 use App\Enums\OrderStatus;
 use App\Enums\PaymentStatus;
+use App\Events\PaymentSucceeded;
 use App\Models\Order;
-use App\Notifications\CustomerOrderConfirmationNotification;
-use App\Notifications\NewOrderNotification;
-use Illuminate\Support\Facades\Notification;
 
 class HandlePaymentSuccessAction
 {
@@ -22,11 +20,7 @@ class HandlePaymentSuccessAction
 
         $freshOrder = $order->fresh();
 
-        $order->store->owner->notify(new NewOrderNotification($freshOrder));
-
-        Notification::route('mail', [
-            $freshOrder->customer_email => $freshOrder->customer_name,
-        ])->notify(new CustomerOrderConfirmationNotification($freshOrder));
+        event(new PaymentSucceeded($freshOrder));
 
         return $freshOrder;
     }

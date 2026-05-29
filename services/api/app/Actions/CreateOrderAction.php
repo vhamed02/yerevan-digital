@@ -5,6 +5,7 @@ namespace App\Actions;
 use App\Data\CheckoutData;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentStatus;
+use App\Events\OrderCreated;
 use App\Models\Order;
 use App\Repositories\Contracts\OrderRepositoryInterface;
 use App\Repositories\Contracts\ProductRepositoryInterface;
@@ -101,5 +102,9 @@ class CreateOrderAction
 
             return $order;
         });
+
+        event(new OrderCreated($order));
+
+        return $order;
     }
 }

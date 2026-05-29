@@ -3,12 +3,12 @@
 namespace App\Http\Controllers\Seller;
 
 use App\Enums\OrderStatus;
+use App\Events\OrderStatusChanged;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Seller\UpdateOrderStatusRequest;
 use App\Http\Resources\Seller\OrderDetailResource;
 use App\Http\Resources\Seller\OrderResource;
 use App\Jobs\ExportOrdersJob;
-use App\Notifications\OrderStatusChangedNotification;
 use App\Repositories\Contracts\OrderRepositoryInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -67,11 +67,11 @@ class OrderController extends Controller
 
         $this->orders->update($order, array_merge(['status' => $newStatus], $extra));
 
-        if ($order->customer) {
-            $order->customer->notify(new OrderStatusChangedNotification($order));
-        }
+        $freshOrder = $order->fresh();
 
-        return $this->success(new OrderResource($order->fresh()), 'Order status updated.');
+        event(new OrderStatusChanged($freshOrder));
+
+        return $this->success(new OrderResource($freshOrder), 'Order status updated.');
     }
 
     public function export(Request $request): JsonResponse

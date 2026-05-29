@@ -38,8 +38,12 @@ use App\Repositories\Eloquent\ProductViewRepository;
 use App\Repositories\Eloquent\StorePaymentGatewayRepository;
 use App\Repositories\Eloquent\StoreTemplateConfigRepository;
 use App\Repositories\Eloquent\StoreTemplateRepository;
+use App\Events\OrderStatusChanged;
+use App\Events\PaymentSucceeded;
 use App\Events\ProductViewed;
 use App\Listeners\RecordProductView;
+use App\Listeners\SendNewOrderNotifications;
+use App\Listeners\SendOrderStatusNotification;
 use App\Services\PaymentGateway\Gateways\ConverseBankGateway;
 use App\Services\PaymentGateway\Gateways\IdramGateway;
 use App\Services\PaymentGateway\Gateways\InnecobankGateway;
@@ -89,6 +93,8 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Event::listen(ProductViewed::class, RecordProductView::class);
+        Event::listen(PaymentSucceeded::class, SendNewOrderNotifications::class);
+        Event::listen(OrderStatusChanged::class, SendOrderStatusNotification::class);
 
         User::observe(UserObserver::class);
         Store::observe(StoreObserver::class);

@@ -372,8 +372,84 @@ public function checkout(CheckoutRequest $request, string $slug): JsonResponse
 
 ---
 
-## Upcoming Improvements (Planned)
+---
 
-| # | Title | Priority |
-|---|-------|----------|
-| 5 | Introduce domain events (`OrderCreated`, `PaymentSucceeded`, `OrderStatusChanged`) — decouple notification dispatch from HTTP handlers | MEDIUM |
+## Improvement #5 — Introduced Domain Events to Decouple Notification Dispatch
+
+**Date:** 2026-05-29
+**Files created:**
+- `services/api/app/Events/OrderCreated.php`
+- `services/api/app/Events/PaymentSucceeded.php`
+- `services/api/app/Events/OrderStatusChanged.php`
+- `services/api/app/Listeners/SendNewOrderNotifications.php`
+- `services/api/app/Listeners/SendOrderStatusNotification.php`
+
+**Files updated:**
+- `services/api/app/Actions/HandlePaymentSuccessAction.php` — replaced 2 direct `notify()` calls with `event(new PaymentSucceeded(...))`
+- `services/api/app/Actions/CreateOrderAction.php` — fires `event(new OrderCreated(...))` after transaction commits
+- `services/api/app/Http/Controllers/Seller/OrderController.php` — replaced direct `notify()` call with `event(new OrderStatusChanged(...))`
+- `services/api/app/Providers/AppServiceProvider.php` — registered 2 new event-listener pairs
+
+### What was wrong
+
+Notification dispatch was hard-coded directly inside the classes that triggered the domain operation:
+
+- `HandlePaymentSuccessAction::execute()` called `$order->store->owner->notify(...)` and `Notification::route('mail', ...)->notify(...)` inline — the action knew about both the payment domain AND the notification domain
+- `Seller/OrderController::updateStatus()` called `$order->customer->notify(new OrderStatusChangedNotification($order))` inline — an HTTP controller was making notification decisions
+
+This tight coupling had two concrete consequences:
+
+1. **Adding any new side effect required modifying the originating class.** Want to fire a webhook on payment success? Edit `HandlePaymentSuccessAction`. Want to post to Slack when an order ships? Edit `OrderController`. Every new requirement creates a new reason to touch already-tested, already-working code.
+
+2. **The existing `Events/` and `Listeners/` directories were nearly unused.** The architecture declared its intent (one event: `ProductViewed`, one listener: `RecordProductView`) but the most important domain operations — payment and order management — were not event-driven at all.
+
+### What was fixed
+
+**Three domain events** — plain classes carrying an `Order` instance, consistent with the existing `ProductViewed` pattern:
+
+```
+OrderCreated      — fired by CreateOrderAction after the DB transaction commits
+PaymentSucceeded  — fired by HandlePaymentSuccessAction after the order is marked paid
+OrderStatusChanged — fired by OrderController after the status transition is persisted
+```
+
+**Two queued listeners** — both on the `notifications` queue, both `ShouldQueue`:
+
+```
+SendNewOrderNotifications   — handles PaymentSucceeded
+                              → NewOrderNotification to seller
+                              → CustomerOrderConfirmationNotification to customer
+
+SendOrderStatusNotification — handles OrderStatusChanged
+                              → OrderStatusChangedNotification to customer (if registered)
+```
+
+`HandlePaymentSuccessAction` dropped from 29 to 18 lines. `OrderController::updateStatus()` went from 5 lines of notification logic to one `event()` call. Neither class imports a notification class anymore.
+
+`OrderCreated` has no listener yet — it fires and produces no side effects today — but it makes the event available as a hook for future work (welcome emails, analytics, admin feeds) without touching `CreateOrderAction`.
+
+### Why this matters
+
+- Adding a new side effect to any of these domain operations now means writing a new Listener and registering it — zero changes to the originating action or controller.
+- All notification logic is now concentrated in the `Listeners/` directory, making it trivially easy to audit: "what happens when a payment succeeds?" has one answer in one file.
+- The `OrderCreated` event establishes a future-safe hook point: the first time someone needs to react to a new order (inventory sync, analytics, fraud check), the event is already in place.
+
+### CV-ready bullets
+
+- **Decoupled notification dispatch from business logic** across a Laravel e-commerce API by introducing three domain events (`OrderCreated`, `PaymentSucceeded`, `OrderStatusChanged`) and two dedicated queued listeners, removing all direct `notify()` calls from action classes and HTTP controllers and establishing a single, auditable location for all order-related notification logic.
+
+- **Extended an existing event-driven architecture** — the codebase already had one event/listener pair (`ProductViewed` / `RecordProductView`) — by applying the same pattern to the platform's highest-stakes operations: payment confirmation and order fulfilment, ensuring that adding new side effects (webhooks, push notifications, analytics) to these flows requires only a new listener, with zero changes to tested business logic.
+
+- **Improved the open/closed principle compliance** of the order management domain: `HandlePaymentSuccessAction`, `CreateOrderAction`, and `OrderController` no longer need to be modified when notification requirements change — they are closed for modification and the event system is open for extension.
+
+---
+
+## All Improvements Complete ✅
+
+| # | Title | Commit |
+|---|-------|--------|
+| 1 | Resolve `FRONTEND_URL` via config layer | `ff17528` |
+| 2 | Extract Order State Machine into `OrderStatus` enum | `96cb79a` |
+| 3 | Extract `HandlePaymentSuccessAction` | `02314d5` |
+| 4 | Extract `CreateOrderAction` + `CheckoutData` DTO | `84c9551` |
+| 5 | Introduce domain events + listeners | `TBD` |
