@@ -62,7 +62,7 @@ class PaymentController extends Controller
             'initiated_at'       => now(),
         ]);
 
-        $frontendUrl = rtrim(env('FRONTEND_URL', config('app.url')), '/');
+        $frontendUrl = rtrim(config('app.frontend_url'), '/');
 
         $paymentRequest = new PaymentRequest(
             orderId: $order->uuid,
@@ -203,7 +203,7 @@ class PaymentController extends Controller
 
         $order       = $transaction->order;
         $slug        = $order->store->slug;
-        $frontendUrl = rtrim(env('FRONTEND_URL', config('app.url')), '/');
+        $frontendUrl = rtrim(config('app.frontend_url'), '/');
 
         if ($success) {
             $order->update([
