@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers\Seller;
 
+use App\Actions\DeleteProductImageAction;
+use App\Actions\ReorderProductImagesAction;
+use App\Actions\UploadProductImagesAction;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Seller\CreateProductRequest;
 use App\Http\Requests\Seller\ReorderImagesRequest;
@@ -11,18 +14,15 @@ use App\Http\Resources\Seller\ProductDetailResource;
 use App\Http\Resources\Seller\ProductImageResource;
 use App\Http\Resources\Seller\ProductResource;
 use App\Repositories\Contracts\ProductRepositoryInterface;
-use App\Services\ImageService;
 use App\Services\SlugService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class ProductController extends Controller
 {
     public function __construct(
         private readonly ProductRepositoryInterface $products,
-        private readonly ImageService               $imageService,
         private readonly SlugService                $slugService,
     ) {}
 
@@ -151,7 +151,7 @@ class ProductController extends Controller
         return $this->success(['status' => $product->fresh()->status->value], 'Product status updated.');
     }
 
-    public function uploadImages(Request $request, string $uuid): JsonResponse
+    public function uploadImages(Request $request, string $uuid, UploadProductImagesAction $upload): JsonResponse
     {
         $request->validate([
             'images'   => ['required', 'array', 'max:10'],
@@ -164,28 +164,12 @@ class ProductController extends Controller
         }
 
         $product = $this->products->findByStoreAndUuid($store->id, $uuid);
-        $isFirst = !$product->images()->exists();
-        $uploaded = [];
+        $images  = $upload->execute($product, $request->file('images'), (string) $store->id);
 
-        foreach ($request->file('images') as $index => $file) {
-            $variants = $this->imageService->process($file, 'products', (string) $store->id);
-
-            $image = $product->images()->create([
-                'path_original'  => $variants['original'],
-                'path_thumbnail' => $variants['thumbnail'],
-                'path_medium'    => $variants['medium'],
-                'path_large'     => $variants['large'],
-                'sort_order'     => $product->images()->max('sort_order') + 1,
-                'is_primary'     => $isFirst && $index === 0,
-            ]);
-
-            $uploaded[] = new ProductImageResource($image);
-        }
-
-        return $this->success($uploaded, 'Images uploaded.', 201);
+        return $this->success(ProductImageResource::collection($images), 'Images uploaded.', 201);
     }
 
-    public function deleteImage(Request $request, string $uuid, int $imageId): JsonResponse
+    public function deleteImage(Request $request, string $uuid, int $imageId, DeleteProductImageAction $delete): JsonResponse
     {
         $store = $request->attributes->get('sellerStore');
         if (!$store) {
@@ -193,18 +177,12 @@ class ProductController extends Controller
         }
 
         $product = $this->products->findByStoreAndUuid($store->id, $uuid);
-        $image = $product->images()->findOrFail($imageId);
-        $wasPrimary = $image->is_primary;
-        $image->delete();
-
-        if ($wasPrimary) {
-            $product->images()->oldest('sort_order')->first()?->update(['is_primary' => true]);
-        }
+        $delete->execute($product, $imageId);
 
         return $this->success(null, 'Image deleted.');
     }
 
-    public function reorderImages(ReorderImagesRequest $request, string $uuid): JsonResponse
+    public function reorderImages(ReorderImagesRequest $request, string $uuid, ReorderProductImagesAction $reorder): JsonResponse
     {
         $store = $request->attributes->get('sellerStore');
         if (!$store) {
@@ -212,22 +190,8 @@ class ProductController extends Controller
         }
 
         $product = $this->products->findByStoreAndUuid($store->id, $uuid);
-        $order = $request->validated()['order'];
+        $images  = $reorder->execute($product, $request->validated()['order']);
 
-        DB::transaction(function () use ($product, $order) {
-            $product->images()->update(['is_primary' => false]);
-
-            foreach ($order as $position => $id) {
-                $product->images()->where('id', $id)->update([
-                    'sort_order' => $position,
-                    'is_primary' => $position === 0,
-                ]);
-            }
-        });
-
-        return $this->success(
-            ProductImageResource::collection($product->images()->orderBy('sort_order')->get()),
-            'Images reordered.'
-        );
+        return $this->success(ProductImageResource::collection($images), 'Images reordered.');
     }
 }

@@ -689,6 +689,64 @@ class RepositoryServiceProvider extends ServiceProvider
 
 ---
 
+---
+
+## Improvement #10 — Extract Product Image Management into Action Classes
+
+**Date:** 2026-05-29
+**Commit:** TBD
+
+**Files changed:**
+- `services/api/app/Http/Controllers/Seller/ProductController.php` — image methods now delegate to actions; dropped `ImageService` and `DB` dependencies
+- `services/api/app/Actions/UploadProductImagesAction.php` — new
+- `services/api/app/Actions/DeleteProductImageAction.php` — new
+- `services/api/app/Actions/ReorderProductImagesAction.php` — new
+- `services/api/tests/Feature/Actions/ProductImageActionsTest.php` — new (5 tests)
+
+### What was wrong
+
+`ProductController` carried three image-management endpoints with non-trivial business logic inline:
+
+- `uploadImages` — primary-image election ("first image of the first-ever upload"), per-file `sort_order` assignment, and image-variant processing
+- `deleteImage` — primary reassignment when the deleted image was primary
+- `reorderImages` — a `DB::transaction` re-sequencing all images and re-electing the primary
+
+This logic was untestable without spinning up an HTTP request and a real `ImageService` (which performs GD/WebP encoding), and it sat inconsistently alongside the rest of the codebase, which had already adopted an `app/Actions/` layer (improvements #3–#4). The controller also depended directly on both `ImageService` and the `DB` facade purely for this logic.
+
+### What was fixed
+
+Extracted each operation into a dedicated single-responsibility action, leaving the controller to resolve the store/product (authorization) and shape the HTTP response:
+
+```php
+// Before — 30+ lines of image logic inline in the controller
+public function uploadImages(Request $request, string $uuid): JsonResponse
+{
+    // validate, resolve, compute $isFirst, loop, process variants, create rows...
+}
+
+// After — controller delegates; ImageService no longer a controller dependency
+public function uploadImages(Request $request, string $uuid, UploadProductImagesAction $upload): JsonResponse
+{
+    // validate + resolve product...
+    $images = $upload->execute($product, $request->file('images'), (string) $store->id);
+    return $this->success(ProductImageResource::collection($images), 'Images uploaded.', 201);
+}
+```
+
+The `ImageService` dependency moved into `UploadProductImagesAction`, and the `DB` facade dependency moved into `ReorderProductImagesAction` — the controller constructor shrank from three injected services to two.
+
+Added `ProductImageActionsTest` (5 tests) covering primary-image election on first upload, no-primary-change on subsequent uploads, primary promotion on delete, primary preservation when deleting a non-primary image, and re-sequencing + primary re-election on reorder. The `ImageService` is mocked so the upload logic is tested without invoking real image encoding. Full suite: **228 tests / 634 assertions** pass.
+
+### CV-ready bullets
+
+- **Extracted three image-management operations** (upload, delete, reorder) from a Laravel controller into dedicated action classes, removing the `ImageService` and `DB` facade dependencies from the controller and aligning the module with the codebase's established action-oriented architecture.
+
+- **Made previously HTTP-only image logic unit-testable**: authored 5 feature tests covering primary-image election, primary reassignment on deletion, and transactional re-ordering — mocking the image-processing service so business rules are verified without invoking GD/WebP encoding.
+
+- **Reduced controller coupling** by relocating a `DB::transaction` re-sequencing routine and a multi-step primary-election rule into testable actions, leaving the controller responsible only for authorization and response shaping.
+
+---
+
 ## Improvements Log
 
 | # | Title | Commit |
@@ -702,9 +760,6 @@ class RepositoryServiceProvider extends ServiceProvider
 | 7 | Extract dashboard stats into repository layer | `769a23e` |
 | 8 | Feature tests for checkout actions + dead-code event fix | `b0c43ca` |
 | 9 | Split `AppServiceProvider` into domain service providers | `fada080` |
+| 10 | Extract `ProductController` image management into action classes | TBD |
 
-## Upcoming Improvements (Planned)
-
-| # | Title | Priority |
-|---|-------|----------|
-| 10 | Extract `ProductController` image management into action classes | MEDIUM |
+_All 10 planned improvements complete. Full test suite: 228 tests / 634 assertions passing._
