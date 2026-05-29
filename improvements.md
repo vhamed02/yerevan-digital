@@ -750,7 +750,7 @@ Added `ProductImageActionsTest` (5 tests) covering primary-image election on fir
 ## Improvement #11 — Backend Security Hardening (Rate Limiting, Token Expiry, Password Policy, Timing-Safe Webhooks)
 
 **Date:** 2026-05-29
-**Commit:** TBD
+**Commit:** `e8e7ac1`
 
 **Files changed:**
 - `services/api/routes/api.php` — applied `throttle:api` to the v1 group and `throttle:auth` to public auth routes
@@ -819,6 +819,6 @@ Two new tests (`test_register_rejects_weak_password`, `test_auth_endpoints_are_r
 | 8 | Feature tests for checkout actions + dead-code event fix | `b0c43ca` |
 | 9 | Split `AppServiceProvider` into domain service providers | `fada080` |
 | 10 | Extract `ProductController` image management into action classes | `cb9a8ba` |
-| 11 | Backend security hardening (rate limiting, token expiry, password policy, timing-safe webhooks) | TBD |
+| 11 | Backend security hardening (rate limiting, token expiry, password policy, timing-safe webhooks) | `e8e7ac1` |
 
 _Full test suite: 230 tests / 644 assertions passing._
