@@ -694,7 +694,7 @@ class RepositoryServiceProvider extends ServiceProvider
 ## Improvement #10 — Extract Product Image Management into Action Classes
 
 **Date:** 2026-05-29
-**Commit:** TBD
+**Commit:** `cb9a8ba`
 
 **Files changed:**
 - `services/api/app/Http/Controllers/Seller/ProductController.php` — image methods now delegate to actions; dropped `ImageService` and `DB` dependencies
@@ -760,6 +760,6 @@ Added `ProductImageActionsTest` (5 tests) covering primary-image election on fir
 | 7 | Extract dashboard stats into repository layer | `769a23e` |
 | 8 | Feature tests for checkout actions + dead-code event fix | `b0c43ca` |
 | 9 | Split `AppServiceProvider` into domain service providers | `fada080` |
-| 10 | Extract `ProductController` image management into action classes | TBD |
+| 10 | Extract `ProductController` image management into action classes | `cb9a8ba` |
 
 _All 10 planned improvements complete. Full test suite: 228 tests / 634 assertions passing._
