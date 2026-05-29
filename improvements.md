@@ -808,7 +808,7 @@ Two new tests (`test_register_rejects_weak_password`, `test_auth_endpoints_are_r
 ## Improvement #12 — Database Indexing & Sargable Date Queries
 
 **Date:** 2026-05-29
-**Commit:** TBD
+**Commit:** `29386f5`
 
 **Files changed:**
 - `services/api/database/migrations/2026_05_29_000001_add_performance_indexes_to_orders_and_products.php` — new (3 indexes)
@@ -826,6 +826,10 @@ Two compounding problems on the orders table, confirmed with `EXPLAIN` against t
 -- BEFORE (production EXPLAIN)
 Seller order list:  type=ref  key=orders_store_id_status_index  Extra=Using filesort
 Admin today count:  type=ALL  key=NULL  rows=390  Extra=Using where
+
+-- AFTER (production EXPLAIN, same queries)
+Seller order list:  type=ref    key=orders_store_id_created_at_index  Extra=Backward index scan   (filesort gone)
+Admin today count:  type=range  key=orders_created_at_index  rows=1  Extra=Using where; Using index  (index-only, 390→1)
 ```
 
 ### What was fixed
@@ -871,6 +875,6 @@ The conversions are behavior-identical (full-day inclusive bounds) and remain SQ
 | 9 | Split `AppServiceProvider` into domain service providers | `fada080` |
 | 10 | Extract `ProductController` image management into action classes | `cb9a8ba` |
 | 11 | Backend security hardening (rate limiting, token expiry, password policy, timing-safe webhooks) | `e8e7ac1` |
-| 12 | Database indexing & sargable date queries | TBD |
+| 12 | Database indexing & sargable date queries | `29386f5` |
 
 _Full test suite: 230 tests / 644 assertions passing._
