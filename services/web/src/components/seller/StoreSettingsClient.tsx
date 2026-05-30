@@ -45,11 +45,13 @@ export default function StoreSettingsClient({ initialStore, categories }: StoreS
     if (fields.name) {
       fd.append('name[hy]', fields.name.hy)
       fd.append('name[en]', fields.name.en)
+      if (fields.name.ru) fd.append('name[ru]', fields.name.ru)
     }
     if (fields.slug) fd.append('slug', fields.slug)
     if (fields.description) {
       fd.append('description[hy]', fields.description.hy)
       fd.append('description[en]', fields.description.en)
+      if (fields.description.ru) fd.append('description[ru]', fields.description.ru)
     }
     if (fields.category_id) fd.append('category_id', String(fields.category_id))
     if (fields.phone) fd.append('phone', fields.phone)
@@ -60,10 +62,12 @@ export default function StoreSettingsClient({ initialStore, categories }: StoreS
     if (fields.meta_title) {
       fd.append('meta_title[hy]', fields.meta_title.hy)
       fd.append('meta_title[en]', fields.meta_title.en)
+      if (fields.meta_title.ru) fd.append('meta_title[ru]', fields.meta_title.ru)
     }
     if (fields.meta_description) {
       fd.append('meta_description[hy]', fields.meta_description.hy)
       fd.append('meta_description[en]', fields.meta_description.en)
+      if (fields.meta_description.ru) fd.append('meta_description[ru]', fields.meta_description.ru)
     }
     if (fields.logo) fd.append('logo', fields.logo)
     if (fields.banner) fd.append('banner', fields.banner)
@@ -72,7 +76,7 @@ export default function StoreSettingsClient({ initialStore, categories }: StoreS
 
   const generalContent = (
     <div className="flex flex-col gap-4 rounded-xl border border-border bg-surface p-5">
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <Input
           label="🇦🇲 Store Name"
           value={store.name.hy}
@@ -82,6 +86,11 @@ export default function StoreSettingsClient({ initialStore, categories }: StoreS
           label="🇬🇧 Store Name"
           value={store.name.en}
           onChange={(e) => setStore((s) => ({ ...s, name: { ...s.name, en: e.target.value } }))}
+        />
+        <Input
+          label="🇷🇺 Store Name"
+          value={store.name.ru ?? ''}
+          onChange={(e) => setStore((s) => ({ ...s, name: { ...s.name, ru: e.target.value } }))}
         />
       </div>
       <Input
@@ -98,7 +107,7 @@ export default function StoreSettingsClient({ initialStore, categories }: StoreS
         placeholder="Select category"
         searchPlaceholder="Search categories..."
       />
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <Textarea
           label="Description (Armenian)"
           value={store.description?.hy ?? ''}
@@ -109,6 +118,12 @@ export default function StoreSettingsClient({ initialStore, categories }: StoreS
           label="Description (English)"
           value={store.description?.en ?? ''}
           onChange={(e) => setStore((s) => ({ ...s, description: { ...(s.description ?? { hy: '', en: '' }), en: e.target.value } }))}
+          rows={3}
+        />
+        <Textarea
+          label="Description (Russian)"
+          value={store.description?.ru ?? ''}
+          onChange={(e) => setStore((s) => ({ ...s, description: { ...(s.description ?? { hy: '', en: '' }), ru: e.target.value } }))}
           rows={3}
         />
       </div>
@@ -204,7 +219,7 @@ export default function StoreSettingsClient({ initialStore, categories }: StoreS
 
   const seoContent = (
     <div className="flex flex-col gap-4 rounded-xl border border-border bg-surface p-5">
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <Input
           label="Meta Title (Armenian)"
           value={store.meta_title?.hy ?? ''}
@@ -215,8 +230,13 @@ export default function StoreSettingsClient({ initialStore, categories }: StoreS
           value={store.meta_title?.en ?? ''}
           onChange={(e) => setStore((s) => ({ ...s, meta_title: { ...(s.meta_title ?? { hy: '', en: '' }), en: e.target.value } }))}
         />
+        <Input
+          label="Meta Title (Russian)"
+          value={store.meta_title?.ru ?? ''}
+          onChange={(e) => setStore((s) => ({ ...s, meta_title: { ...(s.meta_title ?? { hy: '', en: '' }), ru: e.target.value } }))}
+        />
       </div>
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <Textarea
           label="Meta Description (Armenian)"
           value={store.meta_description?.hy ?? ''}
@@ -229,6 +249,14 @@ export default function StoreSettingsClient({ initialStore, categories }: StoreS
           label="Meta Description (English)"
           value={store.meta_description?.en ?? ''}
           onChange={(e) => setStore((s) => ({ ...s, meta_description: { ...(s.meta_description ?? { hy: '', en: '' }), en: e.target.value } }))}
+          maxLength={160}
+          showCounter
+          rows={3}
+        />
+        <Textarea
+          label="Meta Description (Russian)"
+          value={store.meta_description?.ru ?? ''}
+          onChange={(e) => setStore((s) => ({ ...s, meta_description: { ...(s.meta_description ?? { hy: '', en: '' }), ru: e.target.value } }))}
           maxLength={160}
           showCounter
           rows={3}

@@ -54,7 +54,7 @@ so a third locale needs **no content migration**).
 | 1b | Locale-aware content display — converted customer-facing `name.hy \|\| en` sites to `pickLang` (20 files: spark+minimal+_shared templates, store pages, store metadata/JSON-LD, StoreCard/StoreFilters/StaticPageContent/OrderConfirmation) | ✅ Done & live | `b697d19` |
 | 2 | Backend Russian support (SetLocale, `users.locale` enum migration, 12 Form Requests, `in:` rule, locale-aware payment description) | ✅ Done & live | `4137cef` |
 | 3a | RU content-entry: **ProductForm** (3-lang name + lang-driven descriptions/SEO tabs) | ✅ Done & live | `3272c71` |
-| 3b | RU content-entry: StoreSettings + StoreSetupWizard (store name/description/meta) | ⏳ Planned | — |
+| 3b | RU content-entry: StoreSettings + StoreSetupWizard (store name/description/meta) | ✅ Done | `TBD` |
 | 3c | RU content-entry: admin Categories, PageEditor, Payments + CreateSeller locale picker | ⏳ Planned | — |
 | 4 | Translate customer-facing UI (storefront templates + customer store pages → catalog + `useTranslations`) | ⏳ Planned | — |
 | 5 | Trilingual transactional emails (7 notifications + 8 blade templates) | ⏳ Planned | — |
@@ -136,3 +136,8 @@ Legend: ✅ done & live · 🔧 in progress · ⏳ planned
   dynamic `register(\`field_${lang}\`)`, full-description + SEO-preview via per-lang maps).
   Schema/defaults/FormData-submit all carry `*_ru` (RU optional). `tsc` clean; production
   build passes. NEXT: 3b (store forms), then 3c (admin forms + CreateSeller locale picker).
+- **2026-05-30** — Phase 3b done: `StoreSettingsClient` (controlled MultiLang state — name,
+  description, meta_title, meta_description now have 🇷🇺 inputs; `buildFormData` appends
+  `[ru]`) and `StoreSetupWizard` (RHF — `name_ru`/`description_ru` schema, inputs, submit).
+  `tsc` clean; production build passes. NEXT: 3c (admin Categories/PageEditor/Payments +
+  CreateSeller locale picker).

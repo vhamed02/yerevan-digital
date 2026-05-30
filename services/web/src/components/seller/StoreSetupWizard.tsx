@@ -22,10 +22,12 @@ const PRESET_COLORS = [
 const step1Schema = z.object({
   name_hy: z.string().min(2, 'Required'),
   name_en: z.string().min(2, 'Required'),
+  name_ru: z.string().optional(),
   slug: z.string().min(2).regex(/^[a-z0-9-]+$/, 'Only lowercase letters, numbers, hyphens'),
   category_id: z.string().min(1, 'Select a category'),
   description_hy: z.string().optional(),
   description_en: z.string().optional(),
+  description_ru: z.string().optional(),
 })
 
 type Step1Data = z.infer<typeof step1Schema>
@@ -97,10 +99,12 @@ export default function StoreSetupWizard({ categories }: StoreSetupWizardProps) 
       const formData = new FormData()
       formData.append('name[hy]', step1Data.name_hy)
       formData.append('name[en]', step1Data.name_en)
+      if (step1Data.name_ru) formData.append('name[ru]', step1Data.name_ru)
       formData.append('slug', step1Data.slug)
       formData.append('category_id', step1Data.category_id)
       if (step1Data.description_hy) formData.append('description[hy]', step1Data.description_hy)
       if (step1Data.description_en) formData.append('description[en]', step1Data.description_en)
+      if (step1Data.description_ru) formData.append('description[ru]', step1Data.description_ru)
       formData.append('primary_color', primaryColor)
       if (logo) formData.append('logo', logo)
       if (banner) formData.append('banner', banner)
@@ -156,7 +160,7 @@ export default function StoreSetupWizard({ categories }: StoreSetupWizardProps) 
           {step === 1 && (
             <form onSubmit={handleSubmit(onStep1Submit)} className="flex flex-col gap-4">
               <h2 className="font-heading text-lg font-bold text-content-primary">Store Info</h2>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                 <Input
                   label="🇦🇲 Armenian Name"
                   {...register('name_hy')}
@@ -166,6 +170,11 @@ export default function StoreSetupWizard({ categories }: StoreSetupWizardProps) 
                   label="🇬🇧 English Name"
                   {...register('name_en')}
                   error={errors.name_en?.message}
+                />
+                <Input
+                  label="🇷🇺 Russian Name"
+                  {...register('name_ru')}
+                  error={errors.name_ru?.message}
                 />
               </div>
               <div>
@@ -198,7 +207,7 @@ export default function StoreSetupWizard({ categories }: StoreSetupWizardProps) 
               )}
               <div className="flex flex-col gap-1.5">
                 <label className="text-sm font-medium text-content-primary">Description (optional)</label>
-                <div className="flex gap-2">
+                <div className="flex flex-col gap-2 sm:flex-row">
                   <input
                     type="text"
                     placeholder="🇦🇲 Armenian"
@@ -209,6 +218,12 @@ export default function StoreSetupWizard({ categories }: StoreSetupWizardProps) 
                     type="text"
                     placeholder="🇬🇧 English"
                     {...register('description_en')}
+                    className="h-10 flex-1 rounded border border-border bg-surface px-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                  />
+                  <input
+                    type="text"
+                    placeholder="🇷🇺 Russian"
+                    {...register('description_ru')}
                     className="h-10 flex-1 rounded border border-border bg-surface px-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
                   />
                 </div>
