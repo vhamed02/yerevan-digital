@@ -55,7 +55,7 @@ so a third locale needs **no content migration**).
 | 2 | Backend Russian support (SetLocale, `users.locale` enum migration, 12 Form Requests, `in:` rule, locale-aware payment description) | ✅ Done & live | `4137cef` |
 | 3a | RU content-entry: **ProductForm** (3-lang name + lang-driven descriptions/SEO tabs) | ✅ Done & live | `3272c71` |
 | 3b | RU content-entry: StoreSettings + StoreSetupWizard (store name/description/meta) | ✅ Done & live | `e56708a` |
-| 3c | RU content-entry: admin Categories + PageEditor + CreateSeller locale picker (Payments deferred — see note) | ✅ Done | `TBD` |
+| 3c | RU content-entry: admin Categories + PageEditor + CreateSeller locale picker (Payments deferred — see note) | ✅ Done & live | `d634dfd` |
 | 4 | Translate customer-facing UI (storefront templates + customer store pages → catalog + `useTranslations`) | ⏳ Planned | — |
 | 5 | Trilingual transactional emails (7 notifications + 8 blade templates) | ⏳ Planned | — |
 | 6 | SEO (locale-aware JSON-LD/OG, `hreflang`) + full verify sweep | ⏳ Planned | — |
