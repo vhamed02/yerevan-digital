@@ -57,7 +57,8 @@ so a third locale needs **no content migration**).
 | 3b | RU content-entry: StoreSettings + StoreSetupWizard (store name/description/meta) | ✅ Done & live | `e56708a` |
 | 3c | RU content-entry: admin Categories + PageEditor + CreateSeller locale picker (Payments deferred — see note) | ✅ Done & live | `d634dfd` |
 | 4a | UI strings: spark shell (ProductCard, ProductGrid, CartDrawer, StoreHeader, StoreFooter) → new `storefront` catalog namespace | ✅ Done & live | `189beb1` |
-| 4b | UI strings: spark CheckoutForm + StoreHome | ⏳ Planned | — |
+| 4b | UI strings: spark CheckoutForm (incl. translated Zod validation via in-component schema) | ✅ Done | `TBD` |
+| 4b-home | UI strings: spark StoreHome (hero, trust/marquee, section headings) | ⏳ Planned | — |
 | 4c | UI strings: minimal template | ⏳ Planned | — |
 | 4d | UI strings: `_shared` (ProductDetail, CartDrawer) + customer store pages (products listing, checkout result, order confirmation, ReviewSection) | ⏳ Planned | — |
 | 5 | Trilingual transactional emails (7 notifications + 8 blade templates) | ⏳ Planned | — |
@@ -160,3 +161,10 @@ Legend: ✅ done & live · 🔧 in progress · ⏳ planned
   ProductCard, ProductGrid, CartDrawer, StoreHeader, StoreFooter. `tsc` clean; production
   build passes. Phase 4 is large, so split: 4b = spark CheckoutForm + StoreHome; 4c = minimal
   template; 4d = `_shared` + customer store pages.
+- **2026-05-30** — Phase 4b done (CheckoutForm): extended `storefront.checkout` catalog
+  (~36 keys, hy/en/ru, 189 total, full parity). Wired CheckoutForm — moved the Zod schema
+  inside the component (`useMemo` + `t`) so validation messages translate, dropped the
+  garbled transliterated GATEWAY_META descriptions, and translated all labels/placeholders/
+  step indicators/order-summary/buttons. `tsc` clean; production build passes. Split out
+  StoreHome (4b-home) for quality — it has module-level TRUST/MARQUEE consts + many section
+  headings. NEXT: 4b-home, then 4c (minimal), 4d (`_shared` + store pages).

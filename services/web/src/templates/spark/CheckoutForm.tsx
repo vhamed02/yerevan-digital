@@ -1,38 +1,36 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod/v4'
 import Image from 'next/image'
 import Link from 'next/link'
 import { ShieldCheck, Lock, ChevronRight, ShoppingBag, Check } from 'lucide-react'
-import { useLocale } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { useStoreCart } from '@/stores/cart.store'
 import api from '@/lib/api'
 import { pickLang } from '@/lib/i18n'
 import type { CheckoutFormProps } from '../types'
 
-const GATEWAY_META: Record<string, { label: string; badge: string; color: string; description: string }> = {
-  idram:     { label: 'iDram',    badge: 'iDRAM',  color: '#E8001C', description: 'Վճarumn iDram wallet-ov' },
-  inecobank: { label: 'Inecobank',badge: 'INECO',  color: '#004B87', description: 'Ineco Bank փоxantsumn' },
-  telcell:   { label: 'Telcell',  badge: 'TCELL',  color: '#FF6B00', description: 'Telcell wallet-ov vcharum' },
-  ameria:    { label: 'Ameria',   badge: 'AMERIA', color: '#003DA5', description: 'Ameria Bank carte' },
+const GATEWAY_META: Record<string, { label: string; badge: string; color: string }> = {
+  idram:     { label: 'iDram',    badge: 'iDRAM',  color: '#E8001C' },
+  inecobank: { label: 'Inecobank',badge: 'INECO',  color: '#004B87' },
+  telcell:   { label: 'Telcell',  badge: 'TCELL',  color: '#FF6B00' },
+  ameria:    { label: 'Ameria',   badge: 'AMERIA', color: '#003DA5' },
 }
 
-const schema = z.object({
-  full_name:      z.string().min(2, 'Мinim 2 nish'),
-  email:          z.string().email('Аnvaver el. pоst'),
-  phone:          z.string().optional(),
-  address:        z.string().min(5, 'Pаrtаdir'),
-  city:           z.string().min(2, 'Pаrtаdir'),
-  postal_code:    z.string().optional(),
-  country:        z.string().min(2, 'Pаrtаdir'),
-  notes:          z.string().optional(),
-  payment_method: z.string().min(1, 'Yntreq vchari yeghanak'),
-})
-
-type CheckoutData = z.infer<typeof schema>
+interface CheckoutData {
+  full_name: string
+  email: string
+  phone?: string
+  address: string
+  city: string
+  postal_code?: string
+  country: string
+  notes?: string
+  payment_method: string
+}
 
 function Field({
   label, error, children, hint,
@@ -67,6 +65,22 @@ export function CheckoutForm({ storeSlug, store }: CheckoutFormProps) {
   const total = mounted ? getTotal() : 0
   const gateways = store.payment_gateways ?? []
 
+  const t = useTranslations('storefront')
+  const locale = useLocale()
+  const storeName = pickLang(store.name, locale)
+
+  const schema = useMemo(() => z.object({
+    full_name:      z.string().min(2, t('checkout.nameMin')),
+    email:          z.string().email(t('checkout.emailInvalid')),
+    phone:          z.string().optional(),
+    address:        z.string().min(5, t('checkout.required')),
+    city:           z.string().min(2, t('checkout.required')),
+    postal_code:    z.string().optional(),
+    country:        z.string().min(2, t('checkout.required')),
+    notes:          z.string().optional(),
+    payment_method: z.string().min(1, t('checkout.selectPaymentError')),
+  }), [t])
+
   const {
     register,
     handleSubmit,
@@ -75,12 +89,10 @@ export function CheckoutForm({ storeSlug, store }: CheckoutFormProps) {
     formState: { errors, isSubmitting },
   } = useForm<CheckoutData>({
     resolver: zodResolver(schema),
-    defaultValues: { country: 'Հайаstаn', payment_method: gateways[0] ?? '' },
+    defaultValues: { country: t('checkout.countryDefault'), payment_method: gateways[0] ?? '' },
   })
 
   const selectedMethod = watch('payment_method')
-  const locale = useLocale()
-  const storeName = pickLang(store.name, locale)
 
   async function goToStep2() {
     const ok = await trigger(['full_name', 'email', 'phone', 'address', 'city', 'country'])
@@ -104,7 +116,7 @@ export function CheckoutForm({ storeSlug, store }: CheckoutFormProps) {
       const fieldErrors = axiosErr.response?.data?.errors
       const apiMessage = axiosErr.response?.data?.message
       const first = fieldErrors ? Object.values(fieldErrors).flat()[0] : undefined
-      setSubmitError(first ?? apiMessage ?? 'Something went wrong. Please try again.')
+      setSubmitError(first ?? apiMessage ?? t('checkout.genericError'))
     }
   }
 
@@ -118,7 +130,7 @@ export function CheckoutForm({ storeSlug, store }: CheckoutFormProps) {
           </Link>
           <div className="flex items-center gap-1.5 text-xs text-gray-400">
             <Lock className="h-3.5 w-3.5" />
-            Anvtang vcаrum
+            {t('checkout.securePayment')}
           </div>
         </div>
       </div>
@@ -132,14 +144,14 @@ export function CheckoutForm({ storeSlug, store }: CheckoutFormProps) {
             style={step === 1 ? { color: 'var(--accent)' } : {}}
           >
             {step === 2 ? <Check className="h-4 w-4 text-emerald-500" /> : <span className="flex h-5 w-5 items-center justify-center rounded-full text-[11px] font-black text-white" style={{ backgroundColor: 'var(--accent)' }}>1</span>}
-            Mаtаkаrarich ev hаsce
+            {t('checkout.step1')}
           </button>
           <ChevronRight className="h-4 w-4 text-gray-300" />
           <span className={`flex items-center gap-1.5 font-semibold ${step === 2 ? '' : 'text-gray-400'}`}
             style={step === 2 ? { color: 'var(--accent)' } : {}}>
             <span className={`flex h-5 w-5 items-center justify-center rounded-full text-[11px] font-black ${step === 2 ? 'text-white' : 'bg-gray-200 text-gray-500'}`}
               style={step === 2 ? { backgroundColor: 'var(--accent)' } : {}}>2</span>
-            Vcharum
+            {t('checkout.step2')}
           </span>
         </div>
       </div>
@@ -154,16 +166,16 @@ export function CheckoutForm({ storeSlug, store }: CheckoutFormProps) {
               <div className="animate-fade-up flex flex-col gap-5">
                 {/* Contact */}
                 <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-                  <h2 className="mb-5 text-base font-black text-gray-900">Kаpи tvalner</h2>
+                  <h2 className="mb-5 text-base font-black text-gray-900">{t('checkout.contactDetails')}</h2>
                   <div className="flex flex-col gap-4">
-                    <Field label="Anun Аzgаnum" error={errors.full_name?.message}>
-                      <input {...register('full_name')} className={inputCls} placeholder="Аnnа Grigoryan" />
+                    <Field label={t('checkout.fullName')} error={errors.full_name?.message}>
+                      <input {...register('full_name')} className={inputCls} placeholder={t('checkout.fullNamePlaceholder')} />
                     </Field>
                     <div className="grid grid-cols-2 gap-3">
-                      <Field label="El. pоst" error={errors.email?.message}>
+                      <Field label={t('checkout.email')} error={errors.email?.message}>
                         <input {...register('email')} type="email" className={inputCls} placeholder="anna@example.com" />
                       </Field>
-                      <Field label="Herаkhоs" error={errors.phone?.message} hint="Кamаvоr">
+                      <Field label={t('checkout.phone')} error={errors.phone?.message} hint={t('checkout.optional')}>
                         <input {...register('phone')} type="tel" className={inputCls} placeholder="+374 91 000000" />
                       </Field>
                     </div>
@@ -172,28 +184,28 @@ export function CheckoutForm({ storeSlug, store }: CheckoutFormProps) {
 
                 {/* Shipping */}
                 <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-                  <h2 className="mb-5 text-base font-black text-gray-900">Аraqmаn hаsce</h2>
+                  <h2 className="mb-5 text-base font-black text-gray-900">{t('checkout.shippingAddress')}</h2>
                   <div className="flex flex-col gap-4">
-                    <Field label="Phogоc, tun" error={errors.address?.message}>
-                      <input {...register('address')} className={inputCls} placeholder="Baghramyan 1" />
+                    <Field label={t('checkout.streetAddress')} error={errors.address?.message}>
+                      <input {...register('address')} className={inputCls} placeholder={t('checkout.streetPlaceholder')} />
                     </Field>
                     <div className="grid grid-cols-2 gap-3">
-                      <Field label="Kаghаk" error={errors.city?.message}>
-                        <input {...register('city')} className={inputCls} placeholder="Erеvаn" />
+                      <Field label={t('checkout.city')} error={errors.city?.message}>
+                        <input {...register('city')} className={inputCls} placeholder={t('checkout.cityPlaceholder')} />
                       </Field>
-                      <Field label="Postal kod" error={errors.postal_code?.message} hint="Кamаvоr">
+                      <Field label={t('checkout.postalCode')} error={errors.postal_code?.message} hint={t('checkout.optional')}>
                         <input {...register('postal_code')} className={inputCls} placeholder="0001" />
                       </Field>
                     </div>
-                    <Field label="Еrкir" error={errors.country?.message}>
+                    <Field label={t('checkout.country')} error={errors.country?.message}>
                       <input {...register('country')} className={inputCls} />
                     </Field>
-                    <Field label="Nshumnеr" error={errors.notes?.message} hint="Хatuk cuyc­mnеr аraqmаn harmar">
+                    <Field label={t('checkout.notes')} error={errors.notes?.message} hint={t('checkout.notesHint')}>
                       <textarea
                         {...register('notes')}
                         rows={3}
                         className="w-full resize-none rounded-xl border border-gray-200 px-4 py-3 text-sm placeholder:text-gray-300 transition-all focus:border-[var(--accent)] focus:outline-none focus:ring-2 focus:ring-[color-mix(in_srgb,var(--accent)_20%,white)]"
-                        placeholder="Аraqchut'yan daterk, gerаnоm, ev аylN..."
+                        placeholder={t('checkout.notesPlaceholder')}
                       />
                     </Field>
                   </div>
@@ -205,7 +217,7 @@ export function CheckoutForm({ storeSlug, store }: CheckoutFormProps) {
                   className="flex w-full items-center justify-center gap-2 rounded-2xl py-3.5 text-sm font-bold text-white shadow-lg shadow-black/10 transition-all hover:opacity-90 hover:shadow-xl hover:-translate-y-px"
                   style={{ backgroundColor: 'var(--accent)' }}
                 >
-                  Shаrunаkel vpаrumа → Vcharum
+                  {t('checkout.continueToPayment')}
                 </button>
               </div>
             )}
@@ -213,16 +225,16 @@ export function CheckoutForm({ storeSlug, store }: CheckoutFormProps) {
             {step === 2 && (
               <div className="animate-fade-up flex flex-col gap-5">
                 <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-                  <h2 className="mb-5 text-base font-black text-gray-900">Yntreq vchari yeghanak</h2>
+                  <h2 className="mb-5 text-base font-black text-gray-900">{t('checkout.selectPaymentMethod')}</h2>
                   {gateways.length === 0 ? (
                     <div className="flex items-center gap-3 rounded-2xl bg-gray-50 p-5">
                       <ShieldCheck className="h-5 w-5 text-gray-300" />
-                      <p className="text-sm text-gray-500">Vchari yeghanak derd hаsaneli che.</p>
+                      <p className="text-sm text-gray-500">{t('checkout.noPaymentMethods')}</p>
                     </div>
                   ) : (
                     <div className="flex flex-col gap-2.5">
                       {gateways.map((key) => {
-                        const meta = GATEWAY_META[key] ?? { label: key, badge: key.slice(0, 5).toUpperCase(), color: '#374151', description: '' }
+                        const meta = GATEWAY_META[key] ?? { label: key, badge: key.slice(0, 5).toUpperCase(), color: '#374151' }
                         const isSelected = selectedMethod === key
                         return (
                           <label
@@ -242,7 +254,6 @@ export function CheckoutForm({ storeSlug, store }: CheckoutFormProps) {
                             </div>
                             <div className="flex-1 min-w-0">
                               <p className="text-sm font-bold text-gray-900">{meta.label}</p>
-                              {meta.description && <p className="text-xs text-gray-500">{meta.description}</p>}
                             </div>
                             <div className={`flex h-5 w-5 items-center justify-center rounded-full border-2 transition-all ${isSelected ? 'border-[var(--accent)]' : 'border-gray-200'}`}>
                               {isSelected && <div className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: 'var(--accent)' }} />}
@@ -270,13 +281,13 @@ export function CheckoutForm({ storeSlug, store }: CheckoutFormProps) {
                   style={{ backgroundColor: 'var(--accent)' }}
                 >
                   <Lock className="h-4 w-4" />
-                  {isSubmitting ? 'Мshakvum е...' : `Vchаrel ${total.toLocaleString()} ֏`}
+                  {isSubmitting ? t('checkout.processing') : t('checkout.pay', { total: `${total.toLocaleString()} ֏` })}
                 </button>
 
                 <div className="flex items-center justify-center gap-4 text-xs text-gray-400">
-                  <span className="flex items-center gap-1"><ShieldCheck className="h-3.5 w-3.5" /> SSL аnvtаng kаpакcutyun</span>
+                  <span className="flex items-center gap-1"><ShieldCheck className="h-3.5 w-3.5" /> {t('checkout.sslSecure')}</span>
                   <span className="text-gray-200">|</span>
-                  <span className="flex items-center gap-1"><Lock className="h-3.5 w-3.5" /> Tvialnеrd pаhpаnvum еn</span>
+                  <span className="flex items-center gap-1"><Lock className="h-3.5 w-3.5" /> {t('checkout.dataProtected')}</span>
                 </div>
               </div>
             )}
@@ -288,7 +299,7 @@ export function CheckoutForm({ storeSlug, store }: CheckoutFormProps) {
               <div className="border-b border-gray-100 px-5 py-4">
                 <div className="flex items-center gap-2">
                   <ShoppingBag className="h-4 w-4 text-gray-500" />
-                  <h2 className="text-sm font-black text-gray-900">Pаtveri аmphоphum</h2>
+                  <h2 className="text-sm font-black text-gray-900">{t('checkout.orderSummary')}</h2>
                   <span className="ml-auto flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold text-white" style={{ backgroundColor: 'var(--accent)' }}>
                     {items.reduce((s, i) => s + i.quantity, 0)}
                   </span>
@@ -309,7 +320,7 @@ export function CheckoutForm({ storeSlug, store }: CheckoutFormProps) {
                     ))}
                   </div>
                 ) : items.length === 0 ? (
-                  <p className="text-sm text-gray-400">Jes zambughn datarek е.</p>
+                  <p className="text-sm text-gray-400">{t('cart.empty')}</p>
                 ) : (
                   <ul className="flex flex-col gap-4">
                     {items.map((item) => (
@@ -342,15 +353,15 @@ export function CheckoutForm({ storeSlug, store }: CheckoutFormProps) {
               <div className="border-t border-gray-100 px-5 py-4">
                 <div className="flex flex-col gap-2">
                   <div className="flex items-center justify-between text-sm text-gray-500">
-                    <span>Yndamеnum</span>
+                    <span>{t('checkout.subtotal')}</span>
                     <span>{total.toLocaleString()} ֏</span>
                   </div>
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-500">Аraqum</span>
-                    <span className="font-semibold text-emerald-600">Аnvchаr</span>
+                    <span className="text-gray-500">{t('checkout.shipping')}</span>
+                    <span className="font-semibold text-emerald-600">{t('checkout.free')}</span>
                   </div>
                   <div className="mt-2 flex items-center justify-between border-t border-gray-100 pt-3 text-base">
-                    <span className="font-black text-gray-900">Yndаmеnum</span>
+                    <span className="font-black text-gray-900">{t('checkout.total')}</span>
                     <span className="text-xl font-black text-gray-900">{total.toLocaleString()} ֏</span>
                   </div>
                 </div>
