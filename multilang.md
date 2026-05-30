@@ -51,7 +51,7 @@ so a third locale needs **no content migration**).
 | # | Phase | Status | Commit |
 |---|-------|--------|--------|
 | 1a | Foundation — `pickLang` helper, `MultiLang.ru`, routing/proxy/request/switcher +`ru`, `ru.json` (130 keys) | ✅ Done & live | `375ef0a` |
-| 1b | Locale-aware content display — converted customer-facing `name.hy \|\| en` sites to `pickLang` (20 files: spark+minimal+_shared templates, store pages, store metadata/JSON-LD, StoreCard/StoreFilters/StaticPageContent/OrderConfirmation) | ✅ Done | `TBD` |
+| 1b | Locale-aware content display — converted customer-facing `name.hy \|\| en` sites to `pickLang` (20 files: spark+minimal+_shared templates, store pages, store metadata/JSON-LD, StoreCard/StoreFilters/StaticPageContent/OrderConfirmation) | ✅ Done & live | `b697d19` |
 | 2 | Backend Russian support (SetLocale, `users.locale` enum migration, 12 Form Requests, `in:` rule) | ⏳ Planned | — |
 | 3 | Russian content-entry forms (Product/Store/Page/Payments/Seller — 3rd language tab) | ⏳ Planned | — |
 | 4 | Translate customer-facing UI (storefront templates + customer store pages → catalog + `useTranslations`) | ⏳ Planned | — |
