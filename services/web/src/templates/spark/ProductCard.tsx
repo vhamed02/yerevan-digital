@@ -6,7 +6,7 @@ import Image from 'next/image'
 import { ShoppingBag, Check, Heart, Eye } from 'lucide-react'
 import { useStoreCart } from '@/stores/cart.store'
 import { formatViewCount } from '@/lib/formatViewCount'
-import { useLocale } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { pickLang } from '@/lib/i18n'
 import type { ProductCardProps } from '../types'
 
@@ -15,6 +15,7 @@ export function ProductCard({ product, storeSlug, isPreview }: ProductCardProps)
   const [wishlisted, setWishlisted] = useState(false)
   const { addItem } = useStoreCart(storeSlug)
   const locale = useLocale()
+  const t = useTranslations('storefront')
 
   const name = pickLang(product.name, locale)
   const image = product.images?.[0]
@@ -93,11 +94,11 @@ export function ProductCard({ product, storeSlug, isPreview }: ProductCardProps)
               }`}
             >
               {added ? (
-                <><Check className="h-3.5 w-3.5" /> Ավելացվեց</>
+                <><Check className="h-3.5 w-3.5" /> {t('added')}</>
               ) : !inStock ? (
-                'Ոչ առկա'
+                t('outOfStock')
               ) : (
-                <><ShoppingBag className="h-3.5 w-3.5" /> Ավելացնել</>
+                <><ShoppingBag className="h-3.5 w-3.5" /> {t('add')}</>
               )}
             </button>
           </div>
@@ -111,7 +112,7 @@ export function ProductCard({ product, storeSlug, isPreview }: ProductCardProps)
             )}
             {!inStock && (
               <span className="rounded-lg bg-gray-900/80 px-2 py-0.5 text-[10px] font-bold text-white">
-                Ոչ առկա
+                {t('outOfStock')}
               </span>
             )}
           </div>

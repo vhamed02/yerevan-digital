@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { X, Minus, Plus, ShoppingBag, ArrowRight, Gift } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { useTranslations } from 'next-intl'
 import { useStoreCart } from '@/stores/cart.store'
 import type { CartDrawerProps } from '../types'
 
@@ -11,6 +12,7 @@ const FREE_SHIPPING_THRESHOLD = 10000
 
 export function CartDrawer({ open, onClose, storeSlug }: CartDrawerProps) {
   const [mounted, setMounted] = useState(false)
+  const t = useTranslations('storefront')
   useEffect(() => { setMounted(true) }, [])
 
   const { items: storeItems, removeItem, updateQuantity, getTotal, getItemCount } = useStoreCart(storeSlug)
@@ -41,7 +43,7 @@ export function CartDrawer({ open, onClose, storeSlug }: CartDrawerProps) {
         <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
           <div className="flex items-center gap-2.5">
             <ShoppingBag className="h-5 w-5 text-gray-800" />
-            <span className="font-bold text-gray-900">Զամբյուղ</span>
+            <span className="font-bold text-gray-900">{t('cart.title')}</span>
             {count > 0 && (
               <span className="flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold text-white" style={{ backgroundColor: 'var(--accent)' }}>
                 {count}
@@ -63,13 +65,14 @@ export function CartDrawer({ open, onClose, storeSlug }: CartDrawerProps) {
             {hasFreeShipping ? (
               <div className="flex items-center gap-2 text-xs font-medium text-emerald-600">
                 <Gift className="h-3.5 w-3.5" />
-                Դուք ստացաք անվճար առաքում
+                {t('cart.freeShippingUnlocked')}
               </div>
             ) : (
               <p className="mb-2 text-xs text-gray-500">
-                Ավելացրե՛ք ևս{' '}
-                <span className="font-semibold text-gray-800">{toFreeShipping.toLocaleString()} ֏</span>{' '}
-                անվճար առաքման համար
+                {t.rich('cart.addMoreForFreeShipping', {
+                  amount: `${toFreeShipping.toLocaleString()} ֏`,
+                  b: (chunks) => <span className="font-semibold text-gray-800">{chunks}</span>,
+                })}
               </p>
             )}
             <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-gray-100">
@@ -87,15 +90,15 @@ export function CartDrawer({ open, onClose, storeSlug }: CartDrawerProps) {
               <ShoppingBag className="h-8 w-8 text-gray-300" />
             </div>
             <div>
-              <p className="font-semibold text-gray-800">Ձեր զամբյուղը դատարկ է</p>
-              <p className="mt-1 text-sm text-gray-400">Ավելացրե՛ք ապրանքներ սկսելու համար</p>
+              <p className="font-semibold text-gray-800">{t('cart.empty')}</p>
+              <p className="mt-1 text-sm text-gray-400">{t('cart.emptyHint')}</p>
             </div>
             <button
               onClick={onClose}
               className="flex items-center gap-1.5 rounded-full px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
               style={{ backgroundColor: 'var(--accent)' }}
             >
-              Շարունակել գնումները <ArrowRight className="h-3.5 w-3.5" />
+              {t('cart.continueShopping')} <ArrowRight className="h-3.5 w-3.5" />
             </button>
           </div>
         ) : (
@@ -158,7 +161,7 @@ export function CartDrawer({ open, onClose, storeSlug }: CartDrawerProps) {
 
             <div className="border-t border-gray-100 px-5 py-5">
               <div className="mb-4 flex items-center justify-between">
-                <span className="text-sm text-gray-500">Ընդամենը</span>
+                <span className="text-sm text-gray-500">{t('cart.total')}</span>
                 <span className="text-xl font-black text-gray-900">{total.toLocaleString()} ֏</span>
               </div>
               <Link
@@ -167,14 +170,14 @@ export function CartDrawer({ open, onClose, storeSlug }: CartDrawerProps) {
                 className="flex w-full items-center justify-center gap-2 rounded-2xl py-3.5 text-sm font-bold text-white shadow-lg shadow-black/10 transition-all hover:opacity-90 hover:shadow-xl"
                 style={{ backgroundColor: 'var(--accent)' }}
               >
-                Ձևակերպել պատվեր <ArrowRight className="h-4 w-4" />
+                {t('cart.checkout')} <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
                 href={`/store/${storeSlug}/cart`}
                 onClick={onClose}
                 className="mt-2.5 flex w-full items-center justify-center rounded-2xl border border-gray-200 py-3 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50"
               >
-                Տեսնել զամբյուղը
+                {t('cart.viewCart')}
               </Link>
             </div>
           </>

@@ -156,5 +156,31 @@
     "label": "Featured",
     "heading": "Active Stores on Vendora",
     "explore": "Explore All Stores"
+  },
+  "storefront": {
+    "added": "Added",
+    "add": "Add",
+    "outOfStock": "Out of Stock",
+    "noProductsFound": "No products found",
+    "tryAnotherSearch": "Try a different search",
+    "allProducts": "All Products",
+    "more": "More",
+    "featuredProducts": "Featured Products",
+    "discover": "Discover",
+    "viewProducts": "View products",
+    "sections": "Sections",
+    "contact": "Contact",
+    "allRightsReserved": "All rights reserved.",
+    "cart": {
+      "title": "Cart",
+      "freeShippingUnlocked": "You've unlocked free shipping",
+      "addMoreForFreeShipping": "Add <b>{amount}</b> more for free shipping",
+      "empty": "Your cart is empty",
+      "emptyHint": "Add items to get started",
+      "continueShopping": "Continue shopping",
+      "total": "Total",
+      "checkout": "Checkout",
+      "viewCart": "View cart"
+    }
   }
 }

@@ -2,12 +2,13 @@
 
 import Link from 'next/link'
 import { Camera, Globe, Mail, Phone, MapPin, ShieldCheck } from 'lucide-react'
-import { useLocale } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { pickLang } from '@/lib/i18n'
 import type { StoreFooterProps } from '../types'
 
 export function StoreFooter({ store }: StoreFooterProps) {
   const locale = useLocale()
+  const t = useTranslations('storefront')
   const name = pickLang(store.name, locale)
   const description = pickLang(store.description, locale)
   const hasSocial = store.social_instagram || store.social_facebook
@@ -22,7 +23,7 @@ export function StoreFooter({ store }: StoreFooterProps) {
             className="pointer-events-none absolute inset-0 opacity-[0.08]"
             style={{ backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)', backgroundSize: '24px 24px' }}
           />
-          <p className="relative text-[11px] font-semibold uppercase tracking-[0.2em] text-white/70">Բացահայտե՛ք</p>
+          <p className="relative text-[11px] font-semibold uppercase tracking-[0.2em] text-white/70">{t('discover')}</p>
           <h2 className="relative mt-2 text-3xl font-black text-white sm:text-4xl">{name}</h2>
           {description && (
             <p className="relative mt-3 text-sm text-white/70">{description}</p>
@@ -32,7 +33,7 @@ export function StoreFooter({ store }: StoreFooterProps) {
             className="relative mt-6 inline-flex items-center gap-2 rounded-full bg-white px-6 py-2.5 text-sm font-bold shadow-lg transition-all hover:scale-105"
             style={{ color: 'var(--accent)' }}
           >
-            Դիտել ապրանքները →
+            {t('viewProducts')} →
           </Link>
         </div>
       </div>
@@ -77,13 +78,13 @@ export function StoreFooter({ store }: StoreFooterProps) {
 
             {/* Quick links */}
             <div>
-              <p className="mb-4 text-[10px] font-semibold uppercase tracking-widest text-gray-500">Բաժիններ</p>
+              <p className="mb-4 text-[10px] font-semibold uppercase tracking-widest text-gray-500">{t('sections')}</p>
               <nav className="flex flex-col gap-2.5">
                 <Link href={`/store/${store.slug}/products`} className="text-sm text-gray-400 transition-colors hover:text-white">
-                  Բոլոր ապրանքները
+                  {t('allProducts')}
                 </Link>
                 <Link href={`/store/${store.slug}/products?featured=1`} className="text-sm text-gray-400 transition-colors hover:text-white">
-                  Ուշագրավ ապրանքներ
+                  {t('featuredProducts')}
                 </Link>
               </nav>
             </div>
@@ -91,7 +92,7 @@ export function StoreFooter({ store }: StoreFooterProps) {
             {/* Contact */}
             {hasContact && (
               <div>
-                <p className="mb-4 text-[10px] font-semibold uppercase tracking-widest text-gray-500">Կապ</p>
+                <p className="mb-4 text-[10px] font-semibold uppercase tracking-widest text-gray-500">{t('contact')}</p>
                 <div className="flex flex-col gap-3">
                   {store.email && (
                     <a href={`mailto:${store.email}`} className="flex items-center gap-2.5 text-sm text-gray-400 transition-colors hover:text-white">
@@ -119,7 +120,7 @@ export function StoreFooter({ store }: StoreFooterProps) {
           <div className="mt-10 flex flex-col items-center gap-3 border-t border-white/[0.06] pt-8 sm:flex-row sm:justify-between">
             <p className="flex items-center gap-1.5 text-xs text-gray-600">
               <ShieldCheck className="h-3.5 w-3.5" />
-              © {new Date().getFullYear()} {name}. Բոլոր իրավունքները պաշտպանված են։
+              © {new Date().getFullYear()} {name}. {t('allRightsReserved')}
             </p>
             <p className="text-xs text-gray-700">
               Powered by{' '}

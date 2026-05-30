@@ -156,5 +156,31 @@
     "label": "Ընտրված",
     "heading": "Vendora-ի Ակտիվ Խանութները",
     "explore": "Դիտել Բոլոր Խանութները"
+  },
+  "storefront": {
+    "added": "Ավելացվեց",
+    "add": "Ավելացնել",
+    "outOfStock": "Ոչ առկա",
+    "noProductsFound": "Ապրանք չի գտնվել",
+    "tryAnotherSearch": "Փորձե՛ք այլ որոնում",
+    "allProducts": "Բոլոր ապրանքները",
+    "more": "Ավելին",
+    "featuredProducts": "Ուշագրավ ապրանքներ",
+    "discover": "Բացահայտե՛ք",
+    "viewProducts": "Դիտել ապրանքները",
+    "sections": "Բաժիններ",
+    "contact": "Կապ",
+    "allRightsReserved": "Բոլոր իրավունքները պաշտպանված են։",
+    "cart": {
+      "title": "Զամբյուղ",
+      "freeShippingUnlocked": "Դուք ստացաք անվճար առաքում",
+      "addMoreForFreeShipping": "Ավելացրե՛ք ևս <b>{amount}</b> անվճար առաքման համար",
+      "empty": "Ձեր զամբյուղը դատարկ է",
+      "emptyHint": "Ավելացրե՛ք ապրանքներ սկսելու համար",
+      "continueShopping": "Շարունակել գնումները",
+      "total": "Ընդամենը",
+      "checkout": "Ձևակերպել պատվեր",
+      "viewCart": "Տեսնել զամբյուղը"
+    }
   }
 }

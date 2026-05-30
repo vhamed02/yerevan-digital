@@ -2,7 +2,7 @@
 
 > **Living document.** Kept up to date as work progresses. Each phase updates the
 > status table, the progress log, and any decisions that change.
-> Last updated: 2026-05-30 · Status: **Phase 3 complete; Phase 4 next**
+> Last updated: 2026-05-30 · Status: **Phase 4 in progress (4a done)**
 
 ---
 
@@ -56,7 +56,10 @@ so a third locale needs **no content migration**).
 | 3a | RU content-entry: **ProductForm** (3-lang name + lang-driven descriptions/SEO tabs) | ✅ Done & live | `3272c71` |
 | 3b | RU content-entry: StoreSettings + StoreSetupWizard (store name/description/meta) | ✅ Done & live | `e56708a` |
 | 3c | RU content-entry: admin Categories + PageEditor + CreateSeller locale picker (Payments deferred — see note) | ✅ Done & live | `d634dfd` |
-| 4 | Translate customer-facing UI (storefront templates + customer store pages → catalog + `useTranslations`) | ⏳ Planned | — |
+| 4a | UI strings: spark shell (ProductCard, ProductGrid, CartDrawer, StoreHeader, StoreFooter) → new `storefront` catalog namespace | ✅ Done | `TBD` |
+| 4b | UI strings: spark CheckoutForm + StoreHome | ⏳ Planned | — |
+| 4c | UI strings: minimal template | ⏳ Planned | — |
+| 4d | UI strings: `_shared` (ProductDetail, CartDrawer) + customer store pages (products listing, checkout result, order confirmation, ReviewSection) | ⏳ Planned | — |
 | 5 | Trilingual transactional emails (7 notifications + 8 blade templates) | ⏳ Planned | — |
 | 6 | SEO (locale-aware JSON-LD/OG, `hreflang`) + full verify sweep | ⏳ Planned | — |
 
@@ -151,3 +154,9 @@ Legend: ✅ done & live · 🔧 in progress · ⏳ planned
   touched by the form). Adding `ru` there is meaningless until that's fixed; tracked as a
   separate bug, not part of i18n. **Phase 3 (RU content authoring) complete.** NEXT: Phase 4
   (translate customer-facing UI strings).
+- **2026-05-30** — Phase 4a done: created the `storefront` catalog namespace (22 keys incl.
+  a `cart` sub-object, with a `t.rich` free-shipping message) in all 3 catalogs (152 keys
+  each, full parity), and wired `useTranslations('storefront')` into the spark shell —
+  ProductCard, ProductGrid, CartDrawer, StoreHeader, StoreFooter. `tsc` clean; production
+  build passes. Phase 4 is large, so split: 4b = spark CheckoutForm + StoreHome; 4c = minimal
+  template; 4d = `_shared` + customer store pages.

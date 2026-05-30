@@ -1,10 +1,12 @@
 'use client'
 
 import { ShoppingBag } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { ProductCard } from './ProductCard'
 import type { ProductGridProps } from '../types'
 
 export function ProductGrid({ products, storeSlug, isPreview }: ProductGridProps) {
+  const t = useTranslations('storefront')
   if (products.length === 0) {
     return (
       <div className="flex flex-col items-center gap-4 rounded-2xl border border-dashed border-gray-200 py-20 text-center">
@@ -12,8 +14,8 @@ export function ProductGrid({ products, storeSlug, isPreview }: ProductGridProps
           <ShoppingBag className="h-6 w-6 text-gray-400" />
         </div>
         <div>
-          <p className="font-semibold text-gray-700">Ապրանք չի գտնվել</p>
-          <p className="mt-1 text-sm text-gray-400">Փորձե՛ք այլ որոնում</p>
+          <p className="font-semibold text-gray-700">{t('noProductsFound')}</p>
+          <p className="mt-1 text-sm text-gray-400">{t('tryAnotherSearch')}</p>
         </div>
       </div>
     )

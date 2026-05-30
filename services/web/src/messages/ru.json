@@ -156,5 +156,31 @@
     "label": "Избранное",
     "heading": "Активные магазины на Vendora",
     "explore": "Смотреть все магазины"
+  },
+  "storefront": {
+    "added": "Добавлено",
+    "add": "Добавить",
+    "outOfStock": "Нет в наличии",
+    "noProductsFound": "Товары не найдены",
+    "tryAnotherSearch": "Попробуйте другой поиск",
+    "allProducts": "Все товары",
+    "more": "Ещё",
+    "featuredProducts": "Рекомендуемые товары",
+    "discover": "Откройте для себя",
+    "viewProducts": "Смотреть товары",
+    "sections": "Разделы",
+    "contact": "Контакты",
+    "allRightsReserved": "Все права защищены.",
+    "cart": {
+      "title": "Корзина",
+      "freeShippingUnlocked": "Вы получили бесплатную доставку",
+      "addMoreForFreeShipping": "Добавьте ещё на <b>{amount}</b> для бесплатной доставки",
+      "empty": "Ваша корзина пуста",
+      "emptyHint": "Добавьте товары, чтобы начать",
+      "continueShopping": "Продолжить покупки",
+      "total": "Итого",
+      "checkout": "Оформить заказ",
+      "viewCart": "Посмотреть корзину"
+    }
   }
 }
