@@ -2,6 +2,7 @@
 
 import { useState, useRef, useCallback } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 
 const STEP = 1_000
 
@@ -16,6 +17,7 @@ export function PriceRangeFilter({ storeSlug, initialMin, initialMax, rangeMax }
   const RANGE_MAX = rangeMax > 0 ? Math.ceil(rangeMax / STEP) * STEP : STEP
   const router = useRouter()
   const sp = useSearchParams()
+  const t = useTranslations('storefront')
   const [min, setMin] = useState(initialMin ? Math.min(Number(initialMin), RANGE_MAX) : 0)
   const [max, setMax] = useState(initialMax ? Math.min(Number(initialMax), RANGE_MAX) : RANGE_MAX)
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -86,7 +88,7 @@ export function PriceRangeFilter({ storeSlug, initialMin, initialMax, rangeMax }
 
   return (
     <div className="flex items-center gap-2.5">
-      <span className="text-xs font-semibold uppercase tracking-wide text-gray-400">Գին</span>
+      <span className="text-xs font-semibold uppercase tracking-wide text-gray-400">{t('filters.price')}</span>
       <span className="min-w-[44px] rounded-lg bg-gray-50 px-2 py-1 text-center text-xs font-semibold text-gray-700">
         {min === 0 ? '0' : min.toLocaleString()} ֏
       </span>

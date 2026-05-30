@@ -60,8 +60,9 @@ so a third locale needs **no content migration**).
 | 4b | UI strings: spark CheckoutForm (incl. translated Zod validation via in-component schema) | ✅ Done & live | `2cf7ad8` |
 | 4b-home | UI strings: spark StoreHome (hero, trust/marquee, section headings) | ✅ Done & live | `c7fa1a6` |
 | 4c | UI strings: minimal template (ProductCard, ProductGrid, StoreHeader, StoreHome — reuses `storefront` catalog; CartDrawer/CheckoutForm/ProductDetail re-export `_shared`) | ✅ Done & live | `59782ea` |
-| 4d-shared | UI strings: `_shared` trio — CartDrawer, ProductDetail, CheckoutForm (used by minimal; reuse `storefront` catalog + 4 new keys) | ✅ Done | `TBD` |
-| 4d-pages | UI strings: customer store pages — products listing, checkout result pages, OrderConfirmation, ReviewSection, filter controls | ⏳ Planned | — |
+| 4d-shared | UI strings: `_shared` trio — CartDrawer, ProductDetail, CheckoutForm (used by minimal; reuse `storefront` catalog + 4 new keys) | ✅ Done & live | `b3eabc8` |
+| 4d-pages-1 | UI strings: products listing page + checkout-failed page + SearchInput/PriceRangeFilter (`filters`, `payFailed` catalog) | ✅ Done | `TBD` |
+| 4d-pages-2 | UI strings: OrderConfirmation (status timeline/labels) + ReviewSection | ⏳ Planned | — |
 | 5 | Trilingual transactional emails (7 notifications + 8 blade templates) | ⏳ Planned | — |
 | 6 | SEO (locale-aware JSON-LD/OG, `hreflang`) + full verify sweep | ⏳ Planned | — |
 
@@ -187,5 +188,13 @@ Legend: ✅ done & live · 🔧 in progress · ⏳ planned
   215 keys each, full parity. The `_shared` CheckoutForm got the same in-component `useMemo`
   Zod schema refactor as spark's so validation messages translate, and its gateway labels
   were normalized to brand names. `tsc` clean; production build passes. The minimal template
-  is now fully trilingual. NEXT: 4d-pages (products listing, checkout result pages,
+  is now fully trilingual.
+- **2026-05-30** — Phase 4d-pages-1 done: added `storefront.filters` + `payFailed` +
+  `searchPlaceholder` catalog (hy/en/ru, 230 keys, full parity); wired the products listing
+  page (sort options, category/filter chips, product count, pagination via `getTranslations`),
+  the checkout-failed page, and the SearchInput + PriceRangeFilter client controls. Note: the
+  `checkout/{failed,sandbox,success}` dirs were root-owned (early scaffold) — chowned to
+  deploy. `tsc` clean; production build passes. NEXT: 4d-pages-2 (OrderConfirmation status
+  timeline/labels + ReviewSection).
+- **(superseded note)** earlier 4d-pages plan: (products listing, checkout result pages,
   OrderConfirmation, ReviewSection, filter controls).

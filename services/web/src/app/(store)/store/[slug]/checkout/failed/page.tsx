@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { XCircle } from 'lucide-react'
+import { getTranslations } from 'next-intl/server'
 
 export const dynamic = 'force-dynamic'
 
@@ -14,6 +15,7 @@ export default async function CheckoutFailedPage({
   params: Promise<{ slug: string }>
 }) {
   const { slug } = await params
+  const t = await getTranslations('storefront')
 
   return (
     <div className="flex min-h-[70vh] flex-col items-center justify-center px-4 py-16 text-center">
@@ -22,10 +24,10 @@ export default async function CheckoutFailedPage({
       </div>
 
       <h1 className="mb-2 text-2xl font-bold text-gray-900 sm:text-3xl">
-        Վճարումը Չհաջողվեց
+        {t('payFailed.title')}
       </h1>
       <p className="mb-8 mt-2 max-w-sm text-sm text-gray-500">
-        Վճարումը չի կատարվել։ Ձեր զամբյուղը պահպանված է — կարող եք կրկին փորձել կամ ընտրել վճարման այլ եղանակ։
+        {t('payFailed.message')}
       </p>
 
       <div className="flex flex-wrap justify-center gap-3">
@@ -33,13 +35,13 @@ export default async function CheckoutFailedPage({
           href={`/store/${slug}/cart`}
           className="rounded-xl bg-gray-900 px-6 py-3 text-sm font-semibold text-white hover:bg-gray-800 transition-colors"
         >
-          Վերադառնալ զամբյուղ
+          {t('payFailed.returnToCart')}
         </Link>
         <Link
           href={`/store/${slug}`}
           className="rounded-xl border border-gray-200 px-6 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
         >
-          Շարունակել գնումները
+          {t('cart.continueShopping')}
         </Link>
       </div>
     </div>

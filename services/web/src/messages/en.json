@@ -252,6 +252,25 @@
         "secureShopping": "Secure shopping",
         "dailyNew": "New products daily"
       }
+    },
+    "searchPlaceholder": "Search products...",
+    "filters": {
+      "price": "Price",
+      "sortNewest": "Newest",
+      "sortPriceAsc": "Price: Low to High",
+      "sortPriceDesc": "Price: High to Low",
+      "inStock": "In stock",
+      "onSale": "Sale",
+      "clear": "Clear",
+      "prev": "Prev",
+      "next": "Next",
+      "productCount": "{count} products",
+      "page": "Page {page} / {last}"
+    },
+    "payFailed": {
+      "title": "Payment failed",
+      "message": "Payment was not completed. Your cart is saved — you can try again or choose another payment method.",
+      "returnToCart": "Return to cart"
     }
   }
 }

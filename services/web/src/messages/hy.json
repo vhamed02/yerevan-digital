@@ -252,6 +252,25 @@
         "secureShopping": "Անվտանգ գնումներ",
         "dailyNew": "Ամենօրյա նոր ապրանքներ"
       }
+    },
+    "searchPlaceholder": "Որոնել ապրանք...",
+    "filters": {
+      "price": "Գին",
+      "sortNewest": "Նոր",
+      "sortPriceAsc": "Գին՝ աճման",
+      "sortPriceDesc": "Գին՝ նվազման",
+      "inStock": "Առկա",
+      "onSale": "Զեղչ",
+      "clear": "Մաքրել",
+      "prev": "Նախ.",
+      "next": "Հաջ.",
+      "productCount": "{count} ապրանք",
+      "page": "Էջ {page} / {last}"
+    },
+    "payFailed": {
+      "title": "Վճարումը չհաջողվեց",
+      "message": "Վճարումը չի կատարվել։ Ձեր զամբյուղը պահպանված է — կարող եք կրկին փորձել կամ ընտրել վճարման այլ եղանակ։",
+      "returnToCart": "Վերադառնալ զամբյուղ"
     }
   }
 }

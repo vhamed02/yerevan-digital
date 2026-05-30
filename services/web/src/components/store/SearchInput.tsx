@@ -2,11 +2,13 @@
 
 import { useState, useRef } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { Search, X } from 'lucide-react'
 
 export function SearchInput({ storeSlug, initialValue }: { storeSlug: string; initialValue: string }) {
   const router = useRouter()
   const sp = useSearchParams()
+  const t = useTranslations('storefront')
   const [value, setValue] = useState(initialValue)
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -37,7 +39,7 @@ export function SearchInput({ storeSlug, initialValue }: { storeSlug: string; in
         type="search"
         value={value}
         onChange={onChange}
-        placeholder="Որոնել ապրանք..."
+        placeholder={t('searchPlaceholder')}
         className="h-10 w-full rounded-xl border border-gray-200 bg-gray-50 pl-10 pr-9 text-sm text-gray-900 placeholder-gray-400 outline-none focus:border-gray-900 focus:bg-white transition-colors sm:w-64"
       />
       {value && (
