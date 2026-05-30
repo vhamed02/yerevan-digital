@@ -863,7 +863,7 @@ The conversions are behavior-identical (full-day inclusive bounds) and remain SQ
 ## Improvement #13 — Fixed Three Live Production Bugs (Surfaced by Audit)
 
 **Date:** 2026-05-30
-**Commit:** TBD
+**Commit:** `6b7aa0c`
 
 **Files changed:**
 - `services/web/src/components/admin/CreateSellerClient.tsx` — fixed broken post-create redirect + typed the response
@@ -937,6 +937,6 @@ Full suite: **235 tests / 683 assertions** pass.
 | 10 | Extract `ProductController` image management into action classes | `cb9a8ba` |
 | 11 | Backend security hardening (rate limiting, token expiry, password policy, timing-safe webhooks) | `e8e7ac1` |
 | 12 | Database indexing & sargable date queries | `29386f5` |
-| 13 | Fixed three live production bugs (admin redirect, rating aggregate, store-stats SQL) | TBD |
+| 13 | Fixed three live production bugs (admin redirect, rating aggregate, store-stats SQL) | `6b7aa0c` |
 
 _Full test suite: 235 tests / 683 assertions passing._
