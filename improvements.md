@@ -924,7 +924,7 @@ Full suite: **235 tests / 683 assertions** pass.
 ## Improvement #14 — Enforced TypeScript Type-Checking in the Production Build
 
 **Date:** 2026-05-30
-**Commit:** TBD
+**Commit:** `734b775`
 
 **Files changed:**
 - `services/web/next.config.ts` — removed `typescript.ignoreBuildErrors` and the (now-invalid) `eslint.ignoreDuringBuilds` flags
@@ -986,6 +986,6 @@ Verified by reproducing the exact Docker build (`next build` with the production
 | 11 | Backend security hardening (rate limiting, token expiry, password policy, timing-safe webhooks) | `e8e7ac1` |
 | 12 | Database indexing & sargable date queries | `29386f5` |
 | 13 | Fixed three live production bugs (admin redirect, rating aggregate, store-stats SQL) | `6b7aa0c` |
-| 14 | Enforced TypeScript type-checking in the production build | TBD |
+| 14 | Enforced TypeScript type-checking in the production build | `734b775` |
 
 _Backend suite: 235 tests / 683 assertions. Frontend: 48 unit tests. `tsc --noEmit` clean._
