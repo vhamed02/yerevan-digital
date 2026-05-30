@@ -25,17 +25,23 @@ interface Props {
   page: Page
 }
 
-type Lang = 'hy' | 'en'
+type Lang = 'hy' | 'en' | 'ru'
+const LANG_TABS: Lang[] = ['hy', 'en', 'ru']
+const LANG_NAMES: Record<Lang, string> = { hy: 'Armenian', en: 'English', ru: 'Russian' }
+const LANG_FLAGS: Record<Lang, string> = { hy: '🇦🇲 Armenian', en: '🇬🇧 English', ru: '🇷🇺 Russian' }
 
 export default function PageEditorClient({ page }: Props) {
   const [lang, setLang] = useState<Lang>('hy')
   const [published, setPublished] = useState(page.is_published)
   const [titleHy, setTitleHy] = useState(page.title.hy ?? '')
   const [titleEn, setTitleEn] = useState(page.title.en ?? '')
+  const [titleRu, setTitleRu] = useState(page.title.ru ?? '')
   const [metaTitleHy, setMetaTitleHy] = useState(page.meta_title?.hy ?? '')
   const [metaTitleEn, setMetaTitleEn] = useState(page.meta_title?.en ?? '')
+  const [metaTitleRu, setMetaTitleRu] = useState(page.meta_title?.ru ?? '')
   const [metaDescHy, setMetaDescHy] = useState(page.meta_description?.hy ?? '')
   const [metaDescEn, setMetaDescEn] = useState(page.meta_description?.en ?? '')
+  const [metaDescRu, setMetaDescRu] = useState(page.meta_description?.ru ?? '')
 
   const editorHy = useEditor({
     extensions: [
@@ -61,15 +67,35 @@ export default function PageEditorClient({ page }: Props) {
     },
   })
 
-  const activeEditor = lang === 'hy' ? editorHy : editorEn
+  const editorRu = useEditor({
+    extensions: [
+      StarterKit,
+      Underline,
+      Placeholder.configure({ placeholder: 'Start writing in Russian…' }),
+    ],
+    content: page.content.ru ?? '',
+    editorProps: {
+      attributes: { class: 'prose prose-sm max-w-none focus:outline-none min-h-[400px] text-content-primary' },
+    },
+  })
+
+  const editors = { hy: editorHy, en: editorEn, ru: editorRu }
+  const title = { hy: titleHy, en: titleEn, ru: titleRu }
+  const setTitle = { hy: setTitleHy, en: setTitleEn, ru: setTitleRu }
+  const metaTitle = { hy: metaTitleHy, en: metaTitleEn, ru: metaTitleRu }
+  const setMetaTitle = { hy: setMetaTitleHy, en: setMetaTitleEn, ru: setMetaTitleRu }
+  const metaDesc = { hy: metaDescHy, en: metaDescEn, ru: metaDescRu }
+  const setMetaDesc = { hy: setMetaDescHy, en: setMetaDescEn, ru: setMetaDescRu }
+
+  const activeEditor = editors[lang]
 
   const saveMutation = useMutation({
     mutationFn: () =>
       api.put(`/admin/pages/${page.slug}`, {
-        title: { hy: titleHy, en: titleEn },
-        content: { hy: editorHy?.getHTML() ?? '', en: editorEn?.getHTML() ?? '' },
-        meta_title: { hy: metaTitleHy, en: metaTitleEn },
-        meta_description: { hy: metaDescHy, en: metaDescEn },
+        title: { hy: titleHy, en: titleEn, ru: titleRu },
+        content: { hy: editorHy?.getHTML() ?? '', en: editorEn?.getHTML() ?? '', ru: editorRu?.getHTML() ?? '' },
+        meta_title: { hy: metaTitleHy, en: metaTitleEn, ru: metaTitleRu },
+        meta_description: { hy: metaDescHy, en: metaDescEn, ru: metaDescRu },
         is_published: published,
       }),
     onSuccess: () => toast.success('Page saved'),
@@ -158,7 +184,7 @@ export default function PageEditorClient({ page }: Props) {
         <div className="flex flex-1 flex-col overflow-y-auto">
           {/* Language tabs */}
           <div className="flex border-b border-border bg-surface px-5">
-            {(['hy', 'en'] as Lang[]).map((l) => (
+            {LANG_TABS.map((l) => (
               <button
                 key={l}
                 type="button"
@@ -170,7 +196,7 @@ export default function PageEditorClient({ page }: Props) {
                     : 'border-transparent text-content-muted hover:text-content-primary'
                 )}
               >
-                {l === 'hy' ? '🇦🇲 Armenian' : '🇬🇧 English'}
+                {LANG_FLAGS[l]}
               </button>
             ))}
           </div>
@@ -179,8 +205,8 @@ export default function PageEditorClient({ page }: Props) {
             {/* Title */}
             <input
               type="text"
-              value={lang === 'hy' ? titleHy : titleEn}
-              onChange={(e) => lang === 'hy' ? setTitleHy(e.target.value) : setTitleEn(e.target.value)}
+              value={title[lang]}
+              onChange={(e) => setTitle[lang](e.target.value)}
               placeholder="Page title"
               className="mb-6 w-full border-none bg-transparent font-heading text-3xl font-bold text-content-primary placeholder:text-content-muted/40 focus:outline-none"
             />
@@ -194,6 +220,9 @@ export default function PageEditorClient({ page }: Props) {
                 </div>
                 <div className={lang === 'en' ? 'block' : 'hidden'}>
                   <EditorContent editor={editorEn} />
+                </div>
+                <div className={lang === 'ru' ? 'block' : 'hidden'}>
+                  <EditorContent editor={editorRu} />
                 </div>
               </div>
             </div>
@@ -227,30 +256,26 @@ export default function PageEditorClient({ page }: Props) {
 
             <div className="border-t border-border pt-4">
               <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-content-muted">
-                SEO — {lang === 'hy' ? 'Armenian' : 'English'}
+                SEO — {LANG_NAMES[lang]}
               </p>
               <div className="flex flex-col gap-3">
                 <Input
                   label="Meta Title"
-                  value={lang === 'hy' ? metaTitleHy : metaTitleEn}
-                  onChange={(e) =>
-                    lang === 'hy' ? setMetaTitleHy(e.target.value) : setMetaTitleEn(e.target.value)
-                  }
+                  value={metaTitle[lang]}
+                  onChange={(e) => setMetaTitle[lang](e.target.value)}
                 />
                 <Textarea
                   label="Meta Description"
-                  value={lang === 'hy' ? metaDescHy : metaDescEn}
-                  onChange={(e) =>
-                    lang === 'hy' ? setMetaDescHy(e.target.value) : setMetaDescEn(e.target.value)
-                  }
+                  value={metaDesc[lang]}
+                  onChange={(e) => setMetaDesc[lang](e.target.value)}
                   rows={3}
                 />
-                {(lang === 'hy' ? metaTitleHy : metaTitleEn) && (
+                {metaTitle[lang] && (
                   <div className="rounded-lg border border-border bg-surface-secondary p-3 text-xs">
-                    <p className="truncate font-medium text-blue-600">{lang === 'hy' ? titleHy : titleEn}</p>
+                    <p className="truncate font-medium text-blue-600">{title[lang]}</p>
                     <p className="mt-0.5 truncate text-green-700">radif.org/{page.slug}</p>
                     <p className="mt-1 line-clamp-2 text-content-secondary">
-                      {lang === 'hy' ? metaDescHy : metaDescEn}
+                      {metaDesc[lang]}
                     </p>
                   </div>
                 )}

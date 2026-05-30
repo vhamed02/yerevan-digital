@@ -20,7 +20,7 @@ export default function CreateSellerClient() {
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [status, setStatus] = useState<'active' | 'pending'>('active')
-  const [locale, setLocale] = useState<'hy' | 'en'>('hy')
+  const [locale, setLocale] = useState<'hy' | 'en' | 'ru'>('hy')
   const [errors, setErrors] = useState<Record<string, string>>({})
 
   function validate() {
@@ -176,8 +176,8 @@ export default function CreateSellerClient() {
           {/* Locale */}
           <div className="rounded-xl border border-border bg-surface p-5">
             <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-content-muted">Default Language</h2>
-            <div className="grid grid-cols-2 gap-2">
-              {([['hy', 'Armenian'], ['en', 'English']] as const).map(([val, label]) => (
+            <div className="grid grid-cols-3 gap-2">
+              {([['hy', 'Armenian'], ['en', 'English'], ['ru', 'Russian']] as const).map(([val, label]) => (
                 <button
                   key={val}
                   type="button"

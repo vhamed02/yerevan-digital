@@ -2,7 +2,7 @@
 
 > **Living document.** Kept up to date as work progresses. Each phase updates the
 > status table, the progress log, and any decisions that change.
-> Last updated: 2026-05-30 · Status: **Phase 3 in progress (3a done)**
+> Last updated: 2026-05-30 · Status: **Phase 3 complete; Phase 4 next**
 
 ---
 
@@ -55,7 +55,7 @@ so a third locale needs **no content migration**).
 | 2 | Backend Russian support (SetLocale, `users.locale` enum migration, 12 Form Requests, `in:` rule, locale-aware payment description) | ✅ Done & live | `4137cef` |
 | 3a | RU content-entry: **ProductForm** (3-lang name + lang-driven descriptions/SEO tabs) | ✅ Done & live | `3272c71` |
 | 3b | RU content-entry: StoreSettings + StoreSetupWizard (store name/description/meta) | ✅ Done & live | `e56708a` |
-| 3c | RU content-entry: admin Categories, PageEditor, Payments + CreateSeller locale picker | ⏳ Planned | — |
+| 3c | RU content-entry: admin Categories + PageEditor + CreateSeller locale picker (Payments deferred — see note) | ✅ Done | `TBD` |
 | 4 | Translate customer-facing UI (storefront templates + customer store pages → catalog + `useTranslations`) | ⏳ Planned | — |
 | 5 | Trilingual transactional emails (7 notifications + 8 blade templates) | ⏳ Planned | — |
 | 6 | SEO (locale-aware JSON-LD/OG, `hreflang`) + full verify sweep | ⏳ Planned | — |
@@ -141,3 +141,13 @@ Legend: ✅ done & live · 🔧 in progress · ⏳ planned
   `[ru]`) and `StoreSetupWizard` (RHF — `name_ru`/`description_ru` schema, inputs, submit).
   `tsc` clean; production build passes. NEXT: 3c (admin Categories/PageEditor/Payments +
   CreateSeller locale picker).
+- **2026-05-30** — Phase 3c done: `CategoriesAdminClient` (🇷🇺 name input, payload appends
+  `name.ru`), `PageEditorClient` (refactored binary `hy/en` ternaries to lang-keyed maps;
+  added a third TipTap editor + RU title/content/meta), and `CreateSellerClient` (locale
+  picker now offers Russian — backend accepts it after Phase 2). `tsc` clean; production
+  build passes. **Payments form DEFERRED**: `PaymentsAdminClient` has a pre-existing
+  wiring bug — it reads/writes `gw.name` (a plain string identifier column) as if it were
+  the translatable display name, while the real translatable field is `display_name` (never
+  touched by the form). Adding `ru` there is meaningless until that's fixed; tracked as a
+  separate bug, not part of i18n. **Phase 3 (RU content authoring) complete.** NEXT: Phase 4
+  (translate customer-facing UI strings).

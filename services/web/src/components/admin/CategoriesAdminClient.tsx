@@ -19,6 +19,7 @@ interface CategoriesAdminClientProps {
 interface CategoryFormData {
   name_hy: string
   name_en: string
+  name_ru: string
   parent_id: number | null
   icon: string
   sort_order: number
@@ -27,6 +28,7 @@ interface CategoryFormData {
 const emptyForm: CategoryFormData = {
   name_hy: '',
   name_en: '',
+  name_ru: '',
   parent_id: null,
   icon: '',
   sort_order: 0,
@@ -36,6 +38,7 @@ function categoryToForm(cat: AdminCategory): CategoryFormData {
   return {
     name_hy: cat.name.hy,
     name_en: cat.name.en,
+    name_ru: cat.name.ru ?? '',
     parent_id: cat.parent_id ?? null,
     icon: cat.icon ?? '',
     sort_order: cat.sort_order,
@@ -186,7 +189,7 @@ export default function CategoriesAdminClient({ initialCategories }: CategoriesA
   const saveMutation = useMutation({
     mutationFn: (payload: CategoryFormData) => {
       const body = {
-        name: { hy: payload.name_hy, en: payload.name_en },
+        name: { hy: payload.name_hy, en: payload.name_en, ...(payload.name_ru ? { ru: payload.name_ru } : {}) },
         parent_id: payload.parent_id,
         icon: payload.icon,
         sort_order: payload.sort_order,
@@ -339,6 +342,11 @@ export default function CategoriesAdminClient({ initialCategories }: CategoriesA
             value={form.name_en}
             onChange={(e) => setForm((f) => ({ ...f, name_en: e.target.value }))}
             required
+          />
+          <Input
+            label="🇷🇺 Russian Name"
+            value={form.name_ru}
+            onChange={(e) => setForm((f) => ({ ...f, name_ru: e.target.value }))}
           />
           <div>
             <label className="mb-1.5 block text-sm font-medium text-content-primary">
