@@ -59,7 +59,7 @@ so a third locale needs **no content migration**).
 | 4a | UI strings: spark shell (ProductCard, ProductGrid, CartDrawer, StoreHeader, StoreFooter) → new `storefront` catalog namespace | ✅ Done & live | `189beb1` |
 | 4b | UI strings: spark CheckoutForm (incl. translated Zod validation via in-component schema) | ✅ Done & live | `2cf7ad8` |
 | 4b-home | UI strings: spark StoreHome (hero, trust/marquee, section headings) | ✅ Done & live | `c7fa1a6` |
-| 4c | UI strings: minimal template (ProductCard, ProductGrid, StoreHeader, StoreHome — reuses `storefront` catalog; CartDrawer/CheckoutForm/ProductDetail re-export `_shared`) | ✅ Done | `TBD` |
+| 4c | UI strings: minimal template (ProductCard, ProductGrid, StoreHeader, StoreHome — reuses `storefront` catalog; CartDrawer/CheckoutForm/ProductDetail re-export `_shared`) | ✅ Done & live | `59782ea` |
 | 4d | UI strings: `_shared` (ProductDetail, CartDrawer) + customer store pages (products listing, checkout result, order confirmation, ReviewSection) | ⏳ Planned | — |
 | 5 | Trilingual transactional emails (7 notifications + 8 blade templates) | ⏳ Planned | — |
 | 6 | SEO (locale-aware JSON-LD/OG, `hreflang`) + full verify sweep | ⏳ Planned | — |
