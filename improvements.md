@@ -921,6 +921,54 @@ Full suite: **235 tests / 683 assertions** pass.
 
 ---
 
+## Improvement #14 — Enforced TypeScript Type-Checking in the Production Build
+
+**Date:** 2026-05-30
+**Commit:** TBD
+
+**Files changed:**
+- `services/web/next.config.ts` — removed `typescript.ignoreBuildErrors` and the (now-invalid) `eslint.ignoreDuringBuilds` flags
+- `services/web/src/tests/stores/cart.store.test.ts`, `src/tests/stores/auth.store.test.ts` — fixed the latent type errors that surfaced
+- `services/web/package.json` — added a `typecheck` script (`tsc --noEmit`)
+
+### What was wrong
+
+The Next.js build was configured to **silently ignore all TypeScript and ESLint errors**:
+
+```ts
+const nextConfig: NextConfig = {
+  typescript: { ignoreBuildErrors: true },   // ship even with type errors
+  eslint:     { ignoreDuringBuilds: true },  // ship even with lint errors
+  ...
+}
+```
+
+This made the project's `strict: true` tsconfig purely advisory — nothing failed the build, so type errors shipped to production. This is exactly how improvement #13's admin-redirect bug (`res.data.data.id`, a genuine type error) reached production undetected. A full `tsc --noEmit` revealed **5 latent type errors** hiding behind the flag.
+
+A subtlety specific to this Next.js 16 codebase (its `AGENTS.md` warns it diverges from standard Next): the `eslint` config key was **removed from `NextConfig`** in Next 16 — `next build` no longer runs ESLint at all. So `eslint: { ignoreDuringBuilds: true }` was itself an invalid property, and would have become a build-breaking type error the moment type-checking was switched on. Confirmed by reading the bundled `node_modules/next/dist/docs` rather than assuming standard behaviour.
+
+### What was fixed
+
+Removed both flags so `next build` type-checks the whole project (tsconfig includes `**/*.ts(x)`, i.e. tests too) and fails on any error, then fixed the 5 surfaced errors — all in test fixtures that had drifted from the production types:
+
+- `StorefrontProduct` fixtures missing the required `view_count` field
+- a `Store` fixture typing `name` as `string` instead of `MultiLang`
+- an unguarded access on the now-nullable `images` field
+
+Verified by reproducing the exact Docker build (`next build` with the production `NEXT_PUBLIC_*` env): it now runs the TypeScript step and **compiles successfully**, and the 48 frontend unit tests still pass.
+
+**ESLint follow-up (tracked):** because Next 16 decouples ESLint from `next build`, lint is run separately via `npm run lint`, which currently reports 26 errors (10 `react-hooks/set-state-in-effect`, 6 `no-explicit-any`, plus `static-components`/`rules-of-hooks`/unescaped-entities). Several are behaviour-sensitive React-hooks refactors, so wiring a blocking lint gate is deferred to a dedicated cleanup pass rather than bundled here.
+
+### CV-ready bullets
+
+- **Restored compile-time type safety to a production Next.js/TypeScript build** by removing a `ignoreBuildErrors` escape hatch that silently shipped type errors — the same class of bug that had reached production (a mis-typed API-envelope access causing a broken admin redirect). Fixed the latent type errors the change surfaced and verified a clean Docker production build.
+
+- **Investigated framework-specific build behaviour from first-party docs** rather than assumptions: determined that Next.js 16 removed the `eslint` build-config key and no longer runs ESLint during `next build`, then reproduced the exact containerized build to prove the type-check gate passes before shipping — avoiding a broken deploy pipeline.
+
+- **Added a dedicated `typecheck` script** and documented the remaining ESLint debt (26 violations, categorized) as a tracked follow-up, turning an all-or-nothing "ignore everything" config into an enforced type gate plus a concrete lint-cleanup plan.
+
+---
+
 ## Improvements Log
 
 | # | Title | Commit |
@@ -938,5 +986,6 @@ Full suite: **235 tests / 683 assertions** pass.
 | 11 | Backend security hardening (rate limiting, token expiry, password policy, timing-safe webhooks) | `e8e7ac1` |
 | 12 | Database indexing & sargable date queries | `29386f5` |
 | 13 | Fixed three live production bugs (admin redirect, rating aggregate, store-stats SQL) | `6b7aa0c` |
+| 14 | Enforced TypeScript type-checking in the production build | TBD |
 
-_Full test suite: 235 tests / 683 assertions passing._
+_Backend suite: 235 tests / 683 assertions. Frontend: 48 unit tests. `tsc --noEmit` clean._

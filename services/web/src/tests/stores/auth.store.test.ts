@@ -68,7 +68,7 @@ describe('auth.store', () => {
   })
 
   it('login stores sellerStore when provided', () => {
-    const sellerStore = { id: 1, name: 'My Store', slug: 'my-store', status: 'active' } as Store
+    const sellerStore = { id: 1, name: { hy: 'My Store', en: 'My Store' }, slug: 'my-store', status: 'active' } as Store
     store.getState().login({ user: mockUser, token: 'tok-123', store: sellerStore })
     expect(store.getState().sellerStore?.slug).toBe('my-store')
   })

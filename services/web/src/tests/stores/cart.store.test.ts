@@ -35,7 +35,7 @@ function makeCart() {
               variantId:   variant?.id,
               price,
               quantity,
-              image:       product.images[0]?.thumbnail,
+              image:       product.images?.[0]?.thumbnail,
             },
           ],
         }
@@ -77,6 +77,7 @@ const mockProduct: StorefrontProduct = {
   is_featured:  false,
   stock:        10,
   manage_stock: true,
+  view_count:   0,
   images:       [{ uuid: 'img-1', thumbnail: '/thumb.jpg', medium: '/med.jpg', original: '/orig.jpg', large: '/large.jpg' }],
 }
 
@@ -89,6 +90,7 @@ const mockProduct2: StorefrontProduct = {
   is_featured:  false,
   stock:        5,
   manage_stock: true,
+  view_count:   0,
   images:       [],
 }
 
