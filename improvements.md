@@ -969,6 +969,50 @@ Verified by reproducing the exact Docker build (`next build` with the production
 
 ---
 
+## Improvement #15 — Structured Data (JSON-LD) & SEO Metadata for Storefronts
+
+**Date:** 2026-05-30
+**Commit:** TBD
+
+**Files changed:**
+- `services/web/src/components/seo/JsonLd.tsx` — new reusable server-rendered JSON-LD component
+- `services/web/src/app/(store)/store/[slug]/products/[productSlug]/page.tsx` — `Product` + `BreadcrumbList` JSON-LD, canonical, Twitter card
+- `services/web/src/app/(store)/store/[slug]/page.tsx` — `OnlineStore` JSON-LD, canonical, Twitter card
+- `services/web/src/app/layout.tsx` — `metadataBase`
+
+### What was wrong
+
+An audit of the storefront found **zero structured data** (`grep` for `schema.org` / `ld+json` returned nothing) on a public e-commerce site that already had every field Google needs for rich results — price, stock, and an (accurate, post-#13) review aggregate. Google could not surface price, availability, or star ratings in search results. Metadata was also incomplete: no `metadataBase` (so relative OG/canonical URLs resolved unreliably and Next emitted a warning), no canonical tags, and no Twitter Card markup.
+
+### What was fixed
+
+Added server-rendered JSON-LD (read by crawlers from the initial HTML) via a small reusable component:
+
+```tsx
+export function JsonLd({ data }: { data: Record<string, unknown> }) {
+  return <script type="application/ld+json"
+    dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }} />
+}
+```
+
+- **Product detail page** now emits a `Product` schema with an `Offer` (price, `priceCurrency: AMD`, `InStock`/`OutOfStock` from the real stock state) and an `AggregateRating` (built from the accurate all-reviews aggregate fixed in #13) — plus a `BreadcrumbList` (store → product).
+- **Store home page** emits an `OnlineStore` schema (name, url, logo, contact).
+- Both pages gained `alternates.canonical`, an enriched `openGraph`, and a `summary_large_image` Twitter card; the root layout sets `metadataBase` so all relative metadata URLs resolve to absolute ones and the build warning is gone.
+
+JSON-LD is suppressed in template-preview mode (`?preview=true`) so editor previews don't inject duplicate markup. Verified type-clean (`tsc --noEmit`) and via a full containerized `next build` — required now that #14 makes the build fail on type errors.
+
+> Note: `hreflang`/language alternates were intentionally deferred — emitting `hy`/`en` alternates would be misleading until the storefront UI is genuinely bilingual (tracked separately).
+
+### CV-ready bullets
+
+- **Added schema.org structured data (JSON-LD) across an e-commerce storefront** — `Product` + `Offer` + `AggregateRating`, `BreadcrumbList`, and `OnlineStore` schemas — making products eligible for Google rich results (price, availability, and star ratings in the SERP) on a site that previously emitted none.
+
+- **Implemented the structured data as server-rendered output** so it is present in the initial HTML for crawlers, deriving `InStock`/`OutOfStock` from real inventory state and the rating from a corrected all-reviews aggregate, with markup suppressed in editor-preview mode to avoid duplicates.
+
+- **Completed the page-level SEO metadata** by adding `metadataBase`, canonical URLs, enriched Open Graph, and Twitter Card tags via the Next.js Metadata API — eliminating a build-time warning and fixing unreliable relative-URL resolution for social/search previews.
+
+---
+
 ## Improvements Log
 
 | # | Title | Commit |
@@ -987,5 +1031,6 @@ Verified by reproducing the exact Docker build (`next build` with the production
 | 12 | Database indexing & sargable date queries | `29386f5` |
 | 13 | Fixed three live production bugs (admin redirect, rating aggregate, store-stats SQL) | `6b7aa0c` |
 | 14 | Enforced TypeScript type-checking in the production build | `734b775` |
+| 15 | Structured data (JSON-LD) & SEO metadata for storefronts | TBD |
 
-_Backend suite: 235 tests / 683 assertions. Frontend: 48 unit tests. `tsc --noEmit` clean._
+_Backend suite: 235 tests / 683 assertions. Frontend: 48 unit tests. `tsc --noEmit` clean; production `next build` verified._
