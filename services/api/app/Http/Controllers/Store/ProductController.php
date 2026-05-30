@@ -80,6 +80,11 @@ class ProductController extends Controller
                 'reviews'  => fn($q) => $q->where('is_approved', true)->latest()->limit(50),
             ]);
 
+            // Aggregate over ALL approved reviews — the loaded relation is capped
+            // at 50 for display, so deriving the rating from it would be wrong.
+            $product->loadCount(['reviews as rating_count' => fn($q) => $q->where('is_approved', true)]);
+            $product->loadAvg(['reviews as rating_avg' => fn($q) => $q->where('is_approved', true)], 'rating');
+
             $data = (new PublicProductDetailResource($product))->resolve();
             unset($data['view_count']);
 

@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Eloquent;
 
+use App\Enums\OrderStatus;
 use App\Models\Order;
 use App\Repositories\Contracts\OrderRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -153,5 +154,29 @@ class OrderRepository implements OrderRepositoryInterface
             ->map(fn($row) => ['status' => $row->status->value, 'count' => (int) $row->count])
             ->values()
             ->all();
+    }
+
+    public function statusBreakdownByStore(int $storeId): array
+    {
+        $base = Order::where('store_id', $storeId);
+
+        return [
+            'total'      => (clone $base)->count(),
+            'pending'    => (clone $base)->where('status', OrderStatus::Pending)->count(),
+            'processing' => (clone $base)->where('status', OrderStatus::Processing)->count(),
+            'shipped'    => (clone $base)->where('status', OrderStatus::Shipped)->count(),
+            'today'      => (clone $base)->whereBetween('created_at', [today(), today()->endOfDay()])->count(),
+        ];
+    }
+
+    public function revenueSummaryByStore(int $storeId): array
+    {
+        $base = Order::where('store_id', $storeId);
+
+        return [
+            'total'      => (float) (clone $base)->sum('total'),
+            'this_month' => (float) (clone $base)->whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()])->sum('total'),
+            'today'      => (float) (clone $base)->whereBetween('created_at', [today(), today()->endOfDay()])->sum('total'),
+        ];
     }
 }

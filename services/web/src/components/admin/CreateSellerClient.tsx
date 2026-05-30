@@ -9,6 +9,7 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/Button'
 import api from '@/lib/api'
 import { cn } from '@/lib/utils'
+import type { AdminSeller } from '@/types'
 
 export default function CreateSellerClient() {
   const router = useRouter()
@@ -28,17 +29,17 @@ export default function CreateSellerClient() {
     if (!email.trim()) e.email = 'Required'
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) e.email = 'Invalid email'
     if (!password) e.password = 'Required'
-    else if (password.length < 8) e.password = 'At least 8 characters'
+    else if (password.length < 10) e.password = 'At least 10 characters'
     setErrors(e)
     return Object.keys(e).length === 0
   }
 
   const mutation = useMutation({
     mutationFn: () =>
-      api.post('/admin/sellers', { name, email, phone: phone || undefined, password, status, locale }),
+      api.post<AdminSeller>('/admin/sellers', { name, email, phone: phone || undefined, password, status, locale }),
     onSuccess: (res) => {
       toast.success('Seller created')
-      router.push(`/admin/sellers/${res.data.data.id}`)
+      router.push(`/admin/sellers/${res.data.id}`)
     },
     onError: (err: any) => {
       const data = err?.response?.data
@@ -122,7 +123,7 @@ export default function CreateSellerClient() {
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Min. 8 characters"
+                  placeholder="Min. 10 chars, mixed case, number & symbol"
                   className={cn(inputCls(errors.password), 'pr-10')}
                 />
                 <button

@@ -207,4 +207,35 @@ class ProductReviewTest extends TestCase
         $this->assertCount(1, $response->json('data.reviews'));
         $this->assertEquals(1, $response->json('data.rating_count'));
     }
+
+    public function test_rating_aggregate_counts_all_approved_reviews_beyond_display_cap(): void
+    {
+        // 60 approved reviews — more than the 50-row display cap.
+        ProductReview::factory()->approved()->count(55)->create([
+            'store_id'   => $this->store->id,
+            'product_id' => $this->product->id,
+            'rating'     => 4,
+        ]);
+        ProductReview::factory()->approved()->count(5)->create([
+            'store_id'   => $this->store->id,
+            'product_id' => $this->product->id,
+            'rating'     => 5,
+        ]);
+        // Unapproved reviews must not affect the aggregate.
+        ProductReview::factory()->count(3)->create([
+            'store_id'   => $this->store->id,
+            'product_id' => $this->product->id,
+            'rating'     => 1,
+        ]);
+
+        $response = $this->getJson(
+            "/api/v1/store/{$this->store->slug}/products/{$this->product->slug}"
+        )->assertOk();
+
+        // Display list is capped at 50, but the aggregate spans all 60 approved.
+        $this->assertCount(50, $response->json('data.reviews'));
+        $this->assertEquals(60, $response->json('data.rating_count'));
+        // (55*4 + 5*5) / 60 = 4.08 -> rounded to 4.1
+        $this->assertEquals(4.1, $response->json('data.rating_avg'));
+    }
 }

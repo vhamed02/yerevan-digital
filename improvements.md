@@ -860,6 +860,67 @@ The conversions are behavior-identical (full-day inclusive bounds) and remain SQ
 
 ---
 
+## Improvement #13 — Fixed Three Live Production Bugs (Surfaced by Audit)
+
+**Date:** 2026-05-30
+**Commit:** TBD
+
+**Files changed:**
+- `services/web/src/components/admin/CreateSellerClient.tsx` — fixed broken post-create redirect + typed the response
+- `services/api/app/Http/Controllers/Store/ProductController.php`, `app/Http/Resources/Store/PublicProductDetailResource.php` — accurate rating aggregates
+- `services/api/app/Http/Controllers/Seller/StoreController.php` + `OrderRepository`/`ProductRepository` (+ contracts) — moved store-stats SQL into the repository layer, fixing SQLite incompatibility
+- `services/api/tests/Feature/Store/ProductReviewTest.php`, `tests/Feature/Seller/StoreStatsTest.php` — regression tests for the two backend bugs
+
+A full-stack audit surfaced three real defects shipping in production. Each was fixed and locked behind a test.
+
+### Bug 1 — Admin "Create Seller" redirected to a 404 (`/admin/sellers/undefined`)
+
+The success handler read `res.data.data.id`, but the API's response interceptor already unwraps the `{ success, data }` envelope for non-paginated endpoints — so `res.data` **is** the seller object and `res.data.data` was `undefined`. After creating a seller, the admin was redirected to `/admin/sellers/undefined`. This is the exact double-envelope trap documented in the project's own conventions; it compiled and shipped only because the build suppresses TypeScript errors.
+
+```ts
+// Before — res.data.data is undefined → /admin/sellers/undefined
+router.push(`/admin/sellers/${res.data.data.id}`)
+// After — typed response, correct unwrap
+api.post<AdminSeller>('/admin/sellers', {...})
+router.push(`/admin/sellers/${res.data.id}`)
+```
+
+Typing the mutation (`api.post<AdminSeller>`) means the old `.data.data` access is now a compile-time error, preventing regressions. Confirmed clean under `tsc --noEmit`.
+
+### Bug 2 — Product rating was wrong for any product with more than 50 reviews
+
+The product-detail endpoint loaded reviews with `->limit(50)` (for display) and then derived `rating_avg` / `rating_count` **from that capped collection** — so `rating_count` silently maxed out at 50 and the average was biased toward the most recent 50 reviews.
+
+```php
+// Before — derived from a 50-row display collection (wrong past 50 reviews)
+'rating_count' => $this->reviews->count(),               // caps at 50
+'rating_avg'   => round($this->reviews->avg('rating'), 1) // biased
+
+// After — accurate aggregate over ALL approved reviews
+$product->loadCount(['reviews as rating_count' => fn($q) => $q->where('is_approved', true)]);
+$product->loadAvg(['reviews as rating_avg' => fn($q) => $q->where('is_approved', true)], 'rating');
+```
+
+The display list stays capped at 50; the rating is now a separate accurate aggregate. A regression test creates 60 approved reviews and asserts `reviews` returns 50 while `rating_count` is 60 and `rating_avg` is correct.
+
+### Bug 3 — Seller `store/stats` used MySQL-only SQL (untestable, fragile)
+
+`StoreController::stats()` held inline `DB::table()` queries using `CURDATE()`, `DATE()`, `MONTH()` and `YEAR()` — MySQL-only functions that crash under the SQLite-backed test suite (a documented project pitfall), leaving the endpoint untestable. This was the one stats block left behind when the dashboard stats were moved to repositories (improvement #7).
+
+Moved all three queries into database-agnostic repository methods (`Product::statusBreakdownByStore`, `Order::statusBreakdownByStore`, `Order::revenueSummaryByStore`) using Eloquent — which also applies the soft-delete global scope automatically instead of the manual `whereNull('deleted_at')` the raw queries needed. Four new tests cover the breakdown, revenue totals, and own-store scoping.
+
+Full suite: **235 tests / 683 assertions** pass.
+
+### CV-ready bullets
+
+- **Fixed a customer-facing data-integrity bug** in a production e-commerce API where product ratings were computed from a 50-row display slice rather than the full review set — causing review counts to cap at 50 and average ratings to skew on popular products. Replaced the in-PHP derivation with database-level `loadAvg`/`loadCount` aggregates scoped to approved reviews, and added a 60-review regression test.
+
+- **Eliminated a broken admin workflow** where creating a seller redirected to `/admin/sellers/undefined`: the client double-unwrapped an API envelope that the response interceptor had already flattened. Fixed the access and typed the request (`api.post<AdminSeller>`) so the mistake is now a compile-time error rather than a runtime 404.
+
+- **Completed a stalled repository-extraction refactor** by moving the last inline stats endpoint off MySQL-only SQL (`CURDATE()`, `MONTH()`, `YEAR()`) into database-agnostic Eloquent repository methods — making a previously untestable endpoint testable under the SQLite CI suite and restoring automatic soft-delete scoping.
+
+---
+
 ## Improvements Log
 
 | # | Title | Commit |
@@ -876,5 +937,6 @@ The conversions are behavior-identical (full-day inclusive bounds) and remain SQ
 | 10 | Extract `ProductController` image management into action classes | `cb9a8ba` |
 | 11 | Backend security hardening (rate limiting, token expiry, password policy, timing-safe webhooks) | `e8e7ac1` |
 | 12 | Database indexing & sargable date queries | `29386f5` |
+| 13 | Fixed three live production bugs (admin redirect, rating aggregate, store-stats SQL) | TBD |
 
-_Full test suite: 230 tests / 644 assertions passing._
+_Full test suite: 235 tests / 683 assertions passing._

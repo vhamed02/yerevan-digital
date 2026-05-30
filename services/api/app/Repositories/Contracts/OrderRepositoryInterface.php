@@ -41,4 +41,8 @@ interface OrderRepositoryInterface
     public function revenueChartByStore(int $storeId): array;
 
     public function ordersByStatusByStore(int $storeId): array;
+
+    public function statusBreakdownByStore(int $storeId): array;
+
+    public function revenueSummaryByStore(int $storeId): array;
 }

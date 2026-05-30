@@ -32,4 +32,6 @@ interface ProductRepositoryInterface
     public function maxPriceForStore(int $storeId): float;
 
     public function countStatsByStore(int $storeId): array;
+
+    public function statusBreakdownByStore(int $storeId): array;
 }

@@ -147,4 +147,16 @@ class ProductRepository implements ProductRepositoryInterface
             'active_products' => (clone $base)->where('status', ProductStatus::Active)->count(),
         ];
     }
+
+    public function statusBreakdownByStore(int $storeId): array
+    {
+        $base = Product::where('store_id', $storeId);
+
+        return [
+            'total'    => (clone $base)->count(),
+            'active'   => (clone $base)->where('status', ProductStatus::Active)->count(),
+            'draft'    => (clone $base)->where('status', ProductStatus::Draft)->count(),
+            'archived' => (clone $base)->where('status', ProductStatus::Archived)->count(),
+        ];
+    }
 }

@@ -54,12 +54,12 @@ class PublicProductDetailResource extends JsonResource
                 'slug' => $this->category->slug,
             ] : null),
             'view_count'        => (int) ($this->view_count ?? 0),
+            // Read from the loadAvg/loadCount aggregates (all approved reviews),
+            // not from the display collection which is capped at 50.
             'rating_avg'        => $this->whenLoaded('reviews', fn() =>
-                $this->reviews->isNotEmpty()
-                    ? round($this->reviews->avg('rating'), 1)
-                    : null
+                $this->rating_avg !== null ? round((float) $this->rating_avg, 1) : null
             ),
-            'rating_count'      => $this->whenLoaded('reviews', fn() => $this->reviews->count()),
+            'rating_count'      => $this->whenLoaded('reviews', fn() => (int) ($this->rating_count ?? 0)),
             'reviews'           => $this->whenLoaded('reviews', fn() =>
                 $this->reviews->map(fn($r) => [
                     'id'            => $r->id,
