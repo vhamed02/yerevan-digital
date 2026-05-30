@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Search, ShoppingBag, Menu, X } from 'lucide-react'
-import { useLocale } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { useStoreCart } from '@/stores/cart.store'
 import { pickLang } from '@/lib/i18n'
 import { CartDrawer } from './CartDrawer'
@@ -17,6 +17,7 @@ export function StoreHeader({ store, categories, slug, isPreview }: StoreHeaderP
   useEffect(() => { setMounted(true) }, [])
   const { getItemCount } = useStoreCart(slug)
   const locale = useLocale()
+  const t = useTranslations('storefront')
   const cartCount = mounted ? getItemCount() : 0
   const name = pickLang(store.name, locale)
 
@@ -51,7 +52,7 @@ export function StoreHeader({ store, categories, slug, isPreview }: StoreHeaderP
               href={`/store/${slug}/products`}
               className="rounded-md px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900"
             >
-              Բոլոր ապրանքները
+              {t('allProducts')}
             </Link>
             {categories.slice(0, 5).map((cat) => (
               <Link
@@ -102,7 +103,7 @@ export function StoreHeader({ store, categories, slug, isPreview }: StoreHeaderP
                 onClick={() => setMobileMenuOpen(false)}
                 className="rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
               >
-                Բոլոր ապրանքները
+                {t('allProducts')}
               </Link>
               {categories.map((cat) => (
                 <Link

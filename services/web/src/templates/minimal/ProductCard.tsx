@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { ShoppingBag, Check } from 'lucide-react'
-import { useLocale } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { useStoreCart } from '@/stores/cart.store'
 import { pickLang } from '@/lib/i18n'
 import type { ProductCardProps } from '../types'
@@ -13,6 +13,7 @@ export function ProductCard({ product, storeSlug, isPreview }: ProductCardProps)
   const [added, setAdded] = useState(false)
   const { addItem } = useStoreCart(storeSlug)
   const locale = useLocale()
+  const t = useTranslations('storefront')
   const name = pickLang(product.name, locale)
   const image = product.images?.[0]
 
@@ -51,11 +52,11 @@ export function ProductCard({ product, storeSlug, isPreview }: ProductCardProps)
             >
               {added ? (
                 <>
-                  <Check className="h-3.5 w-3.5" /> Ավելացվեց
+                  <Check className="h-3.5 w-3.5" /> {t('added')}
                 </>
               ) : (
                 <>
-                  <ShoppingBag className="h-3.5 w-3.5" /> Ավելացնել
+                  <ShoppingBag className="h-3.5 w-3.5" /> {t('add')}
                 </>
               )}
             </button>

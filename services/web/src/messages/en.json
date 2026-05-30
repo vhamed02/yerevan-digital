@@ -233,6 +233,8 @@
       "collection": "Collection",
       "mostLoved": "Most loved",
       "fullCollection": "The full collection",
+      "products": "Products",
+      "seeAll": "See all",
       "trust": {
         "freeShipping": "Free shipping",
         "securePayment": "Secure payment",

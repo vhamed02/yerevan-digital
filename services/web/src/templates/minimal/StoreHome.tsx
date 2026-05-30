@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { useLocale } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { ProductGrid } from './ProductGrid'
 import { pickLang } from '@/lib/i18n'
 import type { StoreHomeProps } from '../types'
@@ -16,6 +16,7 @@ export function StoreHome({
   isPreview,
 }: StoreHomeProps) {
   const locale = useLocale()
+  const t = useTranslations('storefront')
   const name = pickLang(store.name, locale)
 
   return (
@@ -77,12 +78,12 @@ export function StoreHome({
         {featuredProducts.length > 0 && (
           <section className="mb-10">
             <div className="mb-5 flex items-center justify-between">
-              <h2 className="text-lg font-bold text-gray-900">Ուշագրավ ապրանքներ</h2>
+              <h2 className="text-lg font-bold text-gray-900">{t('featuredProducts')}</h2>
               <Link
                 href={`/store/${slug}/products?featured=1`}
                 className="text-sm text-gray-500 hover:text-gray-700"
               >
-                Տեսնել բոլորը →
+                {t('home.seeAll')} →
               </Link>
             </div>
             <ProductGrid products={featuredProducts} storeSlug={slug} isPreview={isPreview} />
@@ -92,13 +93,13 @@ export function StoreHome({
         <section>
           <div className="mb-5 flex items-center justify-between">
             <h2 className="text-lg font-bold text-gray-900">
-              {featuredProducts.length > 0 ? 'Բոլոր ապրանքները' : 'Ապրանքներ'}
+              {featuredProducts.length > 0 ? t('allProducts') : t('home.products')}
             </h2>
             <Link
               href={`/store/${slug}/products`}
               className="text-sm text-gray-500 hover:text-gray-700"
             >
-              Տեսնել բոլորը →
+              {t('home.seeAll')} →
             </Link>
           </div>
           <ProductGrid products={products} storeSlug={slug} isPreview={isPreview} />

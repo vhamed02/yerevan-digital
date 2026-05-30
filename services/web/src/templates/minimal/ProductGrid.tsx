@@ -1,13 +1,15 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { ProductCard } from './ProductCard'
 import type { ProductGridProps } from '../types'
 
 export function ProductGrid({ products, storeSlug, isPreview }: ProductGridProps) {
+  const t = useTranslations('storefront')
   if (products.length === 0) {
     return (
       <div className="flex flex-col items-center gap-3 py-16 text-center text-gray-400">
-        <p className="text-lg">Ապրանք չի գտնվել</p>
+        <p className="text-lg">{t('noProductsFound')}</p>
       </div>
     )
   }
