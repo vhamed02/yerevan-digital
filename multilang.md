@@ -2,7 +2,7 @@
 
 > **Living document.** Kept up to date as work progresses. Each phase updates the
 > status table, the progress log, and any decisions that change.
-> Last updated: 2026-05-30 · Status: **Phase 2 complete; Phase 3 next**
+> Last updated: 2026-05-30 · Status: **Phase 3 in progress (3a done)**
 
 ---
 
@@ -53,7 +53,9 @@ so a third locale needs **no content migration**).
 | 1a | Foundation — `pickLang` helper, `MultiLang.ru`, routing/proxy/request/switcher +`ru`, `ru.json` (130 keys) | ✅ Done & live | `375ef0a` |
 | 1b | Locale-aware content display — converted customer-facing `name.hy \|\| en` sites to `pickLang` (20 files: spark+minimal+_shared templates, store pages, store metadata/JSON-LD, StoreCard/StoreFilters/StaticPageContent/OrderConfirmation) | ✅ Done & live | `b697d19` |
 | 2 | Backend Russian support (SetLocale, `users.locale` enum migration, 12 Form Requests, `in:` rule, locale-aware payment description) | ✅ Done & live | `4137cef` |
-| 3 | Russian content-entry forms (Product/Store/Page/Payments/Seller — 3rd language tab) | ⏳ Planned | — |
+| 3a | RU content-entry: **ProductForm** (3-lang name + lang-driven descriptions/SEO tabs) | ✅ Done | `TBD` |
+| 3b | RU content-entry: StoreSettings + StoreSetupWizard (store name/description/meta) | ⏳ Planned | — |
+| 3c | RU content-entry: admin Categories, PageEditor, Payments + CreateSeller locale picker | ⏳ Planned | — |
 | 4 | Translate customer-facing UI (storefront templates + customer store pages → catalog + `useTranslations`) | ⏳ Planned | — |
 | 5 | Trilingual transactional emails (7 notifications + 8 blade templates) | ⏳ Planned | — |
 | 6 | SEO (locale-aware JSON-LD/OG, `hreflang`) + full verify sweep | ⏳ Planned | — |
@@ -128,3 +130,9 @@ Legend: ✅ done & live · 🔧 in progress · ⏳ planned
   name is now locale-aware (locale→en→hy). Added SetLocale unit tests + a Russian
   product-authoring feature test. Full suite: 239 tests / 691 assertions. NEXT: Phase 3
   (Russian content-entry forms in the frontend).
+- **2026-05-30** — Phase 3a done: `ProductForm` now authors all three languages. Added a
+  🇷🇺 Russian Name input (3-col grid), refactored the Descriptions and SEO sections from a
+  binary `hy/en` ternary into a clean lang-driven render (tabs from `LANG_TABS`, inputs via
+  dynamic `register(\`field_${lang}\`)`, full-description + SEO-preview via per-lang maps).
+  Schema/defaults/FormData-submit all carry `*_ru` (RU optional). `tsc` clean; production
+  build passes. NEXT: 3b (store forms), then 3c (admin forms + CreateSeller locale picker).

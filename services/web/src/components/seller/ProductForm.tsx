@@ -24,10 +24,12 @@ import type { SellerProduct, SellerVariant, PublicCategory } from '@/types'
 const schema = z.object({
   name_hy: z.string().min(1, 'Required'),
   name_en: z.string().min(1, 'Required'),
+  name_ru: z.string(),
   slug: z.string().min(1).regex(/^[a-z0-9-]+$/, 'Only lowercase letters, numbers, hyphens'),
   category_id: z.string().min(1, 'Select a category'),
   description_short_hy: z.string().max(200),
   description_short_en: z.string().max(200),
+  description_short_ru: z.string().max(200),
   price: z.number().positive('Must be positive'),
   sku: z.string(),
   manage_stock: z.boolean(),
@@ -37,8 +39,10 @@ const schema = z.object({
   is_featured: z.boolean(),
   meta_title_hy: z.string(),
   meta_title_en: z.string(),
+  meta_title_ru: z.string(),
   meta_description_hy: z.string().max(160),
   meta_description_en: z.string().max(160),
+  meta_description_ru: z.string().max(160),
 })
 
 type FormData = z.infer<typeof schema>
@@ -48,8 +52,10 @@ interface ProductFormProps {
   categories: PublicCategory[]
 }
 
-const LANG_TABS = ['hy', 'en'] as const
+const LANG_TABS = ['hy', 'en', 'ru'] as const
 type Lang = (typeof LANG_TABS)[number]
+const LANG_LABELS: Record<Lang, string> = { hy: '🇦🇲 Armenian', en: '🇬🇧 English', ru: '🇷🇺 Russian' }
+const LANG_NAMES: Record<Lang, string> = { hy: 'Armenian', en: 'English', ru: 'Russian' }
 
 export default function ProductForm({ product, categories }: ProductFormProps) {
   const router = useRouter()
@@ -60,6 +66,7 @@ export default function ProductForm({ product, categories }: ProductFormProps) {
   const [seoLang, setSeoLang] = useState<Lang>('hy')
   const [descFullHy, setDescFullHy] = useState(product?.description_full?.hy ?? '')
   const [descFullEn, setDescFullEn] = useState(product?.description_full?.en ?? '')
+  const [descFullRu, setDescFullRu] = useState(product?.description_full?.ru ?? '')
   const [images, setImages] = useState<ProductImageItem[]>(
     product?.images?.map((img) => ({ id: img.uuid, url: img.medium })) ?? []
   )
@@ -81,10 +88,12 @@ export default function ProductForm({ product, categories }: ProductFormProps) {
     defaultValues: {
       name_hy: product?.name.hy ?? '',
       name_en: product?.name.en ?? '',
+      name_ru: product?.name.ru ?? '',
       slug: product?.slug ?? '',
       category_id: product?.category ? String(product.category.id) : '',
       description_short_hy: product?.description_short?.hy ?? '',
       description_short_en: product?.description_short?.en ?? '',
+      description_short_ru: product?.description_short?.ru ?? '',
       price: product?.price ?? 0,
       sku: product?.sku ?? '',
       manage_stock: product?.manage_stock ?? false,
@@ -94,8 +103,10 @@ export default function ProductForm({ product, categories }: ProductFormProps) {
       is_featured: product?.is_featured ?? false,
       meta_title_hy: product?.meta_title?.hy ?? '',
       meta_title_en: product?.meta_title?.en ?? '',
+      meta_title_ru: product?.meta_title?.ru ?? '',
       meta_description_hy: product?.meta_description?.hy ?? '',
       meta_description_en: product?.meta_description?.en ?? '',
+      meta_description_ru: product?.meta_description?.ru ?? '',
     },
   })
 
@@ -105,8 +116,15 @@ export default function ProductForm({ product, categories }: ProductFormProps) {
   const price = watch('price')
   const metaTitleHy = watch('meta_title_hy')
   const metaTitleEn = watch('meta_title_en')
+  const metaTitleRu = watch('meta_title_ru')
   const metaDescHy = watch('meta_description_hy')
   const metaDescEn = watch('meta_description_en')
+  const metaDescRu = watch('meta_description_ru')
+
+  const descFullByLang: Record<Lang, string> = { hy: descFullHy, en: descFullEn, ru: descFullRu }
+  const setDescFullByLang: Record<Lang, (v: string) => void> = { hy: setDescFullHy, en: setDescFullEn, ru: setDescFullRu }
+  const metaTitleByLang: Record<Lang, string> = { hy: metaTitleHy, en: metaTitleEn, ru: metaTitleRu }
+  const metaDescByLang: Record<Lang, string> = { hy: metaDescHy, en: metaDescEn, ru: metaDescRu }
 
   useEffect(() => {
     if (!isEdit && nameEn) {
@@ -143,6 +161,7 @@ export default function ProductForm({ product, categories }: ProductFormProps) {
       const formData = new FormData()
       formData.append('name[hy]', data.name_hy)
       formData.append('name[en]', data.name_en)
+      if (data.name_ru) formData.append('name[ru]', data.name_ru)
       formData.append('slug', data.slug)
       formData.append('category_id', data.category_id)
       formData.append('price', String(data.price))
@@ -158,12 +177,16 @@ export default function ProductForm({ product, categories }: ProductFormProps) {
       if (costPrice) formData.append('cost_price', String(costPrice))
       if (data.description_short_hy) formData.append('description_short[hy]', data.description_short_hy)
       if (data.description_short_en) formData.append('description_short[en]', data.description_short_en)
+      if (data.description_short_ru) formData.append('description_short[ru]', data.description_short_ru)
       if (descFullHy) formData.append('description_full[hy]', descFullHy)
       if (descFullEn) formData.append('description_full[en]', descFullEn)
+      if (descFullRu) formData.append('description_full[ru]', descFullRu)
       if (data.meta_title_hy) formData.append('meta_title[hy]', data.meta_title_hy)
       if (data.meta_title_en) formData.append('meta_title[en]', data.meta_title_en)
+      if (data.meta_title_ru) formData.append('meta_title[ru]', data.meta_title_ru)
       if (data.meta_description_hy) formData.append('meta_description[hy]', data.meta_description_hy)
       if (data.meta_description_en) formData.append('meta_description[en]', data.meta_description_en)
+      if (data.meta_description_ru) formData.append('meta_description[ru]', data.meta_description_ru)
       if (variants.length > 0) {
         formData.append('variants', JSON.stringify(variants))
       }
@@ -224,7 +247,7 @@ export default function ProductForm({ product, categories }: ProductFormProps) {
           <section className="rounded-xl border border-border bg-surface p-5">
             <h2 className="mb-4 text-sm font-semibold text-content-primary">Basic Info</h2>
             <div className="flex flex-col gap-4">
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                 <Input
                   label="🇦🇲 Armenian Name"
                   {...register('name_hy')}
@@ -234,6 +257,11 @@ export default function ProductForm({ product, categories }: ProductFormProps) {
                   label="🇬🇧 English Name"
                   {...register('name_en')}
                   error={errors.name_en?.message}
+                />
+                <Input
+                  label="🇷🇺 Russian Name"
+                  {...register('name_ru')}
+                  error={errors.name_ru?.message}
                 />
               </div>
               <Input
@@ -274,47 +302,29 @@ export default function ProductForm({ product, categories }: ProductFormProps) {
                       : 'border-transparent text-content-muted hover:text-content-primary'
                   }`}
                 >
-                  {lang === 'hy' ? '🇦🇲 Armenian' : '🇬🇧 English'}
+                  {LANG_LABELS[lang]}
                 </button>
               ))}
             </div>
-            {descLang === 'hy' ? (
-              <div className="flex flex-col gap-3">
-                <Textarea
-                  label="Short Description"
-                  {...register('description_short_hy')}
-                  maxLength={200}
-                  showCounter
-                  rows={2}
+            <div className="flex flex-col gap-3">
+              <Textarea
+                key={`short-${descLang}`}
+                label="Short Description"
+                {...register(`description_short_${descLang}`)}
+                maxLength={200}
+                showCounter
+                rows={2}
+              />
+              <div className="flex flex-col gap-1.5">
+                <label className="text-sm font-medium text-content-primary">Full Description</label>
+                <RichTextEditor
+                  key={`full-${descLang}`}
+                  value={descFullByLang[descLang]}
+                  onChange={setDescFullByLang[descLang]}
+                  placeholder={`Write full description in ${LANG_NAMES[descLang]}…`}
                 />
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-sm font-medium text-content-primary">Full Description</label>
-                  <RichTextEditor
-                    value={descFullHy}
-                    onChange={setDescFullHy}
-                    placeholder="Write full description in Armenian…"
-                  />
-                </div>
               </div>
-            ) : (
-              <div className="flex flex-col gap-3">
-                <Textarea
-                  label="Short Description"
-                  {...register('description_short_en')}
-                  maxLength={200}
-                  showCounter
-                  rows={2}
-                />
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-sm font-medium text-content-primary">Full Description</label>
-                  <RichTextEditor
-                    value={descFullEn}
-                    onChange={setDescFullEn}
-                    placeholder="Write full description in English…"
-                  />
-                </div>
-              </div>
-            )}
+            </div>
           </section>
 
           <section className="rounded-xl border border-border bg-surface p-5">
@@ -420,39 +430,25 @@ export default function ProductForm({ product, categories }: ProductFormProps) {
                       : 'border-transparent text-content-muted hover:text-content-primary'
                   }`}
                 >
-                  {lang === 'hy' ? '🇦🇲 Armenian' : '🇬🇧 English'}
+                  {LANG_LABELS[lang]}
                 </button>
               ))}
             </div>
             <div className="flex flex-col gap-3">
-              {seoLang === 'hy' ? (
-                <>
-                  <Input label="Meta Title" {...register('meta_title_hy')} />
-                  <Textarea
-                    label="Meta Description"
-                    {...register('meta_description_hy')}
-                    maxLength={160}
-                    showCounter
-                    rows={3}
-                  />
-                </>
-              ) : (
-                <>
-                  <Input label="Meta Title" {...register('meta_title_en')} />
-                  <Textarea
-                    label="Meta Description"
-                    {...register('meta_description_en')}
-                    maxLength={160}
-                    showCounter
-                    rows={3}
-                  />
-                </>
-              )}
+              <Input key={`mt-${seoLang}`} label="Meta Title" {...register(`meta_title_${seoLang}`)} />
+              <Textarea
+                key={`md-${seoLang}`}
+                label="Meta Description"
+                {...register(`meta_description_${seoLang}`)}
+                maxLength={160}
+                showCounter
+                rows={3}
+              />
               <SeoPreview
                 slug={slug}
                 storeSlug={sellerStore?.slug}
-                title={seoLang === 'hy' ? metaTitleHy : metaTitleEn}
-                description={seoLang === 'hy' ? metaDescHy : metaDescEn}
+                title={metaTitleByLang[seoLang]}
+                description={metaDescByLang[seoLang]}
               />
             </div>
           </section>
