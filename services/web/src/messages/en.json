@@ -220,6 +220,32 @@
       "emailInvalid": "Invalid email",
       "required": "Required",
       "selectPaymentError": "Select a payment method"
+    },
+    "home": {
+      "all": "All",
+      "buyNow": "Buy now",
+      "viewAll": "View all",
+      "featured": "Featured",
+      "featuredProduct": "Featured product",
+      "seeFullCollection": "See the full collection",
+      "whatLookingFor": "What are you looking for?",
+      "selection": "Selection",
+      "collection": "Collection",
+      "mostLoved": "Most loved",
+      "fullCollection": "The full collection",
+      "trust": {
+        "freeShipping": "Free shipping",
+        "securePayment": "Secure payment",
+        "easyReturns": "Easy returns",
+        "support": "24/7 support"
+      },
+      "marquee": {
+        "qualityProducts": "Quality products",
+        "fastDelivery": "Fast delivery",
+        "loyalCustomers": "Loyal customers",
+        "secureShopping": "Secure shopping",
+        "dailyNew": "New products daily"
+      }
     }
   }
 }

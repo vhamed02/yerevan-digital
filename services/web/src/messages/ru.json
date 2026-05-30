@@ -220,6 +220,32 @@
       "emailInvalid": "Неверный эл. адрес",
       "required": "Обязательно",
       "selectPaymentError": "Выберите способ оплаты"
+    },
+    "home": {
+      "all": "Все",
+      "buyNow": "Купить сейчас",
+      "viewAll": "Все",
+      "featured": "Рекомендуемое",
+      "featuredProduct": "Рекомендуемый товар",
+      "seeFullCollection": "Смотреть всю коллекцию",
+      "whatLookingFor": "Что вы ищете?",
+      "selection": "Подборка",
+      "collection": "Коллекция",
+      "mostLoved": "Самые любимые товары",
+      "fullCollection": "Вся коллекция",
+      "trust": {
+        "freeShipping": "Бесплатная доставка",
+        "securePayment": "Безопасная оплата",
+        "easyReturns": "Лёгкий возврат",
+        "support": "Поддержка 24/7"
+      },
+      "marquee": {
+        "qualityProducts": "Качественные товары",
+        "fastDelivery": "Быстрая доставка",
+        "loyalCustomers": "Постоянные клиенты",
+        "secureShopping": "Безопасные покупки",
+        "dailyNew": "Новые товары каждый день"
+      }
     }
   }
 }

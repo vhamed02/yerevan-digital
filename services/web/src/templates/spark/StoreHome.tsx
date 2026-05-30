@@ -8,37 +8,38 @@ import {
   ShieldCheck, RefreshCw, Truck, HeadphonesIcon,
   Sparkles, Star,
 } from 'lucide-react'
-import { useLocale } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { ProductCard } from './ProductCard'
 import { ProductGrid } from './ProductGrid'
 import { pickLang } from '@/lib/i18n'
 import type { StoreHomeProps, StorefrontProduct, PublicCategory } from '../types'
 
 const TRUST_ITEMS = [
-  { icon: Truck,           label: 'Անվճար առաքում' },
-  { icon: ShieldCheck,     label: 'Անվտանգ վճարում' },
-  { icon: RefreshCw,       label: 'Հեշտ վերադարձ' },
-  { icon: HeadphonesIcon,  label: '24/7 աջակցություն' },
+  { icon: Truck,           key: 'home.trust.freeShipping' },
+  { icon: ShieldCheck,     key: 'home.trust.securePayment' },
+  { icon: RefreshCw,       key: 'home.trust.easyReturns' },
+  { icon: HeadphonesIcon,  key: 'home.trust.support' },
 ]
 
 const MARQUEE_ITEMS = [
-  { icon: Sparkles, text: 'Բարձրորակ ապրանքներ' },
-  { icon: Truck,    text: 'Արագ առաքում' },
-  { icon: Star,     text: 'Հավատարիմ հաճախորդներ' },
-  { icon: ShieldCheck, text: 'Անվտանգ գնումներ' },
-  { icon: RefreshCw,   text: 'Հեշտ վերադարձ' },
-  { icon: Sparkles, text: 'Ամենօրյա նոր ապրանքներ' },
+  { icon: Sparkles, key: 'home.marquee.qualityProducts' },
+  { icon: Truck,    key: 'home.marquee.fastDelivery' },
+  { icon: Star,     key: 'home.marquee.loyalCustomers' },
+  { icon: ShieldCheck, key: 'home.marquee.secureShopping' },
+  { icon: RefreshCw,   key: 'home.trust.easyReturns' },
+  { icon: Sparkles, key: 'home.marquee.dailyNew' },
 ]
 
 function Marquee() {
+  const t = useTranslations('storefront')
   const doubled = [...MARQUEE_ITEMS, ...MARQUEE_ITEMS]
   return (
     <div className="overflow-hidden border-y border-gray-100 py-3.5" style={{ backgroundColor: '#fafafa' }}>
       <div className="flex w-max animate-marquee gap-0">
-        {doubled.map(({ icon: Icon, text }, i) => (
+        {doubled.map(({ icon: Icon, key }, i) => (
           <span key={i} className="flex flex-shrink-0 items-center gap-2 px-8 text-sm font-medium text-gray-500">
             <Icon className="h-3.5 w-3.5 flex-shrink-0" style={{ color: 'var(--accent)' }} />
-            {text}
+            {t(key)}
             <span className="ml-6 text-gray-200">—</span>
           </span>
         ))}
@@ -85,6 +86,7 @@ function FeaturedSlider({ products, storeSlug, isPreview }: { products: Storefro
 
 function CategoryCards({ categories, slug }: { categories: PublicCategory[]; slug: string }) {
   const locale = useLocale()
+  const t = useTranslations('storefront')
   const PALETTES = [
     'from-violet-500 to-indigo-600',
     'from-rose-400 to-pink-600',
@@ -102,7 +104,7 @@ function CategoryCards({ categories, slug }: { categories: PublicCategory[]; slu
       >
         <div className="pointer-events-none absolute inset-0 opacity-[0.08]"
           style={{ backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)', backgroundSize: '16px 16px' }} />
-        <span className="relative text-sm font-bold text-white drop-shadow">Բոլոր</span>
+        <span className="relative text-sm font-bold text-white drop-shadow">{t('home.all')}</span>
       </Link>
       {categories.slice(0, 7).map((cat, i) => (
         <Link
@@ -122,6 +124,7 @@ function CategoryCards({ categories, slug }: { categories: PublicCategory[]; slu
 
 function FeaturedSpotlight({ product, storeSlug, isPreview }: { product: StorefrontProduct; storeSlug: string; isPreview?: boolean }) {
   const locale = useLocale()
+  const t = useTranslations('storefront')
   const name = pickLang(product.name, locale)
   const image = product.images?.[0]
   const isOnSale = product.compare_price && product.compare_price > product.price
@@ -150,7 +153,7 @@ function FeaturedSpotlight({ product, storeSlug, isPreview }: { product: Storefr
         <div className="flex flex-col justify-center gap-5 bg-white p-8 sm:p-10">
           <div>
             <p className="mb-2 text-[11px] font-semibold uppercase tracking-widest" style={{ color: 'var(--accent)' }}>
-              Ուշագրավ ապրանք
+              {t('home.featuredProduct')}
             </p>
             <h3 className="text-2xl font-black leading-tight text-gray-900 sm:text-3xl">{name}</h3>
             {product.description_short && (
@@ -169,7 +172,7 @@ function FeaturedSpotlight({ product, storeSlug, isPreview }: { product: Storefr
             className="inline-flex w-fit items-center gap-2 rounded-full px-6 py-3 text-sm font-bold text-white shadow-md shadow-black/10 transition-all group-hover:gap-3 group-hover:shadow-lg"
             style={{ backgroundColor: 'var(--accent)' }}
           >
-            Գնել հիմա <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+            {t('home.buyNow')} <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
           </div>
         </div>
       </div>
@@ -178,6 +181,7 @@ function FeaturedSpotlight({ product, storeSlug, isPreview }: { product: Storefr
 }
 
 function SectionHeading({ eyebrow, title, href }: { eyebrow?: string; title: string; href?: string }) {
+  const t = useTranslations('storefront')
   return (
     <div className="mb-8 flex items-end justify-between">
       <div>
@@ -193,7 +197,7 @@ function SectionHeading({ eyebrow, title, href }: { eyebrow?: string; title: str
           href={href}
           className="flex items-center gap-1.5 rounded-full border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-600 transition-all hover:border-[var(--accent)] hover:text-[var(--accent)]"
         >
-          Բոլորը <ArrowRight className="h-3.5 w-3.5" />
+          {t('home.viewAll')} <ArrowRight className="h-3.5 w-3.5" />
         </Link>
       )}
     </div>
@@ -202,6 +206,7 @@ function SectionHeading({ eyebrow, title, href }: { eyebrow?: string; title: str
 
 export function StoreHome({ store, featuredProducts, products, categories, slug, isPreview }: StoreHomeProps) {
   const locale = useLocale()
+  const t = useTranslations('storefront')
   const name = pickLang(store.name, locale)
   const description = pickLang(store.description, locale)
   const showFeaturedSlider = store.template_config.show_featured_slider !== false
@@ -234,14 +239,14 @@ export function StoreHome({ store, featuredProducts, products, categories, slug,
                   className="inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-sm font-bold text-white shadow-xl shadow-black/20 transition-all hover:scale-105 hover:shadow-2xl"
                   style={{ backgroundColor: 'var(--accent)' }}
                 >
-                  Տեսնել ամբողջ հավաքածուն <ArrowRight className="h-4 w-4" />
+                  {t('home.seeFullCollection')} <ArrowRight className="h-4 w-4" />
                 </Link>
                 {featuredProducts.length > 0 && (
                   <Link
                     href={`/store/${slug}/products?featured=1`}
                     className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-7 py-3.5 text-sm font-semibold text-white backdrop-blur-sm transition-all hover:bg-white/20"
                   >
-                    Ուշագրավ ↗
+                    {t('home.featured')} ↗
                   </Link>
                 )}
               </div>
@@ -256,7 +261,7 @@ export function StoreHome({ store, featuredProducts, products, categories, slug,
           <div className="pointer-events-none absolute inset-0 opacity-[0.06]"
             style={{ backgroundImage: 'radial-gradient(circle, white 1.5px, transparent 1.5px)', backgroundSize: '30px 30px' }} />
           <div className="relative mx-auto max-w-2xl px-6 animate-fade-up">
-            <p className="mb-4 text-[11px] font-bold uppercase tracking-[0.22em] text-white/60">Բացահայտե՛ք</p>
+            <p className="mb-4 text-[11px] font-bold uppercase tracking-[0.22em] text-white/60">{t('discover')}</p>
             <h1 className="text-6xl font-black leading-[1.02] text-white sm:text-8xl">{name}</h1>
             {description && <p className="mt-5 text-lg text-white/70">{description}</p>}
             <Link
@@ -264,7 +269,7 @@ export function StoreHome({ store, featuredProducts, products, categories, slug,
               className="mt-10 inline-flex items-center gap-2.5 rounded-full bg-white px-8 py-4 text-sm font-bold shadow-2xl shadow-black/20 transition-all hover:scale-105"
               style={{ color: 'var(--accent)' }}
             >
-              Գնել հիմա <ArrowRight className="h-4 w-4" />
+              {t('home.buyNow')} <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
         </div>
@@ -277,12 +282,12 @@ export function StoreHome({ store, featuredProducts, products, categories, slug,
       {showTrustStrip && (
         <div className="bg-white">
           <div className="mx-auto flex max-w-7xl items-center justify-around gap-2 overflow-x-auto px-4 py-4" style={{ scrollbarWidth: 'none' }}>
-            {TRUST_ITEMS.map(({ icon: Icon, label }) => (
-              <div key={label} className="flex flex-shrink-0 items-center gap-2.5 px-4">
+            {TRUST_ITEMS.map(({ icon: Icon, key }) => (
+              <div key={key} className="flex flex-shrink-0 items-center gap-2.5 px-4">
                 <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl" style={{ backgroundColor: 'color-mix(in srgb, var(--accent) 12%, white)' }}>
                   <Icon className="h-4 w-4" style={{ color: 'var(--accent)' }} />
                 </div>
-                <span className="whitespace-nowrap text-xs font-semibold text-gray-700">{label}</span>
+                <span className="whitespace-nowrap text-xs font-semibold text-gray-700">{t(key)}</span>
               </div>
             ))}
           </div>
@@ -294,7 +299,7 @@ export function StoreHome({ store, featuredProducts, products, categories, slug,
         {/* ─── Categories ─── */}
         {showCategoryBar && categories.length > 0 && (
           <section>
-            <SectionHeading eyebrow="Բաժիններ" title="Ի՞նչ եք փնտրում" href={`/store/${slug}/products`} />
+            <SectionHeading eyebrow={t('sections')} title={t('home.whatLookingFor')} href={`/store/${slug}/products`} />
             <CategoryCards categories={categories} slug={slug} />
           </section>
         )}
@@ -302,7 +307,7 @@ export function StoreHome({ store, featuredProducts, products, categories, slug,
         {/* ─── Featured spotlight (first featured product, editorial) ─── */}
         {showFeaturedSlider && spotlightProduct && (
           <section>
-            <SectionHeading eyebrow="Ընտրանի" title="Ուշագրավ ապրանք" />
+            <SectionHeading eyebrow={t('home.selection')} title={t('home.featuredProduct')} />
             <FeaturedSpotlight product={spotlightProduct} storeSlug={slug} isPreview={isPreview} />
           </section>
         )}
@@ -311,8 +316,8 @@ export function StoreHome({ store, featuredProducts, products, categories, slug,
         {showFeaturedSlider && sliderProducts.length > 0 && (
           <section>
             <SectionHeading
-              eyebrow="Հավաքածու"
-              title="Ամենասիրված ապրանքները"
+              eyebrow={t('home.collection')}
+              title={t('home.mostLoved')}
               href={`/store/${slug}/products?featured=1`}
             />
             <FeaturedSlider products={sliderProducts} storeSlug={slug} isPreview={isPreview} />
@@ -322,8 +327,8 @@ export function StoreHome({ store, featuredProducts, products, categories, slug,
         {/* ─── All products ─── */}
         <section>
           <SectionHeading
-            eyebrow={featuredProducts.length > 0 ? 'Ամբողջ հավաքածուն' : undefined}
-            title="Բոլոր ապրանքները"
+            eyebrow={featuredProducts.length > 0 ? t('home.fullCollection') : undefined}
+            title={t('allProducts')}
             href={`/store/${slug}/products`}
           />
           <ProductGrid products={products} storeSlug={slug} isPreview={isPreview} />

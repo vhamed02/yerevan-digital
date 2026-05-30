@@ -220,6 +220,32 @@
       "emailInvalid": "Անվավեր էլ. փոստ",
       "required": "Պարտադիր",
       "selectPaymentError": "Ընտրեք վճարի եղանակ"
+    },
+    "home": {
+      "all": "Բոլոր",
+      "buyNow": "Գնել հիմա",
+      "viewAll": "Բոլորը",
+      "featured": "Ուշագրավ",
+      "featuredProduct": "Ուշագրավ ապրանք",
+      "seeFullCollection": "Տեսնել ամբողջ հավաքածուն",
+      "whatLookingFor": "Ի՞նչ եք փնտրում",
+      "selection": "Ընտրանի",
+      "collection": "Հավաքածու",
+      "mostLoved": "Ամենասիրված ապրանքները",
+      "fullCollection": "Ամբողջ հավաքածուն",
+      "trust": {
+        "freeShipping": "Անվճար առաքում",
+        "securePayment": "Անվտանգ վճարում",
+        "easyReturns": "Հեշտ վերադարձ",
+        "support": "24/7 աջակցություն"
+      },
+      "marquee": {
+        "qualityProducts": "Բարձրորակ ապրանքներ",
+        "fastDelivery": "Արագ առաքում",
+        "loyalCustomers": "Հավատարիմ հաճախորդներ",
+        "secureShopping": "Անվտանգ գնումներ",
+        "dailyNew": "Ամենօրյա նոր ապրանքներ"
+      }
     }
   }
 }

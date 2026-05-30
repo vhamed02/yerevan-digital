@@ -58,7 +58,7 @@ so a third locale needs **no content migration**).
 | 3c | RU content-entry: admin Categories + PageEditor + CreateSeller locale picker (Payments deferred — see note) | ✅ Done & live | `d634dfd` |
 | 4a | UI strings: spark shell (ProductCard, ProductGrid, CartDrawer, StoreHeader, StoreFooter) → new `storefront` catalog namespace | ✅ Done & live | `189beb1` |
 | 4b | UI strings: spark CheckoutForm (incl. translated Zod validation via in-component schema) | ✅ Done & live | `2cf7ad8` |
-| 4b-home | UI strings: spark StoreHome (hero, trust/marquee, section headings) | ⏳ Planned | — |
+| 4b-home | UI strings: spark StoreHome (hero, trust/marquee, section headings) | ✅ Done | `TBD` |
 | 4c | UI strings: minimal template | ⏳ Planned | — |
 | 4d | UI strings: `_shared` (ProductDetail, CartDrawer) + customer store pages (products listing, checkout result, order confirmation, ReviewSection) | ⏳ Planned | — |
 | 5 | Trilingual transactional emails (7 notifications + 8 blade templates) | ⏳ Planned | — |
@@ -168,3 +168,9 @@ Legend: ✅ done & live · 🔧 in progress · ⏳ planned
   step indicators/order-summary/buttons. `tsc` clean; production build passes. Split out
   StoreHome (4b-home) for quality — it has module-level TRUST/MARQUEE consts + many section
   headings. NEXT: 4b-home, then 4c (minimal), 4d (`_shared` + store pages).
+- **2026-05-30** — Phase 4b-home done: added the `storefront.home` catalog (incl. `trust` +
+  `marquee` sub-objects, hy/en/ru, 209 keys total, full parity) and fully localized spark
+  StoreHome — module-level TRUST/MARQUEE consts changed to catalog keys (resolved via `t` in
+  the relevant components), CategoryCards/FeaturedSpotlight/SectionHeading/hero/section
+  headings all wired. The whole spark template is now trilingual. `tsc` clean; production
+  build passes. NEXT: 4c (minimal template), 4d (`_shared` + customer store pages).
