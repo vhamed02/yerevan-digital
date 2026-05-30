@@ -8,8 +8,10 @@ import {
   ShieldCheck, RefreshCw, Truck, HeadphonesIcon,
   Sparkles, Star,
 } from 'lucide-react'
+import { useLocale } from 'next-intl'
 import { ProductCard } from './ProductCard'
 import { ProductGrid } from './ProductGrid'
+import { pickLang } from '@/lib/i18n'
 import type { StoreHomeProps, StorefrontProduct, PublicCategory } from '../types'
 
 const TRUST_ITEMS = [
@@ -82,6 +84,7 @@ function FeaturedSlider({ products, storeSlug, isPreview }: { products: Storefro
 }
 
 function CategoryCards({ categories, slug }: { categories: PublicCategory[]; slug: string }) {
+  const locale = useLocale()
   const PALETTES = [
     'from-violet-500 to-indigo-600',
     'from-rose-400 to-pink-600',
@@ -109,7 +112,7 @@ function CategoryCards({ categories, slug }: { categories: PublicCategory[]; slu
         >
           <div className="pointer-events-none absolute inset-0 bg-black/10 opacity-0 transition-opacity group-hover:opacity-100" />
           <span className="relative text-sm font-bold text-white drop-shadow line-clamp-2">
-            {cat.name.hy || cat.name.en}
+            {pickLang(cat.name, locale)}
           </span>
         </Link>
       ))}
@@ -118,7 +121,8 @@ function CategoryCards({ categories, slug }: { categories: PublicCategory[]; slu
 }
 
 function FeaturedSpotlight({ product, storeSlug, isPreview }: { product: StorefrontProduct; storeSlug: string; isPreview?: boolean }) {
-  const name = product.name.hy || product.name.en
+  const locale = useLocale()
+  const name = pickLang(product.name, locale)
   const image = product.images?.[0]
   const isOnSale = product.compare_price && product.compare_price > product.price
   const savingsPct = isOnSale ? Math.round(((product.compare_price! - product.price) / product.compare_price!) * 100) : 0
@@ -151,7 +155,7 @@ function FeaturedSpotlight({ product, storeSlug, isPreview }: { product: Storefr
             <h3 className="text-2xl font-black leading-tight text-gray-900 sm:text-3xl">{name}</h3>
             {product.description_short && (
               <p className="mt-3 text-sm leading-relaxed text-gray-500 line-clamp-3">
-                {product.description_short.hy || product.description_short.en}
+                {pickLang(product.description_short, locale)}
               </p>
             )}
           </div>
@@ -197,8 +201,9 @@ function SectionHeading({ eyebrow, title, href }: { eyebrow?: string; title: str
 }
 
 export function StoreHome({ store, featuredProducts, products, categories, slug, isPreview }: StoreHomeProps) {
-  const name = store.name.hy || store.name.en
-  const description = store.description?.hy || store.description?.en
+  const locale = useLocale()
+  const name = pickLang(store.name, locale)
+  const description = pickLang(store.description, locale)
   const showFeaturedSlider = store.template_config.show_featured_slider !== false
   const showCategoryBar = store.template_config.show_categories_bar !== false
   const showTrustStrip = store.template_config.show_trust_strip !== false

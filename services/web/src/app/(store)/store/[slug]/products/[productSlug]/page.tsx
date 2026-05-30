@@ -2,8 +2,10 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { serverGet } from '@/lib/server-api'
 import { loadTemplate } from '@/lib/templates'
+import { getLocale } from 'next-intl/server'
 import { ViewRecorder } from '@/components/store/ViewRecorder'
 import { JsonLd } from '@/components/seo/JsonLd'
+import { pickLang } from '@/lib/i18n'
 import type { StorefrontStore, StorefrontProduct } from '@/types'
 
 export const dynamic = 'force-dynamic'
@@ -16,15 +18,16 @@ export async function generateMetadata({
   params: Promise<{ slug: string; productSlug: string }>
 }): Promise<Metadata> {
   const { slug, productSlug } = await params
+  const locale = await getLocale()
   const product = await serverGet<StorefrontProduct>(
     `/store/${slug}/products/${productSlug}`
   )
   if (!product) return {}
-  const name = product.name.hy || product.name.en
-  const description = product.meta_description?.hy ?? product.description_short?.hy
+  const name = pickLang(product.name, locale)
+  const description = pickLang(product.meta_description, locale) || pickLang(product.description_short, locale) || undefined
   const image = product.images?.[0]?.large
   return {
-    title: product.meta_title?.hy ?? `${name} | Vendora`,
+    title: pickLang(product.meta_title, locale) || `${name} | Vendora`,
     description,
     alternates: { canonical: `/store/${slug}/products/${productSlug}` },
     openGraph: {
@@ -45,13 +48,14 @@ export async function generateMetadata({
 
 function buildProductJsonLd(
   product: StorefrontProduct,
-  slug: string
+  slug: string,
+  locale: string
 ): Record<string, unknown> {
-  const name = product.name.hy || product.name.en
+  const name = pickLang(product.name, locale)
   const url = `${BASE_URL}/store/${slug}/products/${product.slug}`
   const inStock = !product.manage_stock || product.stock > 0
   const images = (product.images ?? []).map((img) => img.large)
-  const description = product.description_short?.hy || product.description_short?.en
+  const description = pickLang(product.description_short, locale)
 
   return {
     '@context': 'https://schema.org',
@@ -60,7 +64,7 @@ function buildProductJsonLd(
     ...(description ? { description } : {}),
     ...(images.length ? { image: images } : {}),
     ...(product.category
-      ? { category: product.category.name.hy || product.category.name.en }
+      ? { category: pickLang(product.category.name, locale) }
       : {}),
     offers: {
       '@type': 'Offer',
@@ -86,7 +90,8 @@ function buildProductJsonLd(
 function buildBreadcrumbJsonLd(
   store: StorefrontStore,
   product: StorefrontProduct,
-  slug: string
+  slug: string,
+  locale: string
 ): Record<string, unknown> {
   return {
     '@context': 'https://schema.org',
@@ -95,13 +100,13 @@ function buildBreadcrumbJsonLd(
       {
         '@type': 'ListItem',
         position: 1,
-        name: store.name.hy || store.name.en,
+        name: pickLang(store.name, locale),
         item: `${BASE_URL}/store/${slug}`,
       },
       {
         '@type': 'ListItem',
         position: 2,
-        name: product.name.hy || product.name.en,
+        name: pickLang(product.name, locale),
         item: `${BASE_URL}/store/${slug}/products/${product.slug}`,
       },
     ],
@@ -116,6 +121,7 @@ export default async function ProductPage({
   searchParams: Promise<Record<string, string>>
 }) {
   const { slug, productSlug } = await params
+  const locale = await getLocale()
   const sp = await searchParams
   const isPreview = sp.preview === 'true'
 
@@ -134,8 +140,8 @@ export default async function ProductPage({
     <>
       {!isPreview && (
         <>
-          <JsonLd data={buildProductJsonLd(product, slug)} />
-          <JsonLd data={buildBreadcrumbJsonLd(store, product, slug)} />
+          <JsonLd data={buildProductJsonLd(product, slug, locale)} />
+          <JsonLd data={buildBreadcrumbJsonLd(store, product, slug, locale)} />
         </>
       )}
       <Template.ProductDetail product={product} storeSlug={slug} isPreview={isPreview} />

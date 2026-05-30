@@ -1,8 +1,10 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
+import { getLocale } from 'next-intl/server'
 import { serverGet } from '@/lib/server-api'
 import { loadTemplate } from '@/lib/templates'
 import { JsonLd } from '@/components/seo/JsonLd'
+import { pickLang } from '@/lib/i18n'
 import type { StorefrontStore, StorefrontProduct, PublicCategory } from '@/types'
 
 export const dynamic = 'force-dynamic'
@@ -15,12 +17,13 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>
 }): Promise<Metadata> {
   const { slug } = await params
+  const locale = await getLocale()
   const store = await serverGet<StorefrontStore>(`/store/${slug}/info`)
   if (!store) return {}
-  const name = store.name.hy || store.name.en
-  const description = store.meta_description?.hy ?? store.description?.hy
+  const name = pickLang(store.name, locale)
+  const description = pickLang(store.meta_description, locale) || pickLang(store.description, locale) || undefined
   return {
-    title: store.meta_title?.hy ?? `${name} | Vendora`,
+    title: pickLang(store.meta_title, locale) || `${name} | Vendora`,
     description,
     alternates: { canonical: `/store/${slug}` },
     openGraph: {
@@ -39,9 +42,9 @@ export async function generateMetadata({
   }
 }
 
-function buildStoreJsonLd(store: StorefrontStore, slug: string): Record<string, unknown> {
-  const name = store.name.hy || store.name.en
-  const description = store.description?.hy || store.description?.en
+function buildStoreJsonLd(store: StorefrontStore, slug: string, locale: string): Record<string, unknown> {
+  const name = pickLang(store.name, locale)
+  const description = pickLang(store.description, locale)
   return {
     '@context': 'https://schema.org',
     '@type': 'OnlineStore',
@@ -63,6 +66,7 @@ export default async function StorefrontPage({
   searchParams: Promise<Record<string, string>>
 }) {
   const { slug } = await params
+  const locale = await getLocale()
   const sp = await searchParams
   const isPreview = sp.preview === 'true'
   const previewTemplateKey = sp.template as string | undefined
@@ -83,7 +87,7 @@ export default async function StorefrontPage({
 
   return (
     <>
-      {!isPreview && <JsonLd data={buildStoreJsonLd(store, slug)} />}
+      {!isPreview && <JsonLd data={buildStoreJsonLd(store, slug, locale)} />}
       <Template.StoreHome
         store={store}
         featuredProducts={featuredData?.data ?? []}

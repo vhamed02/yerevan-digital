@@ -4,13 +4,16 @@ import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { ShoppingBag, Check } from 'lucide-react'
+import { useLocale } from 'next-intl'
 import { useStoreCart } from '@/stores/cart.store'
+import { pickLang } from '@/lib/i18n'
 import type { ProductCardProps } from '../types'
 
 export function ProductCard({ product, storeSlug, isPreview }: ProductCardProps) {
   const [added, setAdded] = useState(false)
   const { addItem } = useStoreCart(storeSlug)
-  const name = product.name.hy || product.name.en
+  const locale = useLocale()
+  const name = pickLang(product.name, locale)
   const image = product.images?.[0]
 
   function handleQuickAdd(e: React.MouseEvent) {

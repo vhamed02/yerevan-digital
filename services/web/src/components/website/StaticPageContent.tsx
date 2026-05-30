@@ -1,3 +1,4 @@
+import { pickLang } from '@/lib/i18n'
 import type { Page } from '@/types'
 
 interface StaticPageContentProps {
@@ -7,8 +8,8 @@ interface StaticPageContentProps {
 }
 
 export default function StaticPageContent({ page, locale, bare = false }: StaticPageContentProps) {
-  const title = locale === 'en' ? (page.title.en || page.title.hy) : (page.title.hy || page.title.en)
-  const content = locale === 'en' ? (page.content.en || page.content.hy) : (page.content.hy || page.content.en)
+  const title = pickLang(page.title, locale)
+  const content = pickLang(page.content, locale)
 
   const isHtml = content.trimStart().startsWith('<')
 

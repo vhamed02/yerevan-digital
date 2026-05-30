@@ -4,7 +4,9 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Search, ShoppingBag, Menu, X, ChevronDown } from 'lucide-react'
+import { useLocale } from 'next-intl'
 import { useStoreCart } from '@/stores/cart.store'
+import { pickLang } from '@/lib/i18n'
 import { CartDrawer } from './CartDrawer'
 import type { StoreHeaderProps } from '../types'
 
@@ -22,8 +24,9 @@ export function StoreHeader({ store, categories, slug, isPreview }: StoreHeaderP
   }, [])
 
   const { getItemCount } = useStoreCart(slug)
+  const locale = useLocale()
   const cartCount = mounted ? getItemCount() : 0
-  const name = store.name.hy || store.name.en
+  const name = pickLang(store.name, locale)
   const announcementText = store.template_config?.announcement_text
 
   return (
@@ -85,7 +88,7 @@ export function StoreHeader({ store, categories, slug, isPreview }: StoreHeaderP
                   href={`/store/${slug}/products?category=${cat.slug}`}
                   className="relative whitespace-nowrap px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:text-gray-900 after:absolute after:bottom-0 after:left-3 after:right-3 after:h-px after:bg-[var(--accent)] after:scale-x-0 after:transition-transform hover:after:scale-x-100"
                 >
-                  {cat.name.hy || cat.name.en}
+                  {pickLang(cat.name, locale)}
                 </Link>
               ))}
               {categories.length > 5 && (
@@ -168,7 +171,7 @@ export function StoreHeader({ store, categories, slug, isPreview }: StoreHeaderP
                 onClick={() => setMobileMenuOpen(false)}
                 className="flex items-center rounded-xl px-3 py-3 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50"
               >
-                {cat.name.hy || cat.name.en}
+                {pickLang(cat.name, locale)}
               </Link>
             ))}
           </nav>

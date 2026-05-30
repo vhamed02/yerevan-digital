@@ -7,9 +7,11 @@ import {
   ShoppingBag, Plus, Minus, Check, ChevronRight,
   ShieldCheck, RefreshCw, Truck, ChevronDown, Star, X, Eye,
 } from 'lucide-react'
+import { useLocale } from 'next-intl'
 import { useStoreCart } from '@/stores/cart.store'
 import ReviewSection from '@/components/store/ReviewSection'
 import { formatViewCount } from '@/lib/formatViewCount'
+import { pickLang } from '@/lib/i18n'
 import type { ProductDetailProps, StorefrontVariant } from '../types'
 
 function StarRating({ avg, count }: { avg: number; count: number }) {
@@ -111,9 +113,10 @@ export function ProductDetail({ product, storeSlug, isPreview }: ProductDetailPr
     setTimeout(() => setAdded(false), 2200)
   }
 
-  const name = product.name.hy || product.name.en
-  const descFull = product.description_full?.hy || product.description_full?.en
-  const descShort = product.description_short?.hy || product.description_short?.en
+  const locale = useLocale()
+  const name = pickLang(product.name, locale)
+  const descFull = pickLang(product.description_full, locale)
+  const descShort = pickLang(product.description_short, locale)
   const activeImage = product.images?.[activeImageIdx]
 
   return (

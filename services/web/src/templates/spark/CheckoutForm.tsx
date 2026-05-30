@@ -7,8 +7,10 @@ import { z } from 'zod/v4'
 import Image from 'next/image'
 import Link from 'next/link'
 import { ShieldCheck, Lock, ChevronRight, ShoppingBag, Check } from 'lucide-react'
+import { useLocale } from 'next-intl'
 import { useStoreCart } from '@/stores/cart.store'
 import api from '@/lib/api'
+import { pickLang } from '@/lib/i18n'
 import type { CheckoutFormProps } from '../types'
 
 const GATEWAY_META: Record<string, { label: string; badge: string; color: string; description: string }> = {
@@ -77,7 +79,8 @@ export function CheckoutForm({ storeSlug, store }: CheckoutFormProps) {
   })
 
   const selectedMethod = watch('payment_method')
-  const storeName = store.name.hy || store.name.en
+  const locale = useLocale()
+  const storeName = pickLang(store.name, locale)
 
   async function goToStep2() {
     const ok = await trigger(['full_name', 'email', 'phone', 'address', 'city', 'country'])

@@ -4,8 +4,10 @@ import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { ShoppingBag, Plus, Minus, Check, ChevronRight } from 'lucide-react'
+import { useLocale } from 'next-intl'
 import { useStoreCart } from '@/stores/cart.store'
 import ReviewSection from '@/components/store/ReviewSection'
+import { pickLang } from '@/lib/i18n'
 import type { ProductDetailProps, StorefrontVariant } from '../types'
 
 export function ProductDetail({ product, storeSlug, isPreview }: ProductDetailProps) {
@@ -18,6 +20,7 @@ export function ProductDetail({ product, storeSlug, isPreview }: ProductDetailPr
   const [added, setAdded] = useState(false)
 
   const { addItem } = useStoreCart(storeSlug)
+  const locale = useLocale()
 
   const price = selectedVariant ? selectedVariant.price : product.price
   const inStock = selectedVariant
@@ -35,8 +38,8 @@ export function ProductDetail({ product, storeSlug, isPreview }: ProductDetailPr
     setTimeout(() => setAdded(false), 2000)
   }
 
-  const name = product.name.hy || product.name.en
-  const descFull = product.description_full?.hy || product.description_full?.en
+  const name = pickLang(product.name, locale)
+  const descFull = pickLang(product.description_full, locale)
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
@@ -88,7 +91,7 @@ export function ProductDetail({ product, storeSlug, isPreview }: ProductDetailPr
             <h1 className="text-2xl font-bold text-gray-900">{name}</h1>
             {product.description_short && (
               <p className="mt-2 text-gray-600">
-                {product.description_short.hy || product.description_short.en}
+                {pickLang(product.description_short, locale)}
               </p>
             )}
           </div>

@@ -6,6 +6,7 @@ import { useLocale } from 'next-intl'
 import { Avatar } from '@/components/ui/Avatar'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
+import { pickLang } from '@/lib/i18n'
 import type { PublicStore } from '@/types'
 
 const DEFAULT_BANNER = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQwIiBoZWlnaHQ9IjI4MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjRThFQUYwIi8+PC9zdmc+'
@@ -15,9 +16,9 @@ interface StoreCardProps {
 }
 
 export default function StoreCard({ store }: StoreCardProps) {
-  const locale = useLocale() as 'hy' | 'en'
-  const name = store.name[locale] || store.name.hy
-  const categoryName = store.category?.name[locale] || store.category?.name.hy
+  const locale = useLocale()
+  const name = pickLang(store.name, locale)
+  const categoryName = pickLang(store.category?.name, locale)
 
   return (
     <div className="overflow-hidden rounded-xl border border-border bg-surface shadow-sm transition-shadow hover:shadow-md">

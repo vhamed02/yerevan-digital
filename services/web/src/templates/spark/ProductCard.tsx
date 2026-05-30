@@ -6,14 +6,17 @@ import Image from 'next/image'
 import { ShoppingBag, Check, Heart, Eye } from 'lucide-react'
 import { useStoreCart } from '@/stores/cart.store'
 import { formatViewCount } from '@/lib/formatViewCount'
+import { useLocale } from 'next-intl'
+import { pickLang } from '@/lib/i18n'
 import type { ProductCardProps } from '../types'
 
 export function ProductCard({ product, storeSlug, isPreview }: ProductCardProps) {
   const [added, setAdded] = useState(false)
   const [wishlisted, setWishlisted] = useState(false)
   const { addItem } = useStoreCart(storeSlug)
+  const locale = useLocale()
 
-  const name = product.name.hy || product.name.en
+  const name = pickLang(product.name, locale)
   const image = product.images?.[0]
   const hoverImage = product.images?.[1]
   const isOnSale = product.compare_price && product.compare_price > product.price

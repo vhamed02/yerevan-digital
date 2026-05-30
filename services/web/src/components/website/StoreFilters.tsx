@@ -2,6 +2,8 @@
 
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import { useCallback } from 'react'
+import { useLocale } from 'next-intl'
+import { pickLang } from '@/lib/i18n'
 import type { PublicCategory } from '@/types'
 
 const SORT_OPTIONS = [
@@ -22,6 +24,7 @@ export default function StoreFilters({ categories, currentCategory, currentSort 
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
+  const locale = useLocale()
 
   const updateParam = useCallback(
     (key: string, value: string | null) => {
@@ -71,7 +74,7 @@ export default function StoreFilters({ categories, currentCategory, currentSort 
                     onChange={() => toggleCategory(id)}
                     className="h-4 w-4 rounded border-border text-brand-500 focus:ring-brand-500"
                   />
-                  <span className="text-sm text-content-secondary">{cat.name.hy}</span>
+                  <span className="text-sm text-content-secondary">{pickLang(cat.name, locale)}</span>
                 </label>
               )
             })}

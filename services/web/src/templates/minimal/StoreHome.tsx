@@ -2,7 +2,9 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
+import { useLocale } from 'next-intl'
 import { ProductGrid } from './ProductGrid'
+import { pickLang } from '@/lib/i18n'
 import type { StoreHomeProps } from '../types'
 
 export function StoreHome({
@@ -13,7 +15,8 @@ export function StoreHome({
   slug,
   isPreview,
 }: StoreHomeProps) {
-  const name = store.name.hy || store.name.en
+  const locale = useLocale()
+  const name = pickLang(store.name, locale)
 
   return (
     <div>
@@ -31,7 +34,7 @@ export function StoreHome({
               <h1 className="font-bold text-3xl text-white drop-shadow-md sm:text-5xl">{name}</h1>
               {store.description && (
                 <p className="mt-2 text-white/90 text-sm sm:text-base">
-                  {store.description.hy || store.description.en}
+                  {pickLang(store.description, locale)}
                 </p>
               )}
             </div>
@@ -44,7 +47,7 @@ export function StoreHome({
           <h1 className="font-bold text-3xl text-gray-900 sm:text-5xl">{name}</h1>
           {store.description && (
             <p className="mt-3 text-gray-500">
-              {store.description.hy || store.description.en}
+              {pickLang(store.description, locale)}
             </p>
           )}
         </div>
@@ -65,7 +68,7 @@ export function StoreHome({
                 href={`/store/${slug}/products?category=${cat.slug}`}
                 className="flex-shrink-0 rounded-full border border-gray-200 px-4 py-1.5 text-sm font-medium text-gray-700 hover:border-gray-900 hover:text-gray-900 transition-colors whitespace-nowrap"
               >
-                {cat.name.hy || cat.name.en}
+                {pickLang(cat.name, locale)}
               </Link>
             ))}
           </div>

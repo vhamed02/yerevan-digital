@@ -1,7 +1,9 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
+import { getLocale } from 'next-intl/server'
 import { serverGet } from '@/lib/server-api'
 import { loadTemplate } from '@/lib/templates'
+import { pickLang } from '@/lib/i18n'
 import type { StorefrontStore } from '@/types'
 
 export const dynamic = 'force-dynamic'
@@ -12,8 +14,9 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>
 }): Promise<Metadata> {
   const { slug } = await params
+  const locale = await getLocale()
   const data = await serverGet<StorefrontStore>(`/store/${slug}/info`)
-  const name = data ? data.name.hy || data.name.en : ''
+  const name = data ? pickLang(data.name, locale) : ''
   return { title: `Checkout — ${name} | Vendora` }
 }
 

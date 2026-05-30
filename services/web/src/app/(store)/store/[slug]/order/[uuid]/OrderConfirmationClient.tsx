@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { useLocale } from 'next-intl'
 import { CheckCircle, Clock, Package, Truck, Star, XCircle, RefreshCw, CreditCard } from 'lucide-react'
+import { pickLang } from '@/lib/i18n'
 import type { StorefrontOrder } from '@/types'
 
 interface Props {
@@ -156,6 +158,7 @@ const STATUS_COLORS: Record<string, string> = {
 // ── Main component ────────────────────────────────────────────────────────────
 
 export function OrderConfirmationClient({ order, storeSlug, isNew = false }: Props) {
+  const locale = useLocale()
   const formattedDate = order?.created_at
     ? new Date(order.created_at).toLocaleDateString('hy-AM', { year: 'numeric', month: 'long', day: 'numeric' })
     : null
@@ -218,7 +221,7 @@ export function OrderConfirmationClient({ order, storeSlug, isNew = false }: Pro
                 {order.items.map((item, i) => (
                   <li key={i} className="flex items-start justify-between gap-3 text-sm">
                     <span className="text-gray-700">
-                      {item.product_name.hy || item.product_name.en}
+                      {pickLang(item.product_name, locale)}
                       {item.variant_name && (
                         <span className="text-gray-400"> — {item.variant_name}</span>
                       )}{' '}

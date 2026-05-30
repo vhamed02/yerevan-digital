@@ -1,11 +1,13 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
+import { getLocale } from 'next-intl/server'
 import { serverGet } from '@/lib/server-api'
 import { loadTemplate } from '@/lib/templates'
 import { SortSelect } from '@/components/store/SortSelect'
 import { PriceRangeFilter } from '@/components/store/PriceRangeFilter'
 import { SearchInput } from '@/components/store/SearchInput'
+import { pickLang } from '@/lib/i18n'
 import type { StorefrontStore, StorefrontProduct, PublicCategory } from '@/types'
 
 export const dynamic = 'force-dynamic'
@@ -16,9 +18,10 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>
 }): Promise<Metadata> {
   const { slug } = await params
+  const locale = await getLocale()
   const store = await serverGet<StorefrontStore>(`/store/${slug}/info`)
   if (!store) return {}
-  const name = store.name.hy || store.name.en
+  const name = pickLang(store.name, locale)
   return { title: `Products — ${name} | Vendora` }
 }
 
@@ -30,6 +33,7 @@ export default async function StoreProductsPage({
   searchParams: Promise<Record<string, string>>
 }) {
   const { slug } = await params
+  const locale = await getLocale()
   const sp = await searchParams
 
   const category = sp.category ?? ''
@@ -115,7 +119,7 @@ export default async function StoreProductsPage({
                   : 'border-gray-200 text-gray-600 hover:border-gray-400'
               }`}
             >
-              {cat.name.hy || cat.name.en}
+              {pickLang(cat.name, locale)}
             </Link>
           ))}
         </div>

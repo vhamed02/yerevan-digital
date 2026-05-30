@@ -2,7 +2,7 @@
 
 > **Living document.** Kept up to date as work progresses. Each phase updates the
 > status table, the progress log, and any decisions that change.
-> Last updated: 2026-05-30 · Status: **Phase 1 in progress**
+> Last updated: 2026-05-30 · Status: **Phase 1 complete; Phase 2 next**
 
 ---
 
@@ -51,7 +51,7 @@ so a third locale needs **no content migration**).
 | # | Phase | Status | Commit |
 |---|-------|--------|--------|
 | 1a | Foundation — `pickLang` helper, `MultiLang.ru`, routing/proxy/request/switcher +`ru`, `ru.json` (130 keys) | ✅ Done & live | `375ef0a` |
-| 1b | Locale-aware content display — convert ~120 `name.hy \|\| en` sites to `pickLang` (customer-facing first) | 🔧 In progress | — |
+| 1b | Locale-aware content display — converted customer-facing `name.hy \|\| en` sites to `pickLang` (20 files: spark+minimal+_shared templates, store pages, store metadata/JSON-LD, StoreCard/StoreFilters/StaticPageContent/OrderConfirmation) | ✅ Done | `TBD` |
 | 2 | Backend Russian support (SetLocale, `users.locale` enum migration, 12 Form Requests, `in:` rule) | ⏳ Planned | — |
 | 3 | Russian content-entry forms (Product/Store/Page/Payments/Seller — 3rd language tab) | ⏳ Planned | — |
 | 4 | Translate customer-facing UI (storefront templates + customer store pages → catalog + `useTranslations`) | ⏳ Planned | — |
@@ -111,3 +111,13 @@ Legend: ✅ done & live · 🔧 in progress · ⏳ planned
   Next: Phase 1b (`pickLang` content-site conversion).
 - **2026-05-30** — Phase 1a deployed (`375ef0a`) and verified live: `/ru` renders the
   homepage in Russian (`<html lang="ru">`); `/` still Armenian. No regression.
+- **2026-05-30** — Phase 1b done: converted all customer-facing catalog content-display
+  sites (20 files) from `name.hy || name.en` to locale-aware `pickLang(...)` — storefront
+  templates (spark/minimal/_shared), customer store pages, store/product `generateMetadata`
+  + JSON-LD, StoreCard/StoreFilters/StaticPageContent/OrderConfirmation. Client components
+  use `useLocale()`; server pages use `getLocale()`. The two `StoreFooter` server
+  components were marked `'use client'` (they render inside `StoreLayoutClient`). Fixes the
+  long-standing bug where EN visitors saw Armenian content; RU visitors now get RU content
+  (fallback ru→en→hy). `tsc` clean; production build passes. **Note:** seller/admin internal
+  content-display still uses the old pattern — deferred (dashboards are English-chrome,
+  out of customer-facing scope). NEXT: Phase 2 (backend RU support).

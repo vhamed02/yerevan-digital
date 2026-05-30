@@ -1,10 +1,15 @@
+'use client'
+
 import Link from 'next/link'
 import { Camera, Globe, Mail, Phone, MapPin, ShieldCheck } from 'lucide-react'
+import { useLocale } from 'next-intl'
+import { pickLang } from '@/lib/i18n'
 import type { StoreFooterProps } from '../types'
 
 export function StoreFooter({ store }: StoreFooterProps) {
-  const name = store.name.hy || store.name.en
-  const description = store.description?.hy || store.description?.en
+  const locale = useLocale()
+  const name = pickLang(store.name, locale)
+  const description = pickLang(store.description, locale)
   const hasSocial = store.social_instagram || store.social_facebook
   const hasContact = store.email || store.phone || store.address
 
