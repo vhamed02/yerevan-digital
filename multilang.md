@@ -50,7 +50,7 @@ so a third locale needs **no content migration**).
 
 | # | Phase | Status | Commit |
 |---|-------|--------|--------|
-| 1a | Foundation — `pickLang` helper, `MultiLang.ru`, routing/proxy/request/switcher +`ru`, `ru.json` (130 keys) | ✅ Done | `TBD` |
+| 1a | Foundation — `pickLang` helper, `MultiLang.ru`, routing/proxy/request/switcher +`ru`, `ru.json` (130 keys) | ✅ Done & live | `375ef0a` |
 | 1b | Locale-aware content display — convert ~120 `name.hy \|\| en` sites to `pickLang` (customer-facing first) | 🔧 In progress | — |
 | 2 | Backend Russian support (SetLocale, `users.locale` enum migration, 12 Form Requests, `in:` rule) | ⏳ Planned | — |
 | 3 | Russian content-entry forms (Product/Store/Page/Payments/Seller — 3rd language tab) | ⏳ Planned | — |
@@ -109,3 +109,5 @@ Legend: ✅ done & live · 🔧 in progress · ⏳ planned
   super-admin never sees the switcher (it lives only in the marketing Navbar/Footer).
   `tsc` clean; production `next build` passes. → marketing site is now fully trilingual.
   Next: Phase 1b (`pickLang` content-site conversion).
+- **2026-05-30** — Phase 1a deployed (`375ef0a`) and verified live: `/ru` renders the
+  homepage in Russian (`<html lang="ru">`); `/` still Armenian. No regression.
