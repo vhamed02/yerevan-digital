@@ -56,7 +56,7 @@ so a third locale needs **no content migration**).
 | 3a | RU content-entry: **ProductForm** (3-lang name + lang-driven descriptions/SEO tabs) | ✅ Done & live | `3272c71` |
 | 3b | RU content-entry: StoreSettings + StoreSetupWizard (store name/description/meta) | ✅ Done & live | `e56708a` |
 | 3c | RU content-entry: admin Categories + PageEditor + CreateSeller locale picker (Payments deferred — see note) | ✅ Done & live | `d634dfd` |
-| 4a | UI strings: spark shell (ProductCard, ProductGrid, CartDrawer, StoreHeader, StoreFooter) → new `storefront` catalog namespace | ✅ Done | `TBD` |
+| 4a | UI strings: spark shell (ProductCard, ProductGrid, CartDrawer, StoreHeader, StoreFooter) → new `storefront` catalog namespace | ✅ Done & live | `189beb1` |
 | 4b | UI strings: spark CheckoutForm + StoreHome | ⏳ Planned | — |
 | 4c | UI strings: minimal template | ⏳ Planned | — |
 | 4d | UI strings: `_shared` (ProductDetail, CartDrawer) + customer store pages (products listing, checkout result, order confirmation, ReviewSection) | ⏳ Planned | — |
