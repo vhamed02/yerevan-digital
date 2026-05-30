@@ -171,6 +171,8 @@
     "sections": "Բաժիններ",
     "contact": "Կապ",
     "allRightsReserved": "Բոլոր իրավունքները պաշտպանված են։",
+    "breadcrumbHome": "Գլխավոր",
+    "description": "Նկարագրություն",
     "cart": {
       "title": "Զամբյուղ",
       "freeShippingUnlocked": "Դուք ստացաք անվճար առաքում",
@@ -219,7 +221,9 @@
       "nameMin": "Առնվազն 2 նիշ",
       "emailInvalid": "Անվավեր էլ. փոստ",
       "required": "Պարտադիր",
-      "selectPaymentError": "Ընտրեք վճարի եղանակ"
+      "selectPaymentError": "Ընտրեք վճարի եղանակ",
+      "qty": "Քան.",
+      "placeOrder": "Պատվիրել և վճարել"
     },
     "home": {
       "all": "Բոլոր",

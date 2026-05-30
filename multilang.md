@@ -60,7 +60,8 @@ so a third locale needs **no content migration**).
 | 4b | UI strings: spark CheckoutForm (incl. translated Zod validation via in-component schema) | ✅ Done & live | `2cf7ad8` |
 | 4b-home | UI strings: spark StoreHome (hero, trust/marquee, section headings) | ✅ Done & live | `c7fa1a6` |
 | 4c | UI strings: minimal template (ProductCard, ProductGrid, StoreHeader, StoreHome — reuses `storefront` catalog; CartDrawer/CheckoutForm/ProductDetail re-export `_shared`) | ✅ Done & live | `59782ea` |
-| 4d | UI strings: `_shared` (ProductDetail, CartDrawer) + customer store pages (products listing, checkout result, order confirmation, ReviewSection) | ⏳ Planned | — |
+| 4d-shared | UI strings: `_shared` trio — CartDrawer, ProductDetail, CheckoutForm (used by minimal; reuse `storefront` catalog + 4 new keys) | ✅ Done | `TBD` |
+| 4d-pages | UI strings: customer store pages — products listing, checkout result pages, OrderConfirmation, ReviewSection, filter controls | ⏳ Planned | — |
 | 5 | Trilingual transactional emails (7 notifications + 8 blade templates) | ⏳ Planned | — |
 | 6 | SEO (locale-aware JSON-LD/OG, `hreflang`) + full verify sweep | ⏳ Planned | — |
 
@@ -180,3 +181,11 @@ Legend: ✅ done & live · 🔧 in progress · ⏳ planned
   each, full parity. Discovered minimal's CartDrawer/CheckoutForm/ProductDetail are thin
   re-exports of `_shared` (so they belong to 4d). `tsc` clean; production build passes.
   NEXT: 4d (`_shared` ProductDetail + CartDrawer + customer store pages + ReviewSection).
+- **2026-05-30** — Phase 4d-shared done: localized the `_shared` trio (CartDrawer,
+  ProductDetail, CheckoutForm — all used by the minimal template). Reused the `storefront`
+  catalog + 4 new keys (`breadcrumbHome`, `description`, `checkout.qty`, `checkout.placeOrder`);
+  215 keys each, full parity. The `_shared` CheckoutForm got the same in-component `useMemo`
+  Zod schema refactor as spark's so validation messages translate, and its gateway labels
+  were normalized to brand names. `tsc` clean; production build passes. The minimal template
+  is now fully trilingual. NEXT: 4d-pages (products listing, checkout result pages,
+  OrderConfirmation, ReviewSection, filter controls).

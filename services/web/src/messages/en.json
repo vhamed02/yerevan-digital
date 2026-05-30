@@ -171,6 +171,8 @@
     "sections": "Sections",
     "contact": "Contact",
     "allRightsReserved": "All rights reserved.",
+    "breadcrumbHome": "Home",
+    "description": "Description",
     "cart": {
       "title": "Cart",
       "freeShippingUnlocked": "You've unlocked free shipping",
@@ -219,7 +221,9 @@
       "nameMin": "At least 2 characters",
       "emailInvalid": "Invalid email",
       "required": "Required",
-      "selectPaymentError": "Select a payment method"
+      "selectPaymentError": "Select a payment method",
+      "qty": "Qty",
+      "placeOrder": "Place order"
     },
     "home": {
       "all": "All",

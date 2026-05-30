@@ -171,6 +171,8 @@
     "sections": "Разделы",
     "contact": "Контакты",
     "allRightsReserved": "Все права защищены.",
+    "breadcrumbHome": "Главная",
+    "description": "Описание",
     "cart": {
       "title": "Корзина",
       "freeShippingUnlocked": "Вы получили бесплатную доставку",
@@ -219,7 +221,9 @@
       "nameMin": "Минимум 2 символа",
       "emailInvalid": "Неверный эл. адрес",
       "required": "Обязательно",
-      "selectPaymentError": "Выберите способ оплаты"
+      "selectPaymentError": "Выберите способ оплаты",
+      "qty": "Кол-во",
+      "placeOrder": "Оформить и оплатить"
     },
     "home": {
       "all": "Все",

@@ -4,11 +4,13 @@ import { useState, useEffect } from 'react'
 import { X, Minus, Plus, ShoppingBag } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { useTranslations } from 'next-intl'
 import { useStoreCart } from '@/stores/cart.store'
 import type { CartDrawerProps } from '../types'
 
 export function CartDrawer({ open, onClose, storeSlug }: CartDrawerProps) {
   const [mounted, setMounted] = useState(false)
+  const t = useTranslations('storefront')
   useEffect(() => { setMounted(true) }, [])
   const { items: storeItems, removeItem, updateQuantity, getTotal, getItemCount } = useStoreCart(storeSlug)
   const items = mounted ? storeItems : []
@@ -34,7 +36,7 @@ export function CartDrawer({ open, onClose, storeSlug }: CartDrawerProps) {
         <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
           <div className="flex items-center gap-2">
             <ShoppingBag className="h-5 w-5 text-gray-700" />
-            <span className="font-semibold text-gray-900">Զամբյուղ ({count})</span>
+            <span className="font-semibold text-gray-900">{t('cart.title')} ({count})</span>
           </div>
           <button
             onClick={onClose}
@@ -48,12 +50,12 @@ export function CartDrawer({ open, onClose, storeSlug }: CartDrawerProps) {
         {items.length === 0 ? (
           <div className="flex flex-1 flex-col items-center justify-center gap-4 text-center px-6">
             <ShoppingBag className="h-16 w-16 text-gray-200" />
-            <p className="text-gray-500">Ձեր զամբյուղը դատարկ է</p>
+            <p className="text-gray-500">{t('cart.empty')}</p>
             <button
               onClick={onClose}
               className="text-sm font-medium text-indigo-600 hover:text-indigo-700"
             >
-              Շարունակել գնումները
+              {t('cart.continueShopping')}
             </button>
           </div>
         ) : (
@@ -111,7 +113,7 @@ export function CartDrawer({ open, onClose, storeSlug }: CartDrawerProps) {
 
             <div className="border-t border-gray-100 px-5 py-4">
               <div className="mb-4 flex items-center justify-between">
-                <span className="text-gray-600">Ընդամենը</span>
+                <span className="text-gray-600">{t('cart.total')}</span>
                 <span className="text-lg font-bold text-gray-900">{total.toLocaleString()} ֏</span>
               </div>
               <div className="flex flex-col gap-2">
@@ -120,14 +122,14 @@ export function CartDrawer({ open, onClose, storeSlug }: CartDrawerProps) {
                   onClick={onClose}
                   className="flex items-center justify-center rounded-lg bg-gray-900 px-4 py-3 text-sm font-semibold text-white hover:bg-gray-800 transition-colors"
                 >
-                  Գնել →
+                  {t('cart.checkout')} →
                 </Link>
                 <Link
                   href={`/store/${storeSlug}/cart`}
                   onClick={onClose}
                   className="flex items-center justify-center rounded-lg border border-gray-200 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                 >
-                  Տեսնել զամբյուղը
+                  {t('cart.viewCart')}
                 </Link>
               </div>
             </div>

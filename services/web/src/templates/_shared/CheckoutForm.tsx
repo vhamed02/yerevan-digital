@@ -1,47 +1,58 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod/v4'
 import Image from 'next/image'
+import { useTranslations } from 'next-intl'
 import { useStoreCart } from '@/stores/cart.store'
 import api from '@/lib/api'
 import type { CheckoutFormProps } from '../types'
 
 const GATEWAY_META: Record<string, { label: string; badge: string; color: string }> = {
-  idram:     { label: 'Վճարել iDram-ով',    badge: 'iDram',  color: '#E8001C' },
-  inecobank: { label: 'Inecobank փոխանցում', badge: 'Ineco',  color: '#004B87' },
-  telcell:   { label: 'Վճարել Telcell-ով',  badge: 'Tcell',  color: '#FF6B00' },
-  ameria:    { label: 'Ամերիա Բանկ',        badge: 'Ameria', color: '#003DA5' },
+  idram:     { label: 'iDram',     badge: 'iDram',  color: '#E8001C' },
+  inecobank: { label: 'Inecobank', badge: 'Ineco',  color: '#004B87' },
+  telcell:   { label: 'Telcell',   badge: 'Tcell',  color: '#FF6B00' },
+  ameria:    { label: 'Ameria',    badge: 'Ameria', color: '#003DA5' },
 }
 
-const schema = z.object({
-  full_name:      z.string().min(2, 'Պարտադիր'),
-  email:          z.string().email('Անվավեր էլ. փոստ'),
-  phone:          z.string().optional(),
-  address:        z.string().min(5, 'Պարտադիր'),
-  city:           z.string().min(2, 'Պարտադիր'),
-  postal_code:    z.string().optional(),
-  country:        z.string().min(2, 'Պարտադիր'),
-  notes:          z.string().optional(),
-  payment_method: z.string().min(1, 'Ընտրեք վճարման եղանակ'),
-})
-
-type CheckoutData = z.infer<typeof schema>
+interface CheckoutData {
+  full_name: string
+  email: string
+  phone?: string
+  address: string
+  city: string
+  postal_code?: string
+  country: string
+  notes?: string
+  payment_method: string
+}
 
 export function CheckoutForm({ storeSlug, store }: CheckoutFormProps) {
   const [mounted, setMounted] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
+  const t = useTranslations('storefront')
 
   useEffect(() => { setMounted(true) }, [])
 
   const { items: cartItems, getTotal } = useStoreCart(storeSlug)
-  // Use empty state during SSR to avoid hydration mismatch with localStorage
   const items = mounted ? cartItems : []
   const total = mounted ? getTotal() : 0
 
   const gateways = store.payment_gateways ?? []
+
+  const schema = useMemo(() => z.object({
+    full_name:      z.string().min(2, t('checkout.required')),
+    email:          z.string().email(t('checkout.emailInvalid')),
+    phone:          z.string().optional(),
+    address:        z.string().min(5, t('checkout.required')),
+    city:           z.string().min(2, t('checkout.required')),
+    postal_code:    z.string().optional(),
+    country:        z.string().min(2, t('checkout.required')),
+    notes:          z.string().optional(),
+    payment_method: z.string().min(1, t('checkout.selectPaymentError')),
+  }), [t])
 
   const {
     register,
@@ -51,7 +62,7 @@ export function CheckoutForm({ storeSlug, store }: CheckoutFormProps) {
   } = useForm<CheckoutData>({
     resolver: zodResolver(schema),
     defaultValues: {
-      country:        'Հայաստան',
+      country:        t('checkout.countryDefault'),
       payment_method: gateways[0] ?? '',
     },
   })
@@ -86,9 +97,9 @@ export function CheckoutForm({ storeSlug, store }: CheckoutFormProps) {
       const fieldErrors = axiosErr.response?.data?.errors
       if (fieldErrors) {
         const first = Object.values(fieldErrors).flat()[0]
-        setSubmitError(first ?? apiMessage ?? 'Something went wrong. Please try again.')
+        setSubmitError(first ?? apiMessage ?? t('checkout.genericError'))
       } else {
-        setSubmitError(apiMessage ?? 'Something went wrong. Please try again.')
+        setSubmitError(apiMessage ?? t('checkout.genericError'))
       }
     }
   }
@@ -100,26 +111,26 @@ export function CheckoutForm({ storeSlug, store }: CheckoutFormProps) {
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
-      <h1 className="mb-8 text-2xl font-bold text-gray-900">Վճարում</h1>
+      <h1 className="mb-8 text-2xl font-bold text-gray-900">{t('checkout.step2')}</h1>
 
       <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_380px]">
         <div className="flex flex-col gap-6">
           <section>
-            <h2 className="mb-4 text-base font-semibold text-gray-900">Հաճախորդի տվյալներ</h2>
+            <h2 className="mb-4 text-base font-semibold text-gray-900">{t('checkout.contactDetails')}</h2>
             <div className="flex flex-col gap-4">
               <div>
-                <label className={labelCls}>Անուն Ազգանուն</label>
-                <input {...register('full_name')} className={inputCls} placeholder="Աննա Գրիգորյան" />
+                <label className={labelCls}>{t('checkout.fullName')}</label>
+                <input {...register('full_name')} className={inputCls} placeholder={t('checkout.fullNamePlaceholder')} />
                 {errors.full_name && <p className={errorCls}>{errors.full_name.message}</p>}
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className={labelCls}>Էլ. փոստ</label>
+                  <label className={labelCls}>{t('checkout.email')}</label>
                   <input {...register('email')} type="email" className={inputCls} placeholder="anna@example.com" />
                   {errors.email && <p className={errorCls}>{errors.email.message}</p>}
                 </div>
                 <div>
-                  <label className={labelCls}>Հեռախոս</label>
+                  <label className={labelCls}>{t('checkout.phone')}</label>
                   <input {...register('phone')} type="tel" className={inputCls} placeholder="+374 91 000000" />
                   {errors.phone && <p className={errorCls}>{errors.phone.message}</p>}
                 </div>
@@ -128,46 +139,46 @@ export function CheckoutForm({ storeSlug, store }: CheckoutFormProps) {
           </section>
 
           <section>
-            <h2 className="mb-4 text-base font-semibold text-gray-900">Առաքման հասցե</h2>
+            <h2 className="mb-4 text-base font-semibold text-gray-900">{t('checkout.shippingAddress')}</h2>
             <div className="flex flex-col gap-4">
               <div>
-                <label className={labelCls}>Փողոց, տուն</label>
-                <input {...register('address')} className={inputCls} placeholder="Բաղրամյան 1" />
+                <label className={labelCls}>{t('checkout.streetAddress')}</label>
+                <input {...register('address')} className={inputCls} placeholder={t('checkout.streetPlaceholder')} />
                 {errors.address && <p className={errorCls}>{errors.address.message}</p>}
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className={labelCls}>Քաղաք</label>
-                  <input {...register('city')} className={inputCls} placeholder="Երևան" />
+                  <label className={labelCls}>{t('checkout.city')}</label>
+                  <input {...register('city')} className={inputCls} placeholder={t('checkout.cityPlaceholder')} />
                   {errors.city && <p className={errorCls}>{errors.city.message}</p>}
                 </div>
                 <div>
-                  <label className={labelCls}>Փոստային կոդ</label>
+                  <label className={labelCls}>{t('checkout.postalCode')}</label>
                   <input {...register('postal_code')} className={inputCls} placeholder="0001" />
                 </div>
               </div>
               <div>
-                <label className={labelCls}>Երկիր</label>
+                <label className={labelCls}>{t('checkout.country')}</label>
                 <input {...register('country')} className={inputCls} />
               </div>
             </div>
           </section>
 
           <section>
-            <h2 className="mb-4 text-base font-semibold text-gray-900">Նշումներ</h2>
+            <h2 className="mb-4 text-base font-semibold text-gray-900">{t('checkout.notes')}</h2>
             <textarea
               {...register('notes')}
               rows={3}
               className="w-full resize-none rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
-              placeholder="Հատուկ ցուցումներ առաքման համար..."
+              placeholder={t('checkout.notesPlaceholder')}
             />
           </section>
 
           <section>
-            <h2 className="mb-4 text-base font-semibold text-gray-900">Վճարման եղանակ</h2>
+            <h2 className="mb-4 text-base font-semibold text-gray-900">{t('checkout.selectPaymentMethod')}</h2>
             {gateways.length === 0 ? (
               <p className="rounded-xl border border-gray-100 bg-gray-50 px-4 py-5 text-sm text-gray-500">
-                Վճարման եղանակ դեռ հասանելի չէ։
+                {t('checkout.noPaymentMethods')}
               </p>
             ) : (
               <div className="flex flex-col gap-2">
@@ -215,7 +226,7 @@ export function CheckoutForm({ storeSlug, store }: CheckoutFormProps) {
 
         <div className="lg:sticky lg:top-4 lg:self-start">
           <div className="rounded-2xl border border-gray-100 bg-gray-50 p-6">
-            <h2 className="mb-4 text-base font-semibold text-gray-900">Պատվերի ամփոփում</h2>
+            <h2 className="mb-4 text-base font-semibold text-gray-900">{t('checkout.orderSummary')}</h2>
 
             {!mounted ? (
               <div className="mb-4 space-y-3">
@@ -224,7 +235,7 @@ export function CheckoutForm({ storeSlug, store }: CheckoutFormProps) {
                 ))}
               </div>
             ) : items.length === 0 ? (
-              <p className="mb-4 text-sm text-gray-400">Ձեր զամբյուղը դատարկ է։</p>
+              <p className="mb-4 text-sm text-gray-400">{t('cart.empty')}</p>
             ) : (
               <ul className="mb-4 flex flex-col gap-3">
                 {items.map((item) => (
@@ -239,7 +250,7 @@ export function CheckoutForm({ storeSlug, store }: CheckoutFormProps) {
                       {item.variantName && (
                         <p className="text-xs text-gray-500">{item.variantName}</p>
                       )}
-                      <p className="text-xs text-gray-500">Քան. {item.quantity}</p>
+                      <p className="text-xs text-gray-500">{t('checkout.qty')} {item.quantity}</p>
                     </div>
                     <span className="whitespace-nowrap text-sm font-medium text-gray-900">
                       {(item.price * item.quantity).toLocaleString()} ֏
@@ -251,15 +262,15 @@ export function CheckoutForm({ storeSlug, store }: CheckoutFormProps) {
 
             <div className="border-t border-gray-200 pt-4">
               <div className="flex items-center justify-between text-sm text-gray-600">
-                <span>Ենթամիջ</span>
+                <span>{t('checkout.subtotal')}</span>
                 <span>{total.toLocaleString()} ֏</span>
               </div>
               <div className="mt-1 flex items-center justify-between text-sm text-gray-600">
-                <span>Առաքում</span>
-                <span className="text-green-600">Անվճար</span>
+                <span>{t('checkout.shipping')}</span>
+                <span className="text-green-600">{t('checkout.free')}</span>
               </div>
               <div className="mt-3 flex items-center justify-between text-base font-bold text-gray-900">
-                <span>Ընդամենը</span>
+                <span>{t('checkout.total')}</span>
                 <span>{total.toLocaleString()} ֏</span>
               </div>
             </div>
@@ -275,7 +286,7 @@ export function CheckoutForm({ storeSlug, store }: CheckoutFormProps) {
               disabled={isSubmitting || !mounted || items.length === 0 || gateways.length === 0}
               className="mt-4 w-full rounded-xl bg-gray-900 px-4 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {isSubmitting ? 'Մշակվում է...' : 'Պատվիրել և վճարել →'}
+              {isSubmitting ? t('checkout.processing') : `${t('checkout.placeOrder')} →`}
             </button>
           </div>
         </div>

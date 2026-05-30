@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { ShoppingBag, Plus, Minus, Check, ChevronRight } from 'lucide-react'
-import { useLocale } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { useStoreCart } from '@/stores/cart.store'
 import ReviewSection from '@/components/store/ReviewSection'
 import { pickLang } from '@/lib/i18n'
@@ -21,6 +21,7 @@ export function ProductDetail({ product, storeSlug, isPreview }: ProductDetailPr
 
   const { addItem } = useStoreCart(storeSlug)
   const locale = useLocale()
+  const t = useTranslations('storefront')
 
   const price = selectedVariant ? selectedVariant.price : product.price
   const inStock = selectedVariant
@@ -44,9 +45,9 @@ export function ProductDetail({ product, storeSlug, isPreview }: ProductDetailPr
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
       <nav className="mb-6 flex items-center gap-1.5 text-sm text-gray-500">
-        <Link href={`/store/${storeSlug}`} className="hover:text-gray-700">Գլխավոր</Link>
+        <Link href={`/store/${storeSlug}`} className="hover:text-gray-700">{t('breadcrumbHome')}</Link>
         <ChevronRight className="h-3.5 w-3.5" />
-        <Link href={`/store/${storeSlug}/products`} className="hover:text-gray-700">Ապրանքներ</Link>
+        <Link href={`/store/${storeSlug}/products`} className="hover:text-gray-700">{t('home.products')}</Link>
         <ChevronRight className="h-3.5 w-3.5" />
         <span className="text-gray-900">{name}</span>
       </nav>
@@ -107,7 +108,7 @@ export function ProductDetail({ product, storeSlug, isPreview }: ProductDetailPr
 
           {!inStock && (
             <span className="inline-flex w-fit rounded-full bg-red-50 px-3 py-1 text-sm font-medium text-red-600">
-              Ապրանքն առկա չէ
+              {t('outOfStock')}
             </span>
           )}
 
@@ -176,12 +177,12 @@ export function ProductDetail({ product, storeSlug, isPreview }: ProductDetailPr
             >
               {added ? (
                 <>
-                  <Check className="h-4 w-4" /> Ավելացվեց
+                  <Check className="h-4 w-4" /> {t('added')}
                 </>
               ) : (
                 <>
                   <ShoppingBag className="h-4 w-4" />
-                  {inStock ? 'Ավելացնել' : 'Ոչ առկա'}
+                  {inStock ? t('add') : t('outOfStock')}
                 </>
               )}
             </button>
@@ -189,7 +190,7 @@ export function ProductDetail({ product, storeSlug, isPreview }: ProductDetailPr
 
           {descFull && (
             <div className="border-t border-gray-100 pt-5">
-              <p className="mb-2 text-sm font-semibold text-gray-700">Նկարագրություն</p>
+              <p className="mb-2 text-sm font-semibold text-gray-700">{t('description')}</p>
               <div
                 className="prose prose-sm max-w-none text-gray-600"
                 dangerouslySetInnerHTML={{ __html: descFull }}
