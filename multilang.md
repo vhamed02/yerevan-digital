@@ -58,7 +58,7 @@ so a third locale needs **no content migration**).
 | 3c | RU content-entry: admin Categories + PageEditor + CreateSeller locale picker (Payments deferred — see note) | ✅ Done & live | `d634dfd` |
 | 4a | UI strings: spark shell (ProductCard, ProductGrid, CartDrawer, StoreHeader, StoreFooter) → new `storefront` catalog namespace | ✅ Done & live | `189beb1` |
 | 4b | UI strings: spark CheckoutForm (incl. translated Zod validation via in-component schema) | ✅ Done & live | `2cf7ad8` |
-| 4b-home | UI strings: spark StoreHome (hero, trust/marquee, section headings) | ✅ Done | `TBD` |
+| 4b-home | UI strings: spark StoreHome (hero, trust/marquee, section headings) | ✅ Done & live | `c7fa1a6` |
 | 4c | UI strings: minimal template | ⏳ Planned | — |
 | 4d | UI strings: `_shared` (ProductDetail, CartDrawer) + customer store pages (products listing, checkout result, order confirmation, ReviewSection) | ⏳ Planned | — |
 | 5 | Trilingual transactional emails (7 notifications + 8 blade templates) | ⏳ Planned | — |
