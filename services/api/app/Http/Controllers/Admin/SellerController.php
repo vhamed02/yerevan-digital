@@ -33,7 +33,7 @@ class SellerController extends Controller
             'password' => ['required', Password::defaults()],
             'phone'    => ['sometimes', 'nullable', 'string', 'max:50'],
             'status'   => ['sometimes', 'in:active,pending'],
-            'locale'   => ['sometimes', 'in:hy,en'],
+            'locale'   => ['sometimes', 'in:hy,en,ru'],
         ]);
 
         $seller = $this->sellers->create($data);

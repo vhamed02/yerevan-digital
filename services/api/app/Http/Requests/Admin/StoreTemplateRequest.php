@@ -13,9 +13,11 @@ class StoreTemplateRequest extends FormRequest
             'name'              => ['required', 'array'],
             'name.hy'           => ['required', 'string', 'max:255'],
             'name.en'           => ['required', 'string', 'max:255'],
+            'name.ru'           => ['nullable', 'string', 'max:255'],
             'description'       => ['nullable', 'array'],
             'description.hy'    => ['nullable', 'string'],
             'description.en'    => ['nullable', 'string'],
+            'description.ru'    => ['nullable', 'string'],
             'sort_order'        => ['nullable', 'integer', 'min:0'],
         ];
     }

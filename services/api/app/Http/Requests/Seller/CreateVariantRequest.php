@@ -12,6 +12,7 @@ class CreateVariantRequest extends FormRequest
             'name'             => ['required', 'array'],
             'name.hy'          => ['required', 'string', 'max:255'],
             'name.en'          => ['required', 'string', 'max:255'],
+            'name.ru'          => ['nullable', 'string', 'max:255'],
             'sku'              => ['nullable', 'string', 'max:100'],
             'price'            => ['nullable', 'numeric', 'min:0'],
             'stock'            => ['required', 'integer', 'min:0'],

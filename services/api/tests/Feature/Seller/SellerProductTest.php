@@ -98,6 +98,22 @@ class SellerProductTest extends TestCase
         ]);
     }
 
+    public function test_seller_can_create_product_with_russian_content(): void
+    {
+        $response = $this->actingAsSeller()
+            ->postJson('/api/v1/seller/products', [
+                'name'        => ['hy' => 'Կարմիր Վարդ', 'en' => 'Red Rose', 'ru' => 'Красная роза'],
+                'description' => ['hy' => '', 'en' => 'A rose', 'ru' => 'Красивая роза'],
+                'price'       => 15000,
+            ])
+            ->assertStatus(201)
+            ->assertJsonPath('data.name.ru', 'Красная роза');
+
+        $product = \App\Models\Product::where('store_id', $this->store->id)->latest('id')->first();
+        $this->assertEquals('Красная роза', $product->getTranslation('name', 'ru'));
+        $this->assertEquals('Красивая роза', $product->getTranslation('description', 'ru'));
+    }
+
     public function test_product_slug_auto_generated_from_english_name(): void
     {
         $this->actingAsSeller()

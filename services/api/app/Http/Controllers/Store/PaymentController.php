@@ -70,7 +70,7 @@ class PaymentController extends Controller
             orderNumber: $order->order_number,
             amount: (float) $order->total,
             currency: $order->currency,
-            description: "Order {$order->order_number} — {$store->getTranslation('name', 'en')}",
+            description: "Order {$order->order_number} — " . ($store->getTranslation('name', app()->getLocale()) ?: $store->getTranslation('name', 'en') ?: $store->getTranslation('name', 'hy')),
             callbackUrl: url("/api/v1/store/{$slug}/payments/callback/{$gatewayKey}"),
             successUrl: "{$frontendUrl}/store/{$slug}/checkout/success?order={$order->uuid}",
             failureUrl: "{$frontendUrl}/store/{$slug}/checkout/failed?order={$order->uuid}",

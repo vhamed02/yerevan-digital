@@ -2,7 +2,7 @@
 
 > **Living document.** Kept up to date as work progresses. Each phase updates the
 > status table, the progress log, and any decisions that change.
-> Last updated: 2026-05-30 · Status: **Phase 1 complete; Phase 2 next**
+> Last updated: 2026-05-30 · Status: **Phase 2 complete; Phase 3 next**
 
 ---
 
@@ -52,7 +52,7 @@ so a third locale needs **no content migration**).
 |---|-------|--------|--------|
 | 1a | Foundation — `pickLang` helper, `MultiLang.ru`, routing/proxy/request/switcher +`ru`, `ru.json` (130 keys) | ✅ Done & live | `375ef0a` |
 | 1b | Locale-aware content display — converted customer-facing `name.hy \|\| en` sites to `pickLang` (20 files: spark+minimal+_shared templates, store pages, store metadata/JSON-LD, StoreCard/StoreFilters/StaticPageContent/OrderConfirmation) | ✅ Done & live | `b697d19` |
-| 2 | Backend Russian support (SetLocale, `users.locale` enum migration, 12 Form Requests, `in:` rule) | ⏳ Planned | — |
+| 2 | Backend Russian support (SetLocale, `users.locale` enum migration, 12 Form Requests, `in:` rule, locale-aware payment description) | ✅ Done | `TBD` |
 | 3 | Russian content-entry forms (Product/Store/Page/Payments/Seller — 3rd language tab) | ⏳ Planned | — |
 | 4 | Translate customer-facing UI (storefront templates + customer store pages → catalog + `useTranslations`) | ⏳ Planned | — |
 | 5 | Trilingual transactional emails (7 notifications + 8 blade templates) | ⏳ Planned | — |
@@ -121,3 +121,10 @@ Legend: ✅ done & live · 🔧 in progress · ⏳ planned
   (fallback ru→en→hy). `tsc` clean; production build passes. **Note:** seller/admin internal
   content-display still uses the old pattern — deferred (dashboards are English-chrome,
   out of customer-facing scope). NEXT: Phase 2 (backend RU support).
+- **2026-05-30** — Phase 2 done: `SetLocale` accepts `ru`; migration extends the
+  `users.locale` enum to `['hy','en','ru']` (via `->change()`, works on MySQL + the
+  SQLite test DB); admin seller `locale` rule `in:hy,en,ru`; all 12 translatable Form
+  Requests (+ inline admin page-create) accept nullable `*.ru`; payment-description store
+  name is now locale-aware (locale→en→hy). Added SetLocale unit tests + a Russian
+  product-authoring feature test. Full suite: 239 tests / 691 assertions. NEXT: Phase 3
+  (Russian content-entry forms in the frontend).

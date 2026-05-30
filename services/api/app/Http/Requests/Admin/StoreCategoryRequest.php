@@ -12,6 +12,7 @@ class StoreCategoryRequest extends FormRequest
             'name'            => ['required', 'array'],
             'name.hy'         => ['required', 'string', 'max:255'],
             'name.en'         => ['required', 'string', 'max:255'],
+            'name.ru'         => ['nullable', 'string', 'max:255'],
             'slug'            => ['nullable', 'string', 'max:100', 'unique:categories,slug'],
             'parent_id'       => ['nullable', 'integer', 'exists:categories,id'],
             'icon'            => ['nullable', 'string', 'max:50'],

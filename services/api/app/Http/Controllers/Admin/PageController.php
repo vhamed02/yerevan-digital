@@ -30,6 +30,7 @@ class PageController extends Controller
             'title'    => ['required', 'array'],
             'title.hy' => ['required', 'string', 'max:200'],
             'title.en' => ['required', 'string', 'max:200'],
+            'title.ru' => ['nullable', 'string', 'max:200'],
         ]);
 
         $page = $this->pages->create([

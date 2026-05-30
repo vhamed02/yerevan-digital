@@ -12,9 +12,11 @@ class UpdateTemplateRequest extends FormRequest
             'name'           => ['sometimes', 'array'],
             'name.hy'        => ['required_with:name', 'string', 'max:255'],
             'name.en'        => ['required_with:name', 'string', 'max:255'],
+            'name.ru'        => ['nullable', 'string', 'max:255'],
             'description'    => ['sometimes', 'nullable', 'array'],
             'description.hy' => ['nullable', 'string'],
             'description.en' => ['nullable', 'string'],
+            'description.ru' => ['nullable', 'string'],
             'sort_order'     => ['sometimes', 'integer', 'min:0'],
         ];
     }
