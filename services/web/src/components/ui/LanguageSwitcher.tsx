@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils'
 const LOCALES = [
   { code: 'hy', flag: '🇦🇲', label: 'Հայ' },
   { code: 'en', flag: '🇬🇧', label: 'EN' },
+  { code: 'ru', flag: '🇷🇺', label: 'РУ' },
 ] as const
 
 interface LanguageSwitcherProps {
@@ -19,7 +20,7 @@ function LanguageSwitcher({ className }: LanguageSwitcherProps) {
 
   const switchLocale = (next: string) => {
     if (next === locale) return
-    const bare = pathname.replace(/^\/(en|hy)(\/|$)/, '/').replace(/\/$/, '') || '/'
+    const bare = pathname.replace(/^\/(en|hy|ru)(\/|$)/, '/').replace(/\/$/, '') || '/'
     const newPath = next === 'hy' ? bare : `/${next}${bare === '/' ? '' : bare}`
     window.location.href = newPath || '/'
   }

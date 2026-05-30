@@ -122,6 +122,7 @@ export interface ApiError {
 export interface MultiLang {
   hy: string
   en: string
+  ru?: string
 }
 
 export interface PublicCategory {

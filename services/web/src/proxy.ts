@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server'
 
-const LOCALES = ['en', 'hy'] as const
+const LOCALES = ['en', 'hy', 'ru'] as const
 type Locale = (typeof LOCALES)[number]
 const DEFAULT_LOCALE: Locale = 'hy'
 
@@ -11,7 +11,7 @@ const AUTH_PATHS = ['/auth/login', '/auth/register', '/auth/forgot-password']
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  const localeMatch = pathname.match(/^\/(en|hy)(\/|$)/)
+  const localeMatch = pathname.match(/^\/(en|hy|ru)(\/|$)/)
   const detectedLocale: Locale = localeMatch ? (localeMatch[1] as Locale) : DEFAULT_LOCALE
 
   const afterPrefix = localeMatch ? pathname.slice(localeMatch[0].length) : null
