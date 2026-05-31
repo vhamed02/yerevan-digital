@@ -2,7 +2,7 @@
 
 > **Living document.** Kept up to date as work progresses. Each phase updates the
 > status table, the progress log, and any decisions that change.
-> Last updated: 2026-05-30 · Status: **Phase 4 complete; Phase 5 next**
+> Last updated: 2026-05-31 · Status: **Phase 5 complete; Phase 6 next**
 
 ---
 
@@ -63,7 +63,7 @@ so a third locale needs **no content migration**).
 | 4d-shared | UI strings: `_shared` trio — CartDrawer, ProductDetail, CheckoutForm (used by minimal; reuse `storefront` catalog + 4 new keys) | ✅ Done & live | `b3eabc8` |
 | 4d-pages-1 | UI strings: products listing page + checkout-failed page + SearchInput/PriceRangeFilter (`filters`, `payFailed` catalog) | ✅ Done & live | `53e9f70` |
 | 4d-pages-2 | UI strings: OrderConfirmation (status timeline/labels via key maps) + ReviewSection (`orderStatus`/`orderTimeline`/`order`/`reviews` catalog) | ✅ Done & live | `ee542ac` |
-| 5 | Trilingual transactional emails (7 notifications + 8 blade templates) | ⏳ Planned | — |
+| 5 | Trilingual transactional emails — `lang/{hy,en,ru}/emails.php` (62 keys), 7 notifications + 7 blades to `__()`, `orders.locale` capture drives customer emails, status-label map | ✅ Done | `53aeb1a` |
 | 6 | SEO (locale-aware JSON-LD/OG, `hreflang`) + full verify sweep | ⏳ Planned | — |
 
 Legend: ✅ done & live · 🔧 in progress · ⏳ planned
@@ -98,8 +98,13 @@ Legend: ✅ done & live · 🔧 in progress · ⏳ planned
   `useTranslations`/`getTranslations`; translate hy/en/ru.
 
 ### Phase 5 — Trilingual transactional emails
-- 7 notification classes + 8 blade templates → 3-locale lookup (incl. status-label map,
-  email `lang`/`dir`).
+- New `lang/{hy,en,ru}/emails.php` (62 keys, full parity) + `config('app.supported_locales')`
+  (env `APP_SUPPORTED_LOCALES`). 7 notifications + 7 blades refactored from inline `hy/en`
+  ternaries to `__('emails.*', …, $locale)` via a shared `ResolvesLocale` concern. Customer
+  emails (confirmation, status-changed) now honour the buyer's checkout locale via a new
+  `orders.locale` column captured in `CreateOrderAction`; seller/admin emails use
+  `users.locale`. Shared `emails.status` label map. `ContactMessageNotification` stays
+  English (internal admin alert).
 
 ### Phase 6 — SEO + verify
 - Locale-aware JSON-LD/OG names via `pickLang`; `alternates.languages` (hreflang) for
@@ -198,3 +203,22 @@ Legend: ✅ done & live · 🔧 in progress · ⏳ planned
   timeline/labels + ReviewSection).
 - **(superseded note)** earlier 4d-pages plan: (products listing, checkout result pages,
   OrderConfirmation, ReviewSection, filter controls).
+- **2026-05-31** — Phase 4d-pages-2 done & live (`ee542ac`): OrderConfirmation (status
+  timeline/labels via key maps) + ReviewSection wired to `storefront.{orderStatus,
+  orderTimeline,order,reviews}` (266 keys, full parity). `tsc` clean; production build passes.
+  **Phase 4 complete** — the whole customer-facing UI surface is trilingual.
+- **2026-05-31** — Phase 5 done: transactional emails are now trilingual. Added
+  `lang/{hy,en,ru}/emails.php` (62 keys, full parity) and `config('app.supported_locales')`
+  (env-driven, also adopted by `SetLocale`). Refactored all 7 locale-aware notifications
+  (`CustomerOrderConfirmation`, `NewOrder`, `OrderStatusChanged`, `StoreApproved`,
+  `StoreSuspended`, `WelcomeSeller`, `OrdersExported`) + 7 blades (layout + 6 content) from
+  inline `hy/en` ternaries to `__('emails.*', …, $locale)` via a shared `ResolvesLocale`
+  concern. `order-confirmation.blade` was previously English-only — now fully localized,
+  including locale-aware item names. New `orders.locale` column (migration) captured in
+  `CreateOrderAction` from the request locale drives the two customer emails (fallback
+  order→notifiable→`config('app.locale')`); seller/admin emails use `users.locale`. Shared
+  `emails.status` label map for the 7 order statuses. `ContactMessageNotification` left
+  English (internal admin alert). New `EmailLocalizationTest` (8 tests) renders every
+  notification in `ru`, asserts the order-locale-driven customer flow, the status-label
+  translation, and the missing-locale fallback. Full suite: **247 tests / 712 assertions**.
+  NEXT: Phase 6 (SEO — locale-aware JSON-LD/OG + hreflang + full verify sweep).
