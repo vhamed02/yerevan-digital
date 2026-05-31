@@ -271,6 +271,50 @@
       "title": "Վճարումը չհաջողվեց",
       "message": "Վճարումը չի կատարվել։ Ձեր զամբյուղը պահպանված է — կարող եք կրկին փորձել կամ ընտրել վճարման այլ եղանակ։",
       "returnToCart": "Վերադառնալ զամբյուղ"
+    },
+    "orderStatus": {
+      "pending": "Սպասվում է",
+      "paid": "Վճարված",
+      "processing": "Պատրաստվում է",
+      "shipped": "Ուղարկված",
+      "delivered": "Հանձնված",
+      "cancelled": "Չեղարկված",
+      "refunded": "Վերադարձված"
+    },
+    "orderTimeline": {
+      "accepted": "Ընդունված",
+      "processing": "Պատրաստվում",
+      "shipped": "Ուղարկված",
+      "delivered": "Հանձնված"
+    },
+    "order": {
+      "received": "Ձեր պատվերն ընդունվեց",
+      "statusTitle": "Պատվերի կարգավիճակ",
+      "confirmationSent": "Հաստատման նամակ ուղարկվեց <b>{email}</b> հասցեին",
+      "progress": "Պատվերի ընթացք",
+      "notFound": "Պատվերը չի գտնվել։"
+    },
+    "reviews": {
+      "heading": "Կարծիքներ",
+      "count": "{count} կարծիք",
+      "none": "Դեռ կարծիք չկա",
+      "write": "Գրել կարծիք",
+      "thankYou": "Շնորհակալություն։ Ձեր կարծիքը կհրապարակվի հաստատումից հետո։",
+      "rating": "Վարկանիշ",
+      "name": "Անուն",
+      "namePlaceholder": "Ձեր անունը",
+      "emailOptional": "Էլ. փոստ (կամընտիր)",
+      "reviewOptional": "Կարծիք (կամընտիր)",
+      "reviewPlaceholder": "Ձեր կարծիքը ապրանքի մասին...",
+      "submitting": "Ուղարկվում...",
+      "submit": "Ուղարկել",
+      "cancel": "Չեղարկել",
+      "selectRating": "Ընտրեք վարկանիշ",
+      "fillCaptcha": "Լրացրեք captcha-ն",
+      "submitFailed": "Ուղարկումը ձախողվեց",
+      "captcha": "Captcha",
+      "refresh": "Թարմացնել",
+      "enterSum": "Մուտքագրեք գումարը"
     }
   }
 }

@@ -271,6 +271,50 @@
       "title": "Payment failed",
       "message": "Payment was not completed. Your cart is saved — you can try again or choose another payment method.",
       "returnToCart": "Return to cart"
+    },
+    "orderStatus": {
+      "pending": "Pending",
+      "paid": "Paid",
+      "processing": "Processing",
+      "shipped": "Shipped",
+      "delivered": "Delivered",
+      "cancelled": "Cancelled",
+      "refunded": "Refunded"
+    },
+    "orderTimeline": {
+      "accepted": "Accepted",
+      "processing": "Preparing",
+      "shipped": "Shipped",
+      "delivered": "Delivered"
+    },
+    "order": {
+      "received": "Your order is confirmed",
+      "statusTitle": "Order status",
+      "confirmationSent": "A confirmation email was sent to <b>{email}</b>",
+      "progress": "Order progress",
+      "notFound": "Order not found."
+    },
+    "reviews": {
+      "heading": "Reviews",
+      "count": "{count} reviews",
+      "none": "No reviews yet",
+      "write": "Write a review",
+      "thankYou": "Thank you! Your review will be published after approval.",
+      "rating": "Rating",
+      "name": "Name",
+      "namePlaceholder": "Your name",
+      "emailOptional": "Email (optional)",
+      "reviewOptional": "Review (optional)",
+      "reviewPlaceholder": "Your thoughts about the product...",
+      "submitting": "Submitting...",
+      "submit": "Submit",
+      "cancel": "Cancel",
+      "selectRating": "Please select a rating",
+      "fillCaptcha": "Please complete the captcha",
+      "submitFailed": "Submission failed",
+      "captcha": "Captcha",
+      "refresh": "Refresh",
+      "enterSum": "Enter the sum"
     }
   }
 }

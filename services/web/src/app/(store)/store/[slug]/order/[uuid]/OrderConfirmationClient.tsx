@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { useLocale } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { CheckCircle, Clock, Package, Truck, Star, XCircle, RefreshCw, CreditCard } from 'lucide-react'
 import { pickLang } from '@/lib/i18n'
 import type { StorefrontOrder } from '@/types'
@@ -59,10 +59,10 @@ function Confetti() {
 // ── Status timeline ───────────────────────────────────────────────────────────
 
 const STEPS = [
-  { key: 'pending',    label: 'Ընդունված',   icon: Clock      },
-  { key: 'processing', label: 'Պատրաստվում', icon: Package    },
-  { key: 'shipped',    label: 'Ուղարկված',   icon: Truck      },
-  { key: 'delivered',  label: 'Հանձնված',    icon: Star       },
+  { key: 'pending',    labelKey: 'orderTimeline.accepted',   icon: Clock   },
+  { key: 'processing', labelKey: 'orderTimeline.processing', icon: Package },
+  { key: 'shipped',    labelKey: 'orderTimeline.shipped',    icon: Truck   },
+  { key: 'delivered',  labelKey: 'orderTimeline.delivered',  icon: Star    },
 ] as const
 
 // statuses that map onto which step index is "reached"
@@ -74,19 +74,20 @@ const STATUS_STEP: Record<string, number> = {
   delivered:  3,
 }
 
-const TERMINAL: Record<string, { label: string; color: string; icon: React.ElementType }> = {
-  cancelled: { label: 'Չեղարկված',  color: 'text-red-600 bg-red-50 border-red-200',     icon: XCircle   },
-  refunded:  { label: 'Վերադարձված', color: 'text-amber-600 bg-amber-50 border-amber-200', icon: RefreshCw },
+const TERMINAL: Record<string, { labelKey: string; color: string; icon: React.ElementType }> = {
+  cancelled: { labelKey: 'orderStatus.cancelled',  color: 'text-red-600 bg-red-50 border-red-200',     icon: XCircle   },
+  refunded:  { labelKey: 'orderStatus.refunded', color: 'text-amber-600 bg-amber-50 border-amber-200', icon: RefreshCw },
 }
 
 function StatusTimeline({ status }: { status: string }) {
+  const t = useTranslations('storefront')
   const terminal = TERMINAL[status]
   if (terminal) {
     const Icon = terminal.icon
     return (
       <div className={`flex items-center gap-3 rounded-2xl border px-5 py-4 ${terminal.color}`}>
         <Icon className="h-5 w-5 shrink-0" />
-        <span className="font-semibold text-sm">{terminal.label}</span>
+        <span className="font-semibold text-sm">{t(terminal.labelKey)}</span>
       </div>
     )
   }
@@ -124,7 +125,7 @@ function StatusTimeline({ status }: { status: string }) {
               )}
             </div>
             <span className={`text-center text-xs font-medium leading-tight ${active ? 'text-gray-900' : done ? 'text-gray-500' : 'text-gray-300'}`}>
-              {step.label}
+              {t(step.labelKey)}
             </span>
           </div>
         )
@@ -135,14 +136,14 @@ function StatusTimeline({ status }: { status: string }) {
 
 // ── Status badge ──────────────────────────────────────────────────────────────
 
-const STATUS_LABELS: Record<string, string> = {
-  pending:    'Սպասվում է',
-  paid:       'Վճարված',
-  processing: 'Պատրաստվում է',
-  shipped:    'Ուղարկված',
-  delivered:  'Հանձնված',
-  cancelled:  'Չեղարկված',
-  refunded:   'Վերադարձված',
+const STATUS_LABEL_KEYS: Record<string, string> = {
+  pending:    'orderStatus.pending',
+  paid:       'orderStatus.paid',
+  processing: 'orderStatus.processing',
+  shipped:    'orderStatus.shipped',
+  delivered:  'orderStatus.delivered',
+  cancelled:  'orderStatus.cancelled',
+  refunded:   'orderStatus.refunded',
 }
 
 const STATUS_COLORS: Record<string, string> = {
@@ -159,6 +160,7 @@ const STATUS_COLORS: Record<string, string> = {
 
 export function OrderConfirmationClient({ order, storeSlug, isNew = false }: Props) {
   const locale = useLocale()
+  const t = useTranslations('storefront')
   const formattedDate = order?.created_at
     ? new Date(order.created_at).toLocaleDateString('hy-AM', { year: 'numeric', month: 'long', day: 'numeric' })
     : null
@@ -175,7 +177,7 @@ export function OrderConfirmationClient({ order, storeSlug, isNew = false }: Pro
             <CheckCircle className="h-12 w-12 text-green-500" />
           </div>
           <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
-            {isNew ? 'Ձեր Պատվերն Ընդունվեց' : 'Պատվերի Կարգավիճակ'}
+            {isNew ? t('order.received') : t('order.statusTitle')}
           </h1>
           {order && (
             <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
@@ -183,7 +185,7 @@ export function OrderConfirmationClient({ order, storeSlug, isNew = false }: Pro
                 #{order.order_number}
               </span>
               <span className={`rounded-full border px-3 py-0.5 text-xs font-semibold ${STATUS_COLORS[order.status] ?? 'bg-gray-100 text-gray-600 border-gray-200'}`}>
-                {STATUS_LABELS[order.status] ?? order.status}
+                {STATUS_LABEL_KEYS[order.status] ? t(STATUS_LABEL_KEYS[order.status]) : order.status}
               </span>
             </div>
           )}
@@ -192,7 +194,10 @@ export function OrderConfirmationClient({ order, storeSlug, isNew = false }: Pro
           )}
           {isNew && order?.customer_email && (
             <p className="mt-2 text-sm text-gray-500">
-              Հաստատման նամակ ուղարկվեց <strong>{order.customer_email}</strong> հասցեին
+              {t.rich('order.confirmationSent', {
+                email: order.customer_email,
+                b: (chunks) => <strong>{chunks}</strong>,
+              })}
             </p>
           )}
         </div>
@@ -202,7 +207,7 @@ export function OrderConfirmationClient({ order, storeSlug, isNew = false }: Pro
             {/* Timeline */}
             <div className="mb-8 rounded-2xl border border-gray-100 bg-white p-6">
               <p className="mb-6 text-xs font-bold uppercase tracking-widest text-gray-400">
-                Պատվերի ընթացք
+                {t('order.progress')}
               </p>
               <StatusTimeline status={order.status} />
             </div>
@@ -210,7 +215,7 @@ export function OrderConfirmationClient({ order, storeSlug, isNew = false }: Pro
             {/* Order summary */}
             <div className="mb-8 rounded-2xl border border-gray-100 bg-gray-50 p-5">
               <p className="mb-3 text-xs font-bold uppercase tracking-widest text-gray-400">
-                Պատվերի ամփոփում
+                {t('checkout.orderSummary')}
               </p>
               {order.customer_name && (
                 <p className="mb-3 text-sm text-gray-600">
@@ -234,13 +239,13 @@ export function OrderConfirmationClient({ order, storeSlug, isNew = false }: Pro
                 ))}
               </ul>
               <div className="flex items-center justify-between border-t border-gray-200 pt-3 font-bold text-gray-900">
-                <span>Ընդամենը</span>
+                <span>{t('cart.total')}</span>
                 <span>{order.total.toLocaleString()} ֏</span>
               </div>
             </div>
           </>
         ) : (
-          <p className="mb-8 text-center text-gray-500">Պատվերը չի գտնվել։</p>
+          <p className="mb-8 text-center text-gray-500">{t('order.notFound')}</p>
         )}
 
         <div className="flex justify-center">
@@ -248,7 +253,7 @@ export function OrderConfirmationClient({ order, storeSlug, isNew = false }: Pro
             href={`/store/${storeSlug}`}
             className="rounded-xl bg-gray-900 px-8 py-3 text-sm font-semibold text-white hover:bg-gray-800 transition-colors"
           >
-            Շարունակել գնումները
+            {t('cart.continueShopping')}
           </Link>
         </div>
       </div>

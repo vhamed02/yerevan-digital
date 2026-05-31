@@ -271,6 +271,50 @@
       "title": "Оплата не удалась",
       "message": "Оплата не была завершена. Ваша корзина сохранена — вы можете попробовать снова или выбрать другой способ оплаты.",
       "returnToCart": "Вернуться в корзину"
+    },
+    "orderStatus": {
+      "pending": "Ожидает",
+      "paid": "Оплачен",
+      "processing": "В обработке",
+      "shipped": "Отправлен",
+      "delivered": "Доставлен",
+      "cancelled": "Отменён",
+      "refunded": "Возвращён"
+    },
+    "orderTimeline": {
+      "accepted": "Принят",
+      "processing": "Готовится",
+      "shipped": "Отправлен",
+      "delivered": "Доставлен"
+    },
+    "order": {
+      "received": "Ваш заказ принят",
+      "statusTitle": "Статус заказа",
+      "confirmationSent": "Письмо с подтверждением отправлено на <b>{email}</b>",
+      "progress": "Ход заказа",
+      "notFound": "Заказ не найден."
+    },
+    "reviews": {
+      "heading": "Отзывы",
+      "count": "{count} отзывов",
+      "none": "Пока нет отзывов",
+      "write": "Написать отзыв",
+      "thankYou": "Спасибо! Ваш отзыв будет опубликован после проверки.",
+      "rating": "Оценка",
+      "name": "Имя",
+      "namePlaceholder": "Ваше имя",
+      "emailOptional": "Эл. почта (необязательно)",
+      "reviewOptional": "Отзыв (необязательно)",
+      "reviewPlaceholder": "Ваше мнение о товаре...",
+      "submitting": "Отправка...",
+      "submit": "Отправить",
+      "cancel": "Отменить",
+      "selectRating": "Выберите оценку",
+      "fillCaptcha": "Заполните captcha",
+      "submitFailed": "Не удалось отправить",
+      "captcha": "Captcha",
+      "refresh": "Обновить",
+      "enterSum": "Введите сумму"
     }
   }
 }

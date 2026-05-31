@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { Turnstile } from '@marsidev/react-turnstile'
+import { useTranslations } from 'next-intl'
 import { Star } from 'lucide-react'
 import type { ProductReview } from '@/types'
 
@@ -33,6 +34,7 @@ function Stars({ value, onChange }: { value: number; onChange?: (v: number) => v
 }
 
 function CaptchaWidget({ apiUrl, onToken }: { apiUrl: string; onToken: (token: string) => void }) {
+  const t = useTranslations('storefront')
   const [img, setImg] = useState('')
   const [rawToken, setRawToken] = useState('')
   const [answer, setAnswer] = useState('')
@@ -62,7 +64,7 @@ function CaptchaWidget({ apiUrl, onToken }: { apiUrl: string; onToken: (token: s
   return (
     <div className="flex flex-col gap-2">
       <label className="text-xs font-semibold uppercase tracking-wide text-gray-500">
-        Captcha *
+        {t('reviews.captcha')} *
       </label>
       <div className="flex items-center gap-3">
         {img && (
@@ -78,14 +80,14 @@ function CaptchaWidget({ apiUrl, onToken }: { apiUrl: string; onToken: (token: s
           onClick={load}
           className="text-xs text-gray-400 hover:text-gray-600 underline underline-offset-2"
         >
-          Refresh
+          {t('reviews.refresh')}
         </button>
       </div>
       <input
         type="text"
         value={answer}
         onChange={handleAnswerChange}
-        placeholder="Enter the sum"
+        placeholder={t('reviews.enterSum')}
         className="w-32 rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 outline-none focus:border-gray-900 focus:bg-white transition-colors"
         maxLength={3}
       />
@@ -108,6 +110,7 @@ export default function ReviewSection({
   storeSlug,
   productSlug,
 }: Props) {
+  const t = useTranslations('storefront')
   const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? ''
   const [showForm, setShowForm] = useState(false)
   const [reviews, setReviews] = useState<ProductReview[]>(initialReviews)
@@ -123,8 +126,8 @@ export default function ReviewSection({
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!rating) { setErrorMsg('Ընտրեք վարկանիշ'); setStatus('error'); return }
-    if (!spamToken) { setErrorMsg('Լրացրեք captcha-ն'); setStatus('error'); return }
+    if (!rating) { setErrorMsg(t('reviews.selectRating')); setStatus('error'); return }
+    if (!spamToken) { setErrorMsg(t('reviews.fillCaptcha')); setStatus('error'); return }
 
     setStatus('sending')
     setErrorMsg('')
@@ -153,7 +156,7 @@ export default function ReviewSection({
       const json = await res.json()
       if (!res.ok) {
         const firstError = json.errors ? Object.values(json.errors as Record<string, string[]>)[0]?.[0] : json.message
-        throw new Error(firstError || 'Failed to submit')
+        throw new Error(firstError || t('reviews.submitFailed'))
       }
       setStatus('success')
       setFields({ name: '', email: '', body: '' })
@@ -162,7 +165,7 @@ export default function ReviewSection({
       setShowForm(false)
     } catch (err: unknown) {
       setStatus('error')
-      setErrorMsg(err instanceof Error ? err.message : 'Ուղարկումը ձախողվեց')
+      setErrorMsg(err instanceof Error ? err.message : t('reviews.submitFailed'))
     }
   }
 
@@ -172,16 +175,16 @@ export default function ReviewSection({
     <div className="border-t border-gray-100 pt-8 mt-8">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-lg font-bold text-gray-900">Կարծիքներ</h2>
+          <h2 className="text-lg font-bold text-gray-900">{t('reviews.heading')}</h2>
           {displayAvg ? (
             <div className="mt-1 flex items-center gap-2">
               <Stars value={Math.round(displayAvg)} />
               <span className="text-sm text-gray-600">
-                {displayAvg} · {ratingCount} կարծիք
+                {displayAvg} · {t('reviews.count', { count: ratingCount })}
               </span>
             </div>
           ) : (
-            <p className="mt-1 text-sm text-gray-400">Դեռ կարծիք չկա</p>
+            <p className="mt-1 text-sm text-gray-400">{t('reviews.none')}</p>
           )}
         </div>
         {!showForm && status !== 'success' && (
@@ -189,7 +192,7 @@ export default function ReviewSection({
             onClick={() => setShowForm(true)}
             className="rounded-xl bg-gray-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-gray-800 transition-colors"
           >
-            Գրել կարծիք
+            {t('reviews.write')}
           </button>
         )}
       </div>
@@ -197,7 +200,7 @@ export default function ReviewSection({
       {status === 'success' && (
         <div className="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 px-6 py-5">
           <p className="text-sm font-medium text-emerald-800">
-            ✓ Շնորհակալություն։ Ձեր կարծիքը կուղարկվի հաստատումից հետո։
+            ✓ {t('reviews.thankYou')}
           </p>
         </div>
       )}
@@ -205,24 +208,24 @@ export default function ReviewSection({
       {showForm && (
         <form onSubmit={handleSubmit} className="mb-10 rounded-2xl border border-gray-100 bg-gray-50 p-6 space-y-5">
           <div>
-            <label className={labelClass}>Վարկանիշ *</label>
+            <label className={labelClass}>{t('reviews.rating')} *</label>
             <Stars value={rating} onChange={setRating} />
           </div>
 
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
             <div>
-              <label className={labelClass}>Անուն *</label>
+              <label className={labelClass}>{t('reviews.name')} *</label>
               <input
                 type="text"
                 required
                 value={fields.name}
                 onChange={e => setFields(f => ({ ...f, name: e.target.value }))}
-                placeholder="Ձեր անունը"
+                placeholder={t('reviews.namePlaceholder')}
                 className={inputClass}
               />
             </div>
             <div>
-              <label className={labelClass}>Էլ. փոստ (կամընտիր)</label>
+              <label className={labelClass}>{t('reviews.emailOptional')}</label>
               <input
                 type="email"
                 value={fields.email}
@@ -234,11 +237,11 @@ export default function ReviewSection({
           </div>
 
           <div>
-            <label className={labelClass}>Կարծիք (կամընտիր)</label>
+            <label className={labelClass}>{t('reviews.reviewOptional')}</label>
             <textarea
               value={fields.body}
               onChange={e => setFields(f => ({ ...f, body: e.target.value }))}
-              placeholder="Ձեր կարծիքը ապրանքի մասին..."
+              placeholder={t('reviews.reviewPlaceholder')}
               rows={4}
               className={`${inputClass} resize-none`}
             />
@@ -267,14 +270,14 @@ export default function ReviewSection({
               disabled={status === 'sending'}
               className="rounded-xl bg-gray-900 px-8 py-2.5 text-sm font-semibold text-white hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              {status === 'sending' ? 'Ուղարկվում...' : 'Ուղարկել'}
+              {status === 'sending' ? t('reviews.submitting') : t('reviews.submit')}
             </button>
             <button
               type="button"
               onClick={() => { setShowForm(false); setStatus('idle'); setErrorMsg('') }}
               className="rounded-xl border border-gray-200 px-6 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-100 transition-colors"
             >
-              Չեղարկել
+              {t('reviews.cancel')}
             </button>
           </div>
         </form>
