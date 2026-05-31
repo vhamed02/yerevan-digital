@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use App\Models\Order;
+use App\Notifications\Concerns\ResolvesLocale;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -10,7 +11,7 @@ use Illuminate\Notifications\Notification;
 
 class CustomerOrderConfirmationNotification extends Notification implements ShouldQueue
 {
-    use Queueable;
+    use Queueable, ResolvesLocale;
 
     public function __construct(public readonly Order $order)
     {
@@ -25,13 +26,10 @@ class CustomerOrderConfirmationNotification extends Notification implements Shou
     public function toMail(object $notifiable): MailMessage
     {
         $order  = $this->order->loadMissing(['items', 'store']);
-        $locale = $notifiable->locale ?? 'hy';
-        $subject = $locale === 'hy'
-            ? "Պատվերը հաստատված է — #{$order->order_number}"
-            : "Order Confirmed — #{$order->order_number}";
+        $locale = $this->resolveLocale($order->locale);
 
         return (new MailMessage)
-            ->subject($subject)
+            ->subject(__('emails.order_confirmation.subject', ['number' => $order->order_number], $locale))
             ->view('emails.orders.order-confirmation', [
                 'order'  => $order,
                 'locale' => $locale,

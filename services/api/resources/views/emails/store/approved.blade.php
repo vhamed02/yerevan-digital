@@ -1,27 +1,15 @@
 @extends('emails.layout')
 
-@section('title', $locale === 'hy' ? 'Ձեր խանութը հաստատված է!' : 'Your store is now live!')
+@section('title', __('emails.store_approved.subject', [], $locale))
 
 @section('content')
-@if($locale === 'hy')
-<h1>Շնորհավո՛ր, {{ $user->name }}!</h1>
-<p>Ձեր խանութը հաստատվել է Vendora ադմինիստրատորի կողմից:</p>
+<h1>{{ __('emails.store_approved.heading', ['name' => $user->name], $locale) }}</h1>
+<p>{{ __('emails.store_approved.intro', [], $locale) }}</p>
 <div class="info-box">
-    <p><strong>Խանութ</strong>: {{ is_array($store->name) ? ($store->name['hy'] ?? '') : $store->name }}</p>
-    <p><strong>Հասցե</strong>: {{ config('app.url') }}/store/{{ $store->slug }}</p>
-    <p><span class="status-badge">Ակտիվ</span></p>
+    <p><strong>{{ __('emails.store_approved.store', [], $locale) }}</strong>: {{ $store->getTranslation('name', $locale) }}</p>
+    <p><strong>{{ __('emails.store_approved.url', [], $locale) }}</strong>: {{ config('app.url') }}/store/{{ $store->slug }}</p>
+    <p><span class="status-badge">{{ __('emails.store_approved.active', [], $locale) }}</span></p>
 </div>
-<p>Այժմ ձեր հաճախորդները կարող են գտնել ձեր խանութը Vendora հարթակում:</p>
-<a href="{{ config('app.url') }}/seller" class="btn">Կառավարել Խանութը</a>
-@else
-<h1>Congratulations, {{ $user->name }}!</h1>
-<p>Your store has been approved by the Vendora team and is now live.</p>
-<div class="info-box">
-    <p><strong>Store</strong>: {{ is_array($store->name) ? ($store->name['en'] ?? '') : $store->name }}</p>
-    <p><strong>URL</strong>: {{ config('app.url') }}/store/{{ $store->slug }}</p>
-    <p><span class="status-badge">Active</span></p>
-</div>
-<p>Your customers can now find and shop at your store on Vendora.</p>
-<a href="{{ config('app.url') }}/seller" class="btn">Manage Your Store</a>
-@endif
+<p>{{ __('emails.store_approved.body', [], $locale) }}</p>
+<a href="{{ config('app.url') }}/seller" class="btn">{{ __('emails.store_approved.manage', [], $locale) }}</a>
 @endsection

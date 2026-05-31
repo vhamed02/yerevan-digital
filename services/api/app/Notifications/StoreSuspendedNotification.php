@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use App\Models\Store;
+use App\Notifications\Concerns\ResolvesLocale;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -10,7 +11,7 @@ use Illuminate\Notifications\Notification;
 
 class StoreSuspendedNotification extends Notification implements ShouldQueue
 {
-    use Queueable;
+    use Queueable, ResolvesLocale;
 
     public function __construct(
         public readonly Store $store,
@@ -26,11 +27,10 @@ class StoreSuspendedNotification extends Notification implements ShouldQueue
 
     public function toMail(object $notifiable): MailMessage
     {
-        $locale  = $notifiable->locale ?? 'hy';
-        $subject = $locale === 'hy' ? 'Ձեր խանութը կասեցված է' : 'Your store has been suspended';
+        $locale = $this->resolveLocale($notifiable->locale ?? null);
 
         return (new MailMessage)
-            ->subject($subject)
+            ->subject(__('emails.store_suspended.subject', [], $locale))
             ->view('emails.store.suspended', [
                 'store'  => $this->store,
                 'user'   => $notifiable,

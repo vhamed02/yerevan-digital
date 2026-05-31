@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ $locale ?? 'hy' }}" dir="{{ ($locale ?? 'hy') === 'hy' ? 'ltr' : 'ltr' }}">
+<html lang="{{ $locale ?? config('app.locale') }}" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -35,7 +35,7 @@
         </div>
         <hr class="divider">
         <div class="footer">
-            <p>{{ $locale === 'hy' ? 'Vendora — Հայկական բիզնեսների համար' : 'Vendora — Built for Armenian businesses' }}</p>
+            <p>{{ __('emails.layout.tagline', [], $locale ?? config('app.locale')) }}</p>
             <p><a href="{{ config('app.url') }}">vendora.am</a> &nbsp;·&nbsp; <a href="mailto:support@vendora.am">support@vendora.am</a></p>
         </div>
     </div>

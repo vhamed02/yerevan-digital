@@ -2,6 +2,7 @@
 
 namespace App\Notifications;
 
+use App\Notifications\Concerns\ResolvesLocale;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -9,7 +10,7 @@ use Illuminate\Notifications\Notification;
 
 class WelcomeSellerNotification extends Notification implements ShouldQueue
 {
-    use Queueable;
+    use Queueable, ResolvesLocale;
 
     public function __construct()
     {
@@ -23,11 +24,10 @@ class WelcomeSellerNotification extends Notification implements ShouldQueue
 
     public function toMail(object $notifiable): MailMessage
     {
-        $locale  = $notifiable->locale ?? 'hy';
-        $subject = $locale === 'hy' ? 'Բարի գալուստ Vendora!' : 'Welcome to Vendora!';
+        $locale = $this->resolveLocale($notifiable->locale ?? null);
 
         return (new MailMessage)
-            ->subject($subject)
+            ->subject(__('emails.welcome.subject', [], $locale))
             ->view('emails.auth.welcome-seller', [
                 'user'   => $notifiable,
                 'locale' => $locale,

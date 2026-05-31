@@ -1,25 +1,25 @@
 @extends('emails.layout')
 
-@section('title', "Order Confirmed — #{{ $order->order_number }}")
+@section('title', __('emails.order_confirmation.subject', ['number' => $order->order_number], $locale))
 
 @section('content')
-<h1>Your order is confirmed!</h1>
-<p>Hi {{ $order->customer_name }}, thank you for your purchase. We've received your order and the seller will prepare it shortly.</p>
+<h1>{{ __('emails.order_confirmation.heading', [], $locale) }}</h1>
+<p>{{ __('emails.order_confirmation.intro', ['name' => $order->customer_name], $locale) }}</p>
 
 <div class="info-box">
-    <p><strong>Order number:</strong> #{{ $order->order_number }}</p>
-    <p><strong>Status:</strong> <span class="status-badge">Confirmed</span></p>
-    <p><strong>Date:</strong> {{ $order->created_at->format('d M Y, H:i') }}</p>
+    <p><strong>{{ __('emails.order_confirmation.order_number', [], $locale) }}:</strong> #{{ $order->order_number }}</p>
+    <p><strong>{{ __('emails.order_confirmation.status', [], $locale) }}:</strong> <span class="status-badge">{{ __('emails.order_confirmation.confirmed', [], $locale) }}</span></p>
+    <p><strong>{{ __('emails.order_confirmation.date', [], $locale) }}:</strong> {{ $order->created_at->format('d M Y, H:i') }}</p>
 </div>
 
 <hr class="divider">
 
-<h2 style="font-size:16px;font-weight:700;margin:0 0 12px;">Items ordered</h2>
+<h2 style="font-size:16px;font-weight:700;margin:0 0 12px;">{{ __('emails.order_confirmation.items', [], $locale) }}</h2>
 <table style="width:100%;border-collapse:collapse;">
 @foreach($order->items as $item)
     @php
         $name = is_array($item->product_name)
-            ? ($item->product_name['hy'] ?? $item->product_name['en'] ?? '')
+            ? ($item->product_name[$locale] ?? $item->product_name['en'] ?? $item->product_name['hy'] ?? '')
             : $item->product_name;
     @endphp
     <tr>
@@ -34,14 +34,14 @@
     </tr>
 @endforeach
     <tr>
-        <td colspan="2" style="padding:12px 0 4px;font-size:15px;font-weight:700;color:#18181b;border-top:1px solid #e4e4e7;">Total</td>
+        <td colspan="2" style="padding:12px 0 4px;font-size:15px;font-weight:700;color:#18181b;border-top:1px solid #e4e4e7;">{{ __('emails.order_confirmation.total', [], $locale) }}</td>
         <td style="padding:12px 0 4px;font-size:15px;font-weight:700;color:#18181b;text-align:right;border-top:1px solid #e4e4e7;">{{ number_format($order->total, 0) }} {{ $order->currency }}</td>
     </tr>
 </table>
 
 @if($order->shipping_address)
 <hr class="divider">
-<h2 style="font-size:16px;font-weight:700;margin:0 0 12px;">Delivery address</h2>
+<h2 style="font-size:16px;font-weight:700;margin:0 0 12px;">{{ __('emails.order_confirmation.delivery_address', [], $locale) }}</h2>
 <div class="info-box">
     @if($order->shipping_address['line1'] ?? null)<p>{{ $order->shipping_address['line1'] }}</p>@endif
     @if($order->shipping_address['city'] ?? null)<p>{{ $order->shipping_address['city'] }}@if($order->shipping_address['postal_code'] ?? null) {{ $order->shipping_address['postal_code'] }}@endif</p>@endif
@@ -50,10 +50,10 @@
 @endif
 
 <a href="{{ config('services.frontend_url', config('app.url')) }}/store/{{ $order->store->slug }}/order/{{ $order->uuid }}" class="btn">
-    Track Your Order
+    {{ __('emails.order_confirmation.track', [], $locale) }}
 </a>
 
 <p style="margin-top:24px;font-size:13px;color:#a1a1aa;">
-    If you have any questions, please contact the store directly or reply to this email.
+    {{ __('emails.order_confirmation.questions', [], $locale) }}
 </p>
 @endsection

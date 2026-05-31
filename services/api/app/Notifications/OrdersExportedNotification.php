@@ -2,6 +2,7 @@
 
 namespace App\Notifications;
 
+use App\Notifications\Concerns\ResolvesLocale;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -9,7 +10,7 @@ use Illuminate\Notifications\Notification;
 
 class OrdersExportedNotification extends Notification implements ShouldQueue
 {
-    use Queueable;
+    use Queueable, ResolvesLocale;
 
     public function __construct(
         private readonly string $csv,
@@ -25,20 +26,12 @@ class OrdersExportedNotification extends Notification implements ShouldQueue
 
     public function toMail(object $notifiable): MailMessage
     {
-        $locale  = $notifiable->locale ?? 'hy';
-        $subject = $locale === 'hy'
-            ? "Պատվերների արտահանում — {$this->storeName}"
-            : "Orders Export — {$this->storeName}";
-
-        $line = $locale === 'hy'
-            ? 'Կցված ֆայլում կգտնեք Ձեր պատվերների արտահանումը CSV ֆորմատով։'
-            : 'Please find your orders export attached as a CSV file.';
-
+        $locale   = $this->resolveLocale($notifiable->locale ?? null);
         $filename = 'orders-' . now()->format('Y-m-d') . '.csv';
 
         return (new MailMessage)
-            ->subject($subject)
-            ->line($line)
+            ->subject(__('emails.orders_export.subject', ['store' => $this->storeName], $locale))
+            ->line(__('emails.orders_export.line', [], $locale))
             ->attachData($this->csv, $filename, ['mime' => 'text/csv']);
     }
 }

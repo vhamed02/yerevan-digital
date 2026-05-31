@@ -31,6 +31,7 @@ class Order extends Model
         'tax',
         'total',
         'currency',
+        'locale',
         'customer_name',
         'customer_email',
         'customer_phone',

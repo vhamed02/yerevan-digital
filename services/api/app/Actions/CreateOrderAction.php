@@ -66,6 +66,9 @@ class CreateOrderAction
                 'tax'              => 0,
                 'total'            => $subtotal,
                 'currency'         => 'AMD',
+                'locale'           => in_array(app()->getLocale(), config('app.supported_locales'), true)
+                    ? app()->getLocale()
+                    : config('app.locale'),
                 'customer_name'    => $data->customerName,
                 'customer_email'   => $data->customerEmail,
                 'customer_phone'   => $data->customerPhone,

@@ -87,6 +87,8 @@ return [
 
     'fallback_locale' => env('APP_FALLBACK_LOCALE', 'en'),
 
+    'supported_locales' => array_filter(explode(',', env('APP_SUPPORTED_LOCALES', 'hy,en,ru'))),
+
     'faker_locale' => env('APP_FAKER_LOCALE', 'en_US'),
 
     /*

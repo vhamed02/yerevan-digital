@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use App\Models\Order;
+use App\Notifications\Concerns\ResolvesLocale;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -10,7 +11,7 @@ use Illuminate\Notifications\Notification;
 
 class OrderStatusChangedNotification extends Notification implements ShouldQueue
 {
-    use Queueable;
+    use Queueable, ResolvesLocale;
 
     public function __construct(public readonly Order $order)
     {
@@ -24,13 +25,10 @@ class OrderStatusChangedNotification extends Notification implements ShouldQueue
 
     public function toMail(object $notifiable): MailMessage
     {
-        $locale  = $notifiable->locale ?? 'hy';
-        $subject = $locale === 'hy'
-            ? "Ձեր պատվերի կարգավիճակը փոխվել է #{$this->order->order_number}"
-            : "Your order status updated #{$this->order->order_number}";
+        $locale = $this->resolveLocale($this->order->locale ?? $notifiable->locale ?? null);
 
         return (new MailMessage)
-            ->subject($subject)
+            ->subject(__('emails.status_changed.subject', ['number' => $this->order->order_number], $locale))
             ->view('emails.orders.status-changed', [
                 'order'  => $this->order,
                 'user'   => $notifiable,

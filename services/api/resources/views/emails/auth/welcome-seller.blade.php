@@ -1,31 +1,17 @@
 @extends('emails.layout')
 
-@section('title', $locale === 'hy' ? 'Բարի գալուստ Vendora!' : 'Welcome to Vendora!')
+@section('title', __('emails.welcome.subject', [], $locale))
 
 @section('content')
-@if($locale === 'hy')
-<h1>Բարի գալուստ, {{ $user->name }}!</h1>
-<p>Շնորհակալ ենք Vendora-ում գրանցվելու համար: Դուք հաջողությամբ ստեղծեցիք ձեր հաշիվը:</p>
-<p>Vendora-ն ձեզ հնարավորություն է տալիս կառուցել ձեր սեփական հայկական խանութը՝ պրոֆեսիոնալ ձևավորումով, հայկական վճարային համակարգերով և հեշտ կառավարմամբ:</p>
-<p><strong>Հաջորդ քայլերը</strong></p>
+<h1>{{ __('emails.welcome.heading', ['name' => $user->name], $locale) }}</h1>
+<p>{{ __('emails.welcome.intro', [], $locale) }}</p>
+<p>{{ __('emails.welcome.about', [], $locale) }}</p>
+<p><strong>{{ __('emails.welcome.next_steps', [], $locale) }}</strong></p>
 <div class="info-box">
-    <p>① Ստեղծեք ձեր խանութը (անուն, slug, նկարագրություն)</p>
-    <p>② Ավելացրեք ձեր ապրանքները</p>
-    <p>③ Կարգավորեք վճարային համակարգը</p>
-    <p>④ Կիսեք ձեր խանութի հղումը հաճախորդների հետ</p>
+    <p>① {{ __('emails.welcome.step1', [], $locale) }}</p>
+    <p>② {{ __('emails.welcome.step2', [], $locale) }}</p>
+    <p>③ {{ __('emails.welcome.step3', [], $locale) }}</p>
+    <p>④ {{ __('emails.welcome.step4', [], $locale) }}</p>
 </div>
-<a href="{{ config('app.url') }}/seller" class="btn">Անցնել Seller Panel</a>
-@else
-<h1>Welcome, {{ $user->name }}!</h1>
-<p>Thank you for registering on Vendora. Your account has been created successfully.</p>
-<p>Vendora lets you build your own Armenian online store with professional templates, local payment gateways, and easy management.</p>
-<p><strong>Next steps</strong></p>
-<div class="info-box">
-    <p>① Create your store (name, slug, description)</p>
-    <p>② Add your products</p>
-    <p>③ Set up your payment gateway</p>
-    <p>④ Share your store link with customers</p>
-</div>
-<a href="{{ config('app.url') }}/seller" class="btn">Go to Seller Panel</a>
-@endif
+<a href="{{ config('app.url') }}/seller" class="btn">{{ __('emails.welcome.panel', [], $locale) }}</a>
 @endsection

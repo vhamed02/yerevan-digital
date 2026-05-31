@@ -1,40 +1,21 @@
 @extends('emails.layout')
 
-@section('title', $locale === 'hy' ? "Պատվերի կարգավիճակ #{$order->order_number}" : "Order Status #{$order->order_number}")
+@section('title', __('emails.status_changed.subject', ['number' => $order->order_number], $locale))
 
 @section('content')
 @php
-$statusLabels = [
-    'hy' => ['pending' => 'Սպասվող', 'paid' => 'Վճարված', 'processing' => 'Մշակվող', 'shipped' => 'Ուղարկված', 'delivered' => 'Հասցված', 'cancelled' => 'Չեղարկված', 'refunded' => 'Վերադարձված'],
-    'en' => ['pending' => 'Pending', 'paid' => 'Paid', 'processing' => 'Processing', 'shipped' => 'Shipped', 'delivered' => 'Delivered', 'cancelled' => 'Cancelled', 'refunded' => 'Refunded'],
-];
-$statusLabel = $statusLabels[$locale][$order->status->value] ?? $order->status->value;
+    $statusLabel = __('emails.status.' . $order->status->value, [], $locale);
 @endphp
-@if($locale === 'hy')
-<h1>Ձեր պատվերի կարգավիճակը փոխվել է</h1>
-<p>Ձեր <strong>#{{ $order->order_number }}</strong> պատվերի կարգավիճակը թարմացվել է:</p>
+<h1>{{ __('emails.status_changed.heading', [], $locale) }}</h1>
+<p>{{ __('emails.status_changed.intro', ['number' => $order->order_number], $locale) }}</p>
 <div class="info-box">
-    <p><strong>Պատվեր #</strong>: {{ $order->order_number }}</p>
-    <p><strong>Կարգավիճակ</strong>: <span class="status-badge">{{ $statusLabel }}</span></p>
-    <p><strong>Ընդամենը</strong>: {{ number_format($order->total, 0) }} {{ $order->currency }}</p>
+    <p><strong>{{ __('emails.status_changed.number', [], $locale) }}</strong>: {{ $order->order_number }}</p>
+    <p><strong>{{ __('emails.status_changed.status', [], $locale) }}</strong>: <span class="status-badge">{{ $statusLabel }}</span></p>
+    <p><strong>{{ __('emails.status_changed.total', [], $locale) }}</strong>: {{ number_format($order->total, 0) }} {{ $order->currency }}</p>
 </div>
 @if($order->status->value === 'shipped')
-<p>Ձեր պատվերն ուղարկվել է: Շուտով կստանաք ձեր ապրանքները:</p>
+<p>{{ __('emails.status_changed.shipped', [], $locale) }}</p>
 @elseif($order->status->value === 'delivered')
-<p>Ձեր պատվերը հասցված է: Ջոկ գնումներ!</p>
-@endif
-@else
-<h1>Your order status has been updated</h1>
-<p>Your order <strong>#{{ $order->order_number }}</strong> status has been updated.</p>
-<div class="info-box">
-    <p><strong>Order #</strong>: {{ $order->order_number }}</p>
-    <p><strong>Status</strong>: <span class="status-badge">{{ $statusLabel }}</span></p>
-    <p><strong>Total</strong>: {{ number_format($order->total, 0) }} {{ $order->currency }}</p>
-</div>
-@if($order->status->value === 'shipped')
-<p>Your order is on its way. You should receive it soon.</p>
-@elseif($order->status->value === 'delivered')
-<p>Your order has been delivered. Enjoy your purchase!</p>
-@endif
+<p>{{ __('emails.status_changed.delivered', [], $locale) }}</p>
 @endif
 @endsection
