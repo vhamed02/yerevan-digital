@@ -1,5 +1,4 @@
 import { routing } from '@/i18n/routing'
-import type { Metadata } from 'next'
 
 const OG_LOCALES: Record<string, string> = {
   hy: 'hy_AM',
@@ -11,7 +10,10 @@ export function localePath(locale: string, path: string): string {
   return locale === routing.defaultLocale ? path : `/${locale}${path}`
 }
 
-export function localizedAlternates(path: string, locale: string): Metadata['alternates'] {
+export function localizedAlternates(
+  path: string,
+  locale: string,
+): { canonical: string; languages: Record<string, string> } {
   const languages: Record<string, string> = {}
   for (const l of routing.locales) {
     languages[l] = localePath(l, path)

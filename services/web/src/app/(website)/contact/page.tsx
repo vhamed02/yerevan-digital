@@ -29,7 +29,7 @@ export default async function ContactPage() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6 lg:px-8">
       <StaticPageContent page={page} locale={locale} bare />
-      <ContactForm locale={locale} apiUrl={apiUrl} />
+      <ContactForm apiUrl={apiUrl} />
     </div>
   )
 }

@@ -5,6 +5,21 @@
       "description": "Create your Armenian online store in minutes. Accept Idram payments, manage products, and grow your business."
     }
   },
+  "contactForm": {
+    "name": "Name",
+    "namePlaceholder": "Your name",
+    "email": "Email (optional)",
+    "emailPlaceholder": "example@mail.com",
+    "phone": "Phone",
+    "phonePlaceholder": "+374 XX XXX XXX",
+    "message": "Message",
+    "messagePlaceholder": "Your question or message...",
+    "send": "Send Message",
+    "sending": "Sending...",
+    "success": "Your message has been sent. We will reply within 24 hours.",
+    "errorRequired": "Please fill in the required fields",
+    "errorGeneric": "Failed to send. Please try again."
+  },
   "common": {
     "save": "Save",
     "cancel": "Cancel",
