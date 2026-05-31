@@ -1,4 +1,10 @@
 {
+  "seo": {
+    "home": {
+      "title": "Vendora — Armenian Online Store Builder",
+      "description": "Create your Armenian online store in minutes. Accept Idram payments, manage products, and grow your business."
+    }
+  },
   "common": {
     "save": "Save",
     "cancel": "Cancel",

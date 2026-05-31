@@ -6,23 +6,30 @@ import FeaturesSection from '@/components/website/FeaturesSection'
 import FeaturedStores from '@/components/website/FeaturedStores'
 import StatsBar from '@/components/website/StatsBar'
 import CtaSection from '@/components/website/CtaSection'
+import { getLocale, getTranslations } from 'next-intl/server'
 import { serverGet } from '@/lib/server-api'
+import { localizedAlternates, ogLocale } from '@/lib/seo'
 import type { PlatformStats } from '@/types'
 
 export const revalidate = 3600
 
-export const metadata: Metadata = {
-  title: 'Vendora — Armenian Online Store Builder',
-  description:
-    'Create your Armenian online store in minutes. Accept Idram payments, manage products, and grow your business.',
-  openGraph: {
-    title: 'Vendora — Armenian Online Store Builder',
-    description:
-      'Create your Armenian online store in minutes. Accept Idram payments, manage products, and grow your business.',
-    type: 'website',
-    locale: 'hy_AM',
-    siteName: 'Vendora',
-  },
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale()
+  const t = await getTranslations('seo')
+  const title = t('home.title')
+  const description = t('home.description')
+  return {
+    title,
+    description,
+    alternates: localizedAlternates('/', locale),
+    openGraph: {
+      title,
+      description,
+      type: 'website',
+      siteName: 'Vendora',
+      ...ogLocale(locale),
+    },
+  }
 }
 
 export default async function LandingPage() {

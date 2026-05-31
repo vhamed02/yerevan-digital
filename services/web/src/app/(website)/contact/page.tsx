@@ -4,6 +4,8 @@ import { notFound } from 'next/navigation'
 import { serverGet } from '@/lib/server-api'
 import StaticPageContent from '@/components/website/StaticPageContent'
 import ContactForm from '@/components/website/ContactForm'
+import { pickLang } from '@/lib/i18n'
+import { localizedAlternates } from '@/lib/seo'
 import type { Page } from '@/types'
 
 export const revalidate = 3600
@@ -12,9 +14,9 @@ export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale()
   const page = await serverGet<Page>('/pages/contact')
   if (!page) return { title: 'Contact Us — Vendora' }
-  const title = locale === 'en' ? (page.meta_title?.en || page.title.en) : (page.meta_title?.hy || page.title.hy)
-  const description = locale === 'en' ? page.meta_description?.en : page.meta_description?.hy
-  return { title, description: description ?? undefined }
+  const title = pickLang(page.meta_title, locale) || pickLang(page.title, locale)
+  const description = pickLang(page.meta_description, locale) || undefined
+  return { title, description, alternates: localizedAlternates('/contact', locale) }
 }
 
 export default async function ContactPage() {

@@ -8,6 +8,7 @@ import { SortSelect } from '@/components/store/SortSelect'
 import { PriceRangeFilter } from '@/components/store/PriceRangeFilter'
 import { SearchInput } from '@/components/store/SearchInput'
 import { pickLang } from '@/lib/i18n'
+import { localizedAlternates } from '@/lib/seo'
 import type { StorefrontStore, StorefrontProduct, PublicCategory } from '@/types'
 
 export const dynamic = 'force-dynamic'
@@ -22,7 +23,10 @@ export async function generateMetadata({
   const store = await serverGet<StorefrontStore>(`/store/${slug}/info`)
   if (!store) return {}
   const name = pickLang(store.name, locale)
-  return { title: `Products — ${name} | Vendora` }
+  return {
+    title: `Products — ${name} | Vendora`,
+    alternates: localizedAlternates(`/store/${slug}/products`, locale),
+  }
 }
 
 export default async function StoreProductsPage({

@@ -6,6 +6,7 @@ import { getLocale } from 'next-intl/server'
 import { ViewRecorder } from '@/components/store/ViewRecorder'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { pickLang } from '@/lib/i18n'
+import { localePath, localizedAlternates, ogLocale } from '@/lib/seo'
 import type { StorefrontStore, StorefrontProduct } from '@/types'
 
 export const dynamic = 'force-dynamic'
@@ -29,12 +30,13 @@ export async function generateMetadata({
   return {
     title: pickLang(product.meta_title, locale) || `${name} | Vendora`,
     description,
-    alternates: { canonical: `/store/${slug}/products/${productSlug}` },
+    alternates: localizedAlternates(`/store/${slug}/products/${productSlug}`, locale),
     openGraph: {
       type: 'website',
       title: name,
       description,
-      url: `/store/${slug}/products/${productSlug}`,
+      url: localePath(locale, `/store/${slug}/products/${productSlug}`),
+      ...ogLocale(locale),
       ...(image ? { images: [{ url: image }] } : {}),
     },
     twitter: {

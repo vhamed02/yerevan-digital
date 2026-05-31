@@ -5,6 +5,7 @@ import { serverGet } from '@/lib/server-api'
 import { loadTemplate } from '@/lib/templates'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { pickLang } from '@/lib/i18n'
+import { localePath, localizedAlternates, ogLocale } from '@/lib/seo'
 import type { StorefrontStore, StorefrontProduct, PublicCategory } from '@/types'
 
 export const dynamic = 'force-dynamic'
@@ -25,12 +26,13 @@ export async function generateMetadata({
   return {
     title: pickLang(store.meta_title, locale) || `${name} | Vendora`,
     description,
-    alternates: { canonical: `/store/${slug}` },
+    alternates: localizedAlternates(`/store/${slug}`, locale),
     openGraph: {
       type: 'website',
       title: name,
       description,
-      url: `/store/${slug}`,
+      url: localePath(locale, `/store/${slug}`),
+      ...ogLocale(locale),
       ...(store.banner_url ? { images: [{ url: store.banner_url }] } : {}),
     },
     twitter: {
