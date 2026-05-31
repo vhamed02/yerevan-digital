@@ -2,7 +2,7 @@
 
 > **Living document.** Kept up to date as work progresses. Each phase updates the
 > status table, the progress log, and any decisions that change.
-> Last updated: 2026-05-30 · Status: **Phase 4 in progress (4a done)**
+> Last updated: 2026-05-30 · Status: **Phase 4 complete; Phase 5 next**
 
 ---
 
@@ -61,8 +61,8 @@ so a third locale needs **no content migration**).
 | 4b-home | UI strings: spark StoreHome (hero, trust/marquee, section headings) | ✅ Done & live | `c7fa1a6` |
 | 4c | UI strings: minimal template (ProductCard, ProductGrid, StoreHeader, StoreHome — reuses `storefront` catalog; CartDrawer/CheckoutForm/ProductDetail re-export `_shared`) | ✅ Done & live | `59782ea` |
 | 4d-shared | UI strings: `_shared` trio — CartDrawer, ProductDetail, CheckoutForm (used by minimal; reuse `storefront` catalog + 4 new keys) | ✅ Done & live | `b3eabc8` |
-| 4d-pages-1 | UI strings: products listing page + checkout-failed page + SearchInput/PriceRangeFilter (`filters`, `payFailed` catalog) | ✅ Done | `TBD` |
-| 4d-pages-2 | UI strings: OrderConfirmation (status timeline/labels) + ReviewSection | ⏳ Planned | — |
+| 4d-pages-1 | UI strings: products listing page + checkout-failed page + SearchInput/PriceRangeFilter (`filters`, `payFailed` catalog) | ✅ Done & live | `53e9f70` |
+| 4d-pages-2 | UI strings: OrderConfirmation (status timeline/labels via key maps) + ReviewSection (`orderStatus`/`orderTimeline`/`order`/`reviews` catalog) | ✅ Done & live | `ee542ac` |
 | 5 | Trilingual transactional emails (7 notifications + 8 blade templates) | ⏳ Planned | — |
 | 6 | SEO (locale-aware JSON-LD/OG, `hreflang`) + full verify sweep | ⏳ Planned | — |
 
