@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { Store } from 'lucide-react'
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import RegisterForm from '@/components/auth/RegisterForm'
 import { serverGet } from '@/lib/server-api'
 import type { PublicCategory } from '@/types'

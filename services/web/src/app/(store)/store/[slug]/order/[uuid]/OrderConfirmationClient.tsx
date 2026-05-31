@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import { useLocale, useTranslations } from 'next-intl'
 import { CheckCircle, Clock, Package, Truck, Star, XCircle, RefreshCw, CreditCard } from 'lucide-react'
 import { pickLang } from '@/lib/i18n'

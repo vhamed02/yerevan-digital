@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import { ShoppingBag, Plus, Minus, Check, ChevronRight } from 'lucide-react'
 import { useLocale, useTranslations } from 'next-intl'
 import { useStoreCart } from '@/stores/cart.store'

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { Store } from 'lucide-react'
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import ForgotPasswordForm from '@/components/auth/ForgotPasswordForm'
 
 export const metadata: Metadata = {

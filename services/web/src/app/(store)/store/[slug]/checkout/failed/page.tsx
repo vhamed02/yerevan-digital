@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import { XCircle } from 'lucide-react'
 import { getTranslations } from 'next-intl/server'
 

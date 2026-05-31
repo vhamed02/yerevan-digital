@@ -1,6 +1,6 @@
 'use client'
 
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 import { Camera, Globe, Mail, Phone, MapPin, ShieldCheck } from 'lucide-react'
 import { useLocale, useTranslations } from 'next-intl'
 import { pickLang } from '@/lib/i18n'
