@@ -2,7 +2,7 @@
 
 > **Living document.** Kept up to date as work progresses. Each phase updates the
 > status table, the progress log, and any decisions that change.
-> Last updated: 2026-05-31 · Status: **Phase 5 complete; Phase 6 next**
+> Last updated: 2026-05-31 · Status: **✅ ALL PHASES COMPLETE (1–6) — fully trilingual**
 
 ---
 
@@ -64,7 +64,7 @@ so a third locale needs **no content migration**).
 | 4d-pages-1 | UI strings: products listing page + checkout-failed page + SearchInput/PriceRangeFilter (`filters`, `payFailed` catalog) | ✅ Done & live | `53e9f70` |
 | 4d-pages-2 | UI strings: OrderConfirmation (status timeline/labels via key maps) + ReviewSection (`orderStatus`/`orderTimeline`/`order`/`reviews` catalog) | ✅ Done & live | `ee542ac` |
 | 5 | Trilingual transactional emails — `lang/{hy,en,ru}/emails.php` (62 keys), 7 notifications + 7 blades to `__()`, `orders.locale` capture drives customer emails, status-label map | ✅ Done | `53aeb1a` |
-| 6 | SEO (locale-aware JSON-LD/OG, `hreflang`) + full verify sweep | ⏳ Planned | — |
+| 6 | SEO — `lib/seo.ts` helper (`localizedAlternates`/`ogLocale`), `hreflang` + `x-default` + og:locale on 8 public pages, marketing meta fixed bilingual→trilingual, localized homepage meta (`seo` catalog) | ✅ Done | `a855abc` |
 
 Legend: ✅ done & live · 🔧 in progress · ⏳ planned
 
@@ -107,8 +107,16 @@ Legend: ✅ done & live · 🔧 in progress · ⏳ planned
   English (internal admin alert).
 
 ### Phase 6 — SEO + verify
-- Locale-aware JSON-LD/OG names via `pickLang`; `alternates.languages` (hreflang) for
-  hy/en/ru; full `tsc` + `next build` + test sweep.
+- New `src/lib/seo.ts` — `localePath`, `localizedAlternates(path, locale)` (canonical +
+  `languages` hreflang incl. `x-default`, derived from `routing` — no hardcoded locale list),
+  and `ogLocale(locale)` (og:locale + alternates, `hy_AM`/`en_US`/`ru_RU`). Applied to all 8
+  public pages with `generateMetadata`: store home, product detail, products listing, and the
+  marketing home/about/contact/terms/privacy. JSON-LD/OG product & store names were already
+  `pickLang`-driven (Phase 1b). Fixed the marketing about/contact/terms/privacy metadata from
+  a bilingual `hy/en` ternary to trilingual `pickLang`; converted the homepage's static English
+  metadata to locale-aware `generateMetadata` backed by a new `seo.home` catalog entry (hy/en/ru,
+  268 keys, full parity). Admin/seller pages intentionally excluded (English-only). Verified:
+  `tsc` clean, production `next build` passes, web suite 54 tests (incl. new `seo.test.ts`, 6).
 
 ---
 
@@ -222,3 +230,13 @@ Legend: ✅ done & live · 🔧 in progress · ⏳ planned
   notification in `ru`, asserts the order-locale-driven customer flow, the status-label
   translation, and the missing-locale fallback. Full suite: **247 tests / 712 assertions**.
   NEXT: Phase 6 (SEO — locale-aware JSON-LD/OG + hreflang + full verify sweep).
+- **2026-05-31** — Phase 6 done — **PROJECT COMPLETE**. Added `src/lib/seo.ts`
+  (`localePath`, `localizedAlternates`, `ogLocale`, all derived from `routing`) and wired
+  hreflang `languages` + `x-default` + og:locale into all 8 public `generateMetadata` pages
+  (store home, product, products listing, marketing home/about/contact/terms/privacy). Fixed
+  the marketing about/contact/terms/privacy meta from bilingual `hy/en` → trilingual
+  `pickLang`, and converted the homepage's static English metadata to locale-aware
+  `generateMetadata` via a new `seo.home` catalog entry (268 keys, full parity). Admin/seller
+  pages excluded (English-only). `tsc` clean; production `next build` passes; web vitest suite
+  **54 tests** (incl. new `seo.test.ts`). The platform is now fully trilingual (HY/EN/RU)
+  across content, UI strings, transactional emails, and SEO metadata.
