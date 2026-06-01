@@ -26,8 +26,6 @@
     @endif
 </table>
 
-<hr class="divider">
-
 <p class="eyebrow">Message</p>
 <div class="quote">{{ $body }}</div>
 

@@ -7,7 +7,7 @@
     <style>
         body { margin: 0; padding: 0; background-color: #f4f4f5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #18181b; -webkit-font-smoothing: antialiased; }
         .wrapper { max-width: 600px; margin: 0 auto; padding: 40px 20px; }
-        .card { background: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #ececef; box-shadow: 0 4px 24px rgba(24,24,27,0.06); }
+        .card { background: #ffffff; overflow: hidden; border: 1px solid #ececef; box-shadow: 0 4px 24px rgba(24,24,27,0.06); }
         .header { background: #18181b; padding: 28px 40px; }
         .header .logo { color: #ffffff; font-size: 22px; font-weight: 700; letter-spacing: -0.4px; text-decoration: none; }
         .header .logo .dot { color: #818cf8; }
