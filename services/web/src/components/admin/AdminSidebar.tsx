@@ -16,6 +16,7 @@ import {
   X,
   FileText,
   MessageSquare,
+  BarChart3,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import useAuthStore from '@/stores/auth.store'
@@ -23,6 +24,7 @@ import { useRouter } from 'next/navigation'
 
 const navItems = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard, exact: true },
+  { href: '/admin/reports', label: 'Reports', icon: BarChart3 },
   { href: '/admin/sellers', label: 'Sellers', icon: Users },
   { href: '/admin/stores', label: 'Stores', icon: Store },
   { href: '/admin/products', label: 'Products', icon: Package },
