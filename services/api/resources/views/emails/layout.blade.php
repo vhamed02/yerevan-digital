@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Vendora')</title>
+    <title>@yield('title', 'Vendorex')</title>
     <style>
         body { margin: 0; padding: 0; background-color: #f4f4f5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #18181b; }
         .wrapper { max-width: 600px; margin: 0 auto; padding: 40px 20px; }
@@ -28,7 +28,7 @@
 <div class="wrapper">
     <div class="card">
         <div class="header">
-            <span class="logo">Vendora</span>
+            <span class="logo">Vendorex</span>
         </div>
         <div class="body">
             @yield('content')
@@ -36,7 +36,7 @@
         <hr class="divider">
         <div class="footer">
             <p>{{ __('emails.layout.tagline', [], $locale ?? config('app.locale')) }}</p>
-            <p><a href="{{ config('app.url') }}">vendora.am</a> &nbsp;·&nbsp; <a href="mailto:support@vendora.am">support@vendora.am</a></p>
+            <p><a href="{{ config('app.url') }}">vendorex.shop</a> &nbsp;·&nbsp; <a href="mailto:support@vendorex.shop">support@vendorex.shop</a></p>
         </div>
     </div>
 </div>

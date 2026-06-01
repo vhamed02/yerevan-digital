@@ -2,7 +2,7 @@
 
 return [
     'layout' => [
-        'tagline' => 'Vendora — Built for Armenian businesses',
+        'tagline' => 'Vendorex — Built for Armenian businesses',
     ],
 
     'status' => [
@@ -53,30 +53,30 @@ return [
     ],
 
     'store_approved' => [
-        'subject' => 'Your store is now live on Vendora!',
+        'subject' => 'Your store is now live on Vendorex!',
         'heading' => 'Congratulations, :name!',
-        'intro'   => 'Your store has been approved by the Vendora team and is now live.',
+        'intro'   => 'Your store has been approved by the Vendorex team and is now live.',
         'store'   => 'Store',
         'url'     => 'URL',
         'active'  => 'Active',
-        'body'    => 'Your customers can now find and shop at your store on Vendora.',
+        'body'    => 'Your customers can now find and shop at your store on Vendorex.',
         'manage'  => 'Manage Your Store',
     ],
 
     'store_suspended' => [
         'subject' => 'Your store has been suspended',
         'heading' => ':name, your store has been suspended',
-        'intro'   => 'Your store ":store" has been suspended by the Vendora team.',
+        'intro'   => 'Your store ":store" has been suspended by the Vendorex team.',
         'reason'  => 'Reason',
         'body'    => 'If you have questions, please contact our support team.',
         'contact' => 'Contact Support',
     ],
 
     'welcome' => [
-        'subject'    => 'Welcome to Vendora!',
+        'subject'    => 'Welcome to Vendorex!',
         'heading'    => 'Welcome, :name!',
-        'intro'      => 'Thank you for registering on Vendora. Your account has been created successfully.',
-        'about'      => 'Vendora lets you build your own Armenian online store with professional templates, local payment gateways, and easy management.',
+        'intro'      => 'Thank you for registering on Vendorex. Your account has been created successfully.',
+        'about'      => 'Vendorex lets you build your own Armenian online store with professional templates, local payment gateways, and easy management.',
         'next_steps' => 'Next steps',
         'step1'      => 'Create your store (name, slug, description)',
         'step2'      => 'Add your products',
