@@ -26,7 +26,13 @@ type StoreListRow struct {
 	CreatedAt  time.Time `db:"created_at"`
 }
 
-func (s *Store) ListStores(ctx context.Context, f StoreFilter, limit, offset int) ([]StoreListRow, int64, error) {
+const storeSelect = `SELECT s.id, s.uuid, s.name, s.slug, s.status, s.is_featured, s.currency, u.name AS owner_name,
+	(SELECT COUNT(*) FROM orders o WHERE o.store_id = s.id AND o.deleted_at IS NULL) AS order_count,
+	(SELECT COALESCE(SUM(o.total), 0) FROM orders o WHERE o.store_id = s.id AND o.payment_status = 'paid' AND o.deleted_at IS NULL) AS revenue,
+	s.created_at
+	FROM stores s JOIN users u ON u.id = s.user_id`
+
+func whereStores(f StoreFilter) (string, []any) {
 	conds := []string{"s.deleted_at IS NULL"}
 	var args []any
 	if f.Status != "" {
@@ -38,23 +44,26 @@ func (s *Store) ListStores(ctx context.Context, f StoreFilter, limit, offset int
 		like := "%" + f.Search + "%"
 		args = append(args, like, like)
 	}
-	where := strings.Join(conds, " AND ")
+	return strings.Join(conds, " AND "), args
+}
+
+func (s *Store) ListStores(ctx context.Context, f StoreFilter, limit, offset int) ([]StoreListRow, int64, error) {
+	where, args := whereStores(f)
 
 	var total int64
 	if err := s.db.GetContext(ctx, &total, "SELECT COUNT(*) FROM stores s WHERE "+where, args...); err != nil {
 		return nil, 0, err
 	}
 
-	q := `SELECT s.id, s.uuid, s.name, s.slug, s.status, s.is_featured, s.currency, u.name AS owner_name,
-	             (SELECT COUNT(*) FROM orders o WHERE o.store_id = s.id AND o.deleted_at IS NULL) AS order_count,
-	             (SELECT COALESCE(SUM(o.total), 0) FROM orders o WHERE o.store_id = s.id AND o.payment_status = 'paid' AND o.deleted_at IS NULL) AS revenue,
-	             s.created_at
-	      FROM stores s JOIN users u ON u.id = s.user_id
-	      WHERE ` + where + ` ORDER BY s.created_at DESC LIMIT ? OFFSET ?`
-
 	var rows []StoreListRow
-	err := s.db.SelectContext(ctx, &rows, q, append(append([]any{}, args...), limit, offset)...)
+	err := s.db.SelectContext(ctx, &rows, storeSelect+" WHERE "+where+" ORDER BY s.created_at DESC LIMIT ? OFFSET ?",
+		append(append([]any{}, args...), limit, offset)...)
 	return rows, total, err
+}
+
+func (s *Store) StreamStores(ctx context.Context, f StoreFilter, fn func(StoreListRow) error) error {
+	where, args := whereStores(f)
+	return stream(ctx, s, storeSelect+" WHERE "+where+" ORDER BY s.created_at DESC", args, fn)
 }
 
 type SellerFilter struct {
@@ -77,7 +86,15 @@ type SellerListRow struct {
 	CreatedAt time.Time      `db:"created_at"`
 }
 
-func (s *Store) ListSellers(ctx context.Context, f SellerFilter, limit, offset int) ([]SellerListRow, int64, error) {
+const sellerSelect = `SELECT u.id, u.uuid, u.name, u.email, u.phone, u.status,
+	s.id AS store_id, s.name AS store_name, s.slug AS store_slug,
+	(SELECT COALESCE(SUM(o.total), 0) FROM orders o
+	   JOIN stores st ON st.id = o.store_id
+	   WHERE st.user_id = u.id AND o.payment_status = 'paid' AND o.deleted_at IS NULL) AS revenue,
+	u.last_login_at, u.created_at
+	FROM users u LEFT JOIN stores s ON s.user_id = u.id AND s.deleted_at IS NULL`
+
+func whereSellers(f SellerFilter) (string, []any) {
 	conds := []string{"u.role = 'seller'", "u.deleted_at IS NULL"}
 	var args []any
 	if f.Status != "" {
@@ -89,26 +106,26 @@ func (s *Store) ListSellers(ctx context.Context, f SellerFilter, limit, offset i
 		like := "%" + f.Search + "%"
 		args = append(args, like, like)
 	}
-	where := strings.Join(conds, " AND ")
+	return strings.Join(conds, " AND "), args
+}
+
+func (s *Store) ListSellers(ctx context.Context, f SellerFilter, limit, offset int) ([]SellerListRow, int64, error) {
+	where, args := whereSellers(f)
 
 	var total int64
 	if err := s.db.GetContext(ctx, &total, "SELECT COUNT(*) FROM users u WHERE "+where, args...); err != nil {
 		return nil, 0, err
 	}
 
-	q := `SELECT u.id, u.uuid, u.name, u.email, u.phone, u.status,
-	             s.id AS store_id, s.name AS store_name, s.slug AS store_slug,
-	             (SELECT COALESCE(SUM(o.total), 0) FROM orders o
-	                JOIN stores st ON st.id = o.store_id
-	                WHERE st.user_id = u.id AND o.payment_status = 'paid' AND o.deleted_at IS NULL) AS revenue,
-	             u.last_login_at, u.created_at
-	      FROM users u
-	      LEFT JOIN stores s ON s.user_id = u.id AND s.deleted_at IS NULL
-	      WHERE ` + where + ` ORDER BY u.created_at DESC LIMIT ? OFFSET ?`
-
 	var rows []SellerListRow
-	err := s.db.SelectContext(ctx, &rows, q, append(append([]any{}, args...), limit, offset)...)
+	err := s.db.SelectContext(ctx, &rows, sellerSelect+" WHERE "+where+" ORDER BY u.created_at DESC LIMIT ? OFFSET ?",
+		append(append([]any{}, args...), limit, offset)...)
 	return rows, total, err
+}
+
+func (s *Store) StreamSellers(ctx context.Context, f SellerFilter, fn func(SellerListRow) error) error {
+	where, args := whereSellers(f)
+	return stream(ctx, s, sellerSelect+" WHERE "+where+" ORDER BY u.created_at DESC", args, fn)
 }
 
 type ProductFilter struct {
@@ -118,23 +135,27 @@ type ProductFilter struct {
 }
 
 type ProductListRow struct {
-	ID           int64     `db:"id"`
-	UUID         string    `db:"uuid"`
-	Name         []byte    `db:"name"`
-	Slug         string    `db:"slug"`
-	Status       string    `db:"status"`
+	ID           int64          `db:"id"`
+	UUID         string         `db:"uuid"`
+	Name         []byte         `db:"name"`
+	Slug         string         `db:"slug"`
+	Status       string         `db:"status"`
 	SKU          sql.NullString `db:"sku"`
-	Price        float64   `db:"price"`
-	Stock        int64     `db:"stock"`
-	ViewCount    int64     `db:"view_count"`
-	IsFeatured   int       `db:"is_featured"`
-	StoreID      int64     `db:"store_id"`
-	StoreName    []byte    `db:"store_name"`
-	CategoryName []byte    `db:"category_name"`
-	CreatedAt    time.Time `db:"created_at"`
+	Price        float64        `db:"price"`
+	Stock        int64          `db:"stock"`
+	ViewCount    int64          `db:"view_count"`
+	IsFeatured   int            `db:"is_featured"`
+	StoreID      int64          `db:"store_id"`
+	StoreName    []byte         `db:"store_name"`
+	CategoryName []byte         `db:"category_name"`
+	CreatedAt    time.Time      `db:"created_at"`
 }
 
-func (s *Store) ListProducts(ctx context.Context, f ProductFilter, limit, offset int) ([]ProductListRow, int64, error) {
+const productSelect = `SELECT p.id, p.uuid, p.name, p.slug, p.status, p.sku, p.price, p.stock, p.view_count, p.is_featured,
+	p.store_id, s.name AS store_name, c.name AS category_name, p.created_at
+	FROM products p JOIN stores s ON s.id = p.store_id LEFT JOIN categories c ON c.id = p.category_id`
+
+func whereProducts(f ProductFilter) (string, []any) {
 	conds := []string{"p.deleted_at IS NULL"}
 	var args []any
 	if f.Status != "" {
@@ -150,23 +171,26 @@ func (s *Store) ListProducts(ctx context.Context, f ProductFilter, limit, offset
 		like := "%" + f.Search + "%"
 		args = append(args, like, like)
 	}
-	where := strings.Join(conds, " AND ")
+	return strings.Join(conds, " AND "), args
+}
+
+func (s *Store) ListProducts(ctx context.Context, f ProductFilter, limit, offset int) ([]ProductListRow, int64, error) {
+	where, args := whereProducts(f)
 
 	var total int64
 	if err := s.db.GetContext(ctx, &total, "SELECT COUNT(*) FROM products p WHERE "+where, args...); err != nil {
 		return nil, 0, err
 	}
 
-	q := `SELECT p.id, p.uuid, p.name, p.slug, p.status, p.sku, p.price, p.stock, p.view_count, p.is_featured,
-	             p.store_id, s.name AS store_name, c.name AS category_name, p.created_at
-	      FROM products p
-	      JOIN stores s ON s.id = p.store_id
-	      LEFT JOIN categories c ON c.id = p.category_id
-	      WHERE ` + where + ` ORDER BY p.created_at DESC LIMIT ? OFFSET ?`
-
 	var rows []ProductListRow
-	err := s.db.SelectContext(ctx, &rows, q, append(append([]any{}, args...), limit, offset)...)
+	err := s.db.SelectContext(ctx, &rows, productSelect+" WHERE "+where+" ORDER BY p.created_at DESC LIMIT ? OFFSET ?",
+		append(append([]any{}, args...), limit, offset)...)
 	return rows, total, err
+}
+
+func (s *Store) StreamProducts(ctx context.Context, f ProductFilter, fn func(ProductListRow) error) error {
+	where, args := whereProducts(f)
+	return stream(ctx, s, productSelect+" WHERE "+where+" ORDER BY p.created_at DESC", args, fn)
 }
 
 type OrderFilter struct {
@@ -195,7 +219,12 @@ type OrderListRow struct {
 	PaidAt        sql.NullTime   `db:"paid_at"`
 }
 
-func (s *Store) ListOrders(ctx context.Context, f OrderFilter, limit, offset int) ([]OrderListRow, int64, error) {
+const orderSelect = `SELECT o.id, o.uuid, o.order_number, o.status, o.payment_status, o.payment_method,
+	o.total, o.currency, o.customer_name, o.customer_email,
+	o.store_id, s.name AS store_name, o.created_at, o.paid_at
+	FROM orders o JOIN stores s ON s.id = o.store_id`
+
+func whereOrders(f OrderFilter) (string, []any) {
 	conds := []string{"o.deleted_at IS NULL"}
 	var args []any
 	if f.Status != "" {
@@ -223,20 +252,43 @@ func (s *Store) ListOrders(ctx context.Context, f OrderFilter, limit, offset int
 		like := "%" + f.Search + "%"
 		args = append(args, like, like, like)
 	}
-	where := strings.Join(conds, " AND ")
+	return strings.Join(conds, " AND "), args
+}
+
+func (s *Store) ListOrders(ctx context.Context, f OrderFilter, limit, offset int) ([]OrderListRow, int64, error) {
+	where, args := whereOrders(f)
 
 	var total int64
 	if err := s.db.GetContext(ctx, &total, "SELECT COUNT(*) FROM orders o WHERE "+where, args...); err != nil {
 		return nil, 0, err
 	}
 
-	q := `SELECT o.id, o.uuid, o.order_number, o.status, o.payment_status, o.payment_method,
-	             o.total, o.currency, o.customer_name, o.customer_email,
-	             o.store_id, s.name AS store_name, o.created_at, o.paid_at
-	      FROM orders o JOIN stores s ON s.id = o.store_id
-	      WHERE ` + where + ` ORDER BY o.created_at DESC LIMIT ? OFFSET ?`
-
 	var rows []OrderListRow
-	err := s.db.SelectContext(ctx, &rows, q, append(append([]any{}, args...), limit, offset)...)
+	err := s.db.SelectContext(ctx, &rows, orderSelect+" WHERE "+where+" ORDER BY o.created_at DESC LIMIT ? OFFSET ?",
+		append(append([]any{}, args...), limit, offset)...)
 	return rows, total, err
+}
+
+func (s *Store) StreamOrders(ctx context.Context, f OrderFilter, fn func(OrderListRow) error) error {
+	where, args := whereOrders(f)
+	return stream(ctx, s, orderSelect+" WHERE "+where+" ORDER BY o.created_at DESC", args, fn)
+}
+
+func stream[T any](ctx context.Context, s *Store, query string, args []any, fn func(T) error) error {
+	rows, err := s.db.QueryxContext(ctx, query, args...)
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var row T
+		if err := rows.StructScan(&row); err != nil {
+			return err
+		}
+		if err := fn(row); err != nil {
+			return err
+		}
+	}
+	return rows.Err()
 }

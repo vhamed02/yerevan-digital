@@ -32,6 +32,7 @@ func NewRouter(s *store.Store, logger *slog.Logger) http.Handler {
 		r.Get("/sellers", sellersHandler(rep))
 		r.Get("/products", productsHandler(rep))
 		r.Get("/orders", ordersHandler(rep))
+		r.Get("/exports/{entity}", exportHandler(rep))
 	})
 
 	return r
