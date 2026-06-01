@@ -61,6 +61,20 @@ func ordersHandler(rep *report.Service) http.HandlerFunc {
 	}
 }
 
+func searchHandler(rep *report.Service) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		limit := int(queryInt64(r, "limit"))
+		if limit < 1 {
+			limit = 10
+		}
+		if limit > 25 {
+			limit = 25
+		}
+		res, err := rep.Search(r.Context(), query(r, "q"), limit)
+		respond(w, res, err)
+	}
+}
+
 func respond(w http.ResponseWriter, body any, err error) {
 	if err != nil {
 		slog.Error("report query failed", "error", err)

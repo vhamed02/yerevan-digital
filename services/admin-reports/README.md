@@ -8,9 +8,9 @@ See the full design in [`docs/admin-reporting-service.md`](../../docs/admin-repo
 
 ## Status
 
-**M2 — exports.** Streaming CSV exports of any list (constant memory — rows are streamed from
-MySQL straight to the response, never buffered), with a UTF-8 BOM for spreadsheet apps.
-(M1: overview via parallel fan-out + filterable/paginated lists. M0: scaffold, auth, CI.)
+**Phase 1 complete (M0–M3).** Scaffold + admin auth (M0), overview via parallel fan-out +
+filterable/paginated lists (M1), streaming CSV exports (M2), cross-entity search (M3).
+Reads the primary MySQL read-only. Phase 2 (event-driven CQRS) is optional/future.
 
 ## Endpoints
 
@@ -24,6 +24,7 @@ MySQL straight to the response, never buffered), with a UTF-8 BOM for spreadshee
 | GET | `/api/admin-reports/sellers` | admin | Sellers list — filters: `q`, `status`; with store + lifetime revenue |
 | GET | `/api/admin-reports/products` | admin | Products list — filters: `q`, `status`, `store_id` |
 | GET | `/api/admin-reports/orders` | admin | Orders list — filters: `q`, `status`, `payment_status`, `store_id`, `from`, `to` |
+| GET | `/api/admin-reports/search` | admin | Cross-entity search (`q`, `limit`) across stores/products/sellers/orders, grouped |
 | GET | `/api/admin-reports/exports/{entity}` | admin | Streaming CSV export of `stores`/`sellers`/`products`/`orders` (same filters as the list) |
 
 List endpoints accept `page` and `per_page` (default 20, max 100) and return `{ data, meta }`.
