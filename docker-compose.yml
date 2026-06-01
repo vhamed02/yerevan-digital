@@ -113,6 +113,20 @@ services:
       redis:
         condition: service_healthy
 
+  admin-reports:
+    build:
+      context: ./services/admin-reports
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    networks:
+      - vendora-backend
+      - vendora-frontend
+    depends_on:
+      mysql:
+        condition: service_healthy
+    restart: unless-stopped
+
 networks:
   vendora-backend:
     driver: bridge
