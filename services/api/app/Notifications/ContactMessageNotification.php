@@ -27,24 +27,18 @@ class ContactMessageNotification extends Notification implements ShouldQueue
 
     public function toMail(object $notifiable): MailMessage
     {
-        $subject = "Contact Form — {$this->senderName}";
-
         $mail = (new MailMessage)
-            ->subject($subject)
-            ->greeting("New contact message from {$this->senderName}")
-            ->line("**Name:** {$this->senderName}");
+            ->subject("New contact message from {$this->senderName}")
+            ->view('emails.contact', [
+                'senderName'  => $this->senderName,
+                'senderEmail' => $this->senderEmail,
+                'senderPhone' => $this->senderPhone,
+                'message'     => $this->message,
+            ]);
 
         if ($this->senderEmail) {
-            $mail->line("**Email:** {$this->senderEmail}");
+            $mail->replyTo($this->senderEmail, $this->senderName);
         }
-
-        if ($this->senderPhone) {
-            $mail->line("**Phone:** {$this->senderPhone}");
-        }
-
-        $mail->line('---')
-             ->line($this->message)
-             ->salutation(' ');
 
         return $mail;
     }

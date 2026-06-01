@@ -98,7 +98,7 @@ class EmailLocalizationTest extends TestCase
 
         $mail = (new StoreApprovedNotification($store))->toMail($seller);
 
-        $this->assertStringContainsString('доступен на Vendora', $mail->subject);
+        $this->assertStringContainsString('доступен на Vendorex', $mail->subject);
         $html = $this->render($mail);
         $this->assertStringContainsString('Поздравляем', $html);
         $this->assertStringContainsString('Управлять магазином', $html);
@@ -123,7 +123,7 @@ class EmailLocalizationTest extends TestCase
 
         $mail = (new WelcomeSellerNotification)->toMail($seller);
 
-        $this->assertStringContainsString('Добро пожаловать в Vendora', $mail->subject);
+        $this->assertStringContainsString('Добро пожаловать в Vendorex', $mail->subject);
         $html = $this->render($mail);
         $this->assertStringContainsString('Следующие шаги', $html);
         $this->assertStringContainsString('Перейти в панель продавца', $html);
