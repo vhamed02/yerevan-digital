@@ -33,7 +33,7 @@ class ContactMessageNotification extends Notification implements ShouldQueue
                 'senderName'  => $this->senderName,
                 'senderEmail' => $this->senderEmail,
                 'senderPhone' => $this->senderPhone,
-                'message'     => $this->message,
+                'body'        => $this->message,
             ]);
 
         if ($this->senderEmail) {

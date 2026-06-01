@@ -4,18 +4,33 @@ namespace Tests\Feature;
 
 use App\Notifications\ContactMessageNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Notifications\AnonymousNotifiable;
-use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
+use Symfony\Component\Mime\Email;
 use Tests\TestCase;
 
 class ContactMessageTest extends TestCase
 {
     use RefreshDatabase;
 
-    private function render(MailMessage $mail): string
-    {
-        return view($mail->view, $mail->viewData)->render();
+    private function sendAndCapture(
+        string $name,
+        ?string $email = null,
+        ?string $phone = null,
+        string $message = 'Hello, I want your product. Help me.',
+    ): Email {
+        Notification::route('mail', 'support@example.com')
+            ->notify(new ContactMessageNotification(
+                senderName: $name,
+                senderEmail: $email,
+                senderPhone: $phone,
+                message: $message,
+            ));
+
+        $messages = Mail::getSymfonyTransport()->messages();
+        $this->assertCount(1, $messages, 'Expected exactly one email to be sent.');
+
+        return $messages->first()->getOriginalMessage();
     }
 
     public function test_contact_endpoint_dispatches_notification(): void
@@ -46,19 +61,19 @@ class ContactMessageTest extends TestCase
         Notification::assertNothingSent();
     }
 
-    public function test_contact_email_uses_vendorex_branding_and_reply_to(): void
+    public function test_contact_email_renders_through_mailer_with_vendorex_branding(): void
     {
-        $mail = (new ContactMessageNotification(
-            senderName: 'Hamed Najari',
-            senderEmail: 'hamed@example.com',
-            senderPhone: '+905317696426',
+        $email = $this->sendAndCapture(
+            name: 'Hamed Najari',
+            email: 'hamed@example.com',
+            phone: '+905317696426',
             message: 'Hello, I want your product. Help me.',
-        ))->toMail(new AnonymousNotifiable);
+        );
 
-        $this->assertSame('New contact message from Hamed Najari', $mail->subject);
-        $this->assertSame('hamed@example.com', $mail->replyTo[0][0]);
+        $this->assertSame('New contact message from Hamed Najari', $email->getSubject());
+        $this->assertSame('hamed@example.com', $email->getReplyTo()[0]->getAddress());
 
-        $html = $this->render($mail);
+        $html = $email->getHtmlBody();
 
         $this->assertStringContainsString('Vendorex', $html);
         $this->assertStringNotContainsString('>Vendora<', $html);
@@ -67,22 +82,22 @@ class ContactMessageTest extends TestCase
         $this->assertStringContainsString('hamed@example.com', $html);
         $this->assertStringContainsString('+905317696426', $html);
         $this->assertStringContainsString('Hello, I want your product. Help me.', $html);
+        $this->assertStringNotContainsString('Illuminate\\Mail\\Message', $html);
     }
 
     public function test_contact_email_omits_optional_fields_when_absent(): void
     {
-        $mail = (new ContactMessageNotification(
-            senderName: 'Anonymous Visitor',
-            senderEmail: null,
-            senderPhone: null,
+        $email = $this->sendAndCapture(
+            name: 'Anonymous Visitor',
             message: 'Just a message with no contact details provided.',
-        ))->toMail(new AnonymousNotifiable);
+        );
 
-        $this->assertEmpty($mail->replyTo);
+        $this->assertEmpty($email->getReplyTo());
 
-        $html = $this->render($mail);
+        $html = $email->getHtmlBody();
 
         $this->assertStringContainsString('Anonymous Visitor', $html);
+        $this->assertStringContainsString('Just a message with no contact details provided.', $html);
         $this->assertStringNotContainsString('Phone', $html);
         $this->assertStringNotContainsString('Reply to', $html);
     }

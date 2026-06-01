@@ -29,7 +29,7 @@
 <hr class="divider">
 
 <p class="eyebrow">Message</p>
-<div class="quote">{{ $message }}</div>
+<div class="quote">{{ $body }}</div>
 
 @if($senderEmail)
 <div style="margin-top:28px;">
