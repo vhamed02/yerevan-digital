@@ -16,7 +16,7 @@
         .body p { font-size: 15px; line-height: 1.65; color: #52525b; margin: 0 0 16px; }
         .btn { display: inline-block; padding: 12px 28px; background: #18181b; color: #ffffff !important; text-decoration: none; border-radius: 10px; font-size: 15px; font-weight: 600; margin: 8px 0; }
         .btn:visited, .btn:hover, .btn:active { color: #ffffff !important; }
-        .divider { border: none; border-top: 1px solid #ececef; margin: 28px 0; }
+        .divider { border: none; border-top: 1px solid #ececef; margin: 0; }
         .footer { padding: 28px 40px 36px; text-align: center; }
         .footer p { font-size: 13px; color: #a1a1aa; margin: 4px 0; }
         .footer a { color: #6366f1; text-decoration: none; font-weight: 500; }
