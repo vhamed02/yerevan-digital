@@ -7,12 +7,14 @@ use App\Actions\ReorderProductImagesAction;
 use App\Actions\UploadProductImagesAction;
 use App\Enums\ProductStatus;
 use App\Enums\StoreStatus;
+use App\Jobs\ProcessImageVariants;
 use App\Models\Product;
 use App\Models\Store;
 use App\Services\ImageService;
 use Database\Seeders\PermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Queue;
 use Mockery;
 use Tests\TestCase;
 
@@ -49,12 +51,16 @@ class ProductImageActionsTest extends TestCase
 
     public function test_upload_marks_first_image_of_first_upload_as_primary(): void
     {
+        Queue::fake();
+
         $imageService = Mockery::mock(ImageService::class);
-        $imageService->shouldReceive('process')->twice()->andReturn([
-            'original'  => 'o.webp',
-            'thumbnail' => 't.webp',
-            'medium'    => 'm.webp',
-            'large'     => 'l.webp',
+        $imageService->shouldReceive('prepare')->twice()->andReturn([
+            'uuid'        => 'u',
+            'original'    => 'l.webp',
+            'thumbnail'   => 't.webp',
+            'medium'      => 'm.webp',
+            'large'       => 'l.webp',
+            'source_path' => 'images/products/1/u/source',
         ]);
 
         $action = new UploadProductImagesAction($imageService);
@@ -68,15 +74,18 @@ class ProductImageActionsTest extends TestCase
         $this->assertTrue($images[0]->is_primary);
         $this->assertFalse($images[1]->is_primary);
         $this->assertEquals([1, 2], [$images[0]->sort_order, $images[1]->sort_order]);
+        Queue::assertPushed(ProcessImageVariants::class, 2);
     }
 
     public function test_upload_to_product_with_existing_images_sets_no_new_primary(): void
     {
+        Queue::fake();
         $this->makeImage(1, primary: true);
 
         $imageService = Mockery::mock(ImageService::class);
-        $imageService->shouldReceive('process')->once()->andReturn([
-            'original' => 'o.webp', 'thumbnail' => 't.webp', 'medium' => 'm.webp', 'large' => 'l.webp',
+        $imageService->shouldReceive('prepare')->once()->andReturn([
+            'uuid' => 'u', 'original' => 'l.webp', 'thumbnail' => 't.webp', 'medium' => 'm.webp',
+            'large' => 'l.webp', 'source_path' => 'images/products/1/u/source',
         ]);
 
         $images = (new UploadProductImagesAction($imageService))
@@ -84,6 +93,7 @@ class ProductImageActionsTest extends TestCase
 
         $this->assertFalse($images[0]->is_primary);
         $this->assertEquals(2, $images[0]->sort_order);
+        Queue::assertPushed(ProcessImageVariants::class, 1);
     }
 
     public function test_delete_promotes_next_image_to_primary(): void
