@@ -62,14 +62,14 @@ printf '%b\n' "$HR"
 # ── build ─────────────────────────────────────────────────────────────────────
 section "Building containers"
 T=$(date +%s)
-$COMPOSE build --build-arg CACHEBUST="$(git rev-parse HEAD)" web api queue
+$COMPOSE build --build-arg CACHEBUST="$(git rev-parse HEAD)" web api queue admin-reports
 ok "web + api + queue built"
 took $T
 
 # ── start ─────────────────────────────────────────────────────────────────────
 section "Starting services"
 T=$(date +%s)
-$COMPOSE up -d --no-deps web api queue
+$COMPOSE up -d --no-deps web api queue admin-reports
 ok "Containers up"
 took $T
 
