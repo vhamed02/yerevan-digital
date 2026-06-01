@@ -1013,6 +1013,32 @@ JSON-LD is suppressed in template-preview mode (`?preview=true`) so editor previ
 
 ---
 
+## Improvement #16 — Go Reporting Microservice (CQRS Read Side) + Admin Analytics Page
+
+**Date:** 2026-06-01
+**Files changed:**
+- `services/admin-reports/**` — new standalone Go 1.23 service (chi, sqlx, errgroup, prometheus, distroless image)
+- `docker/nginx/conf.d/app.conf` — same-origin reverse-proxy route `/api/admin-reports/` (resolver + variable upstream)
+- `scripts/deploy.sh`, `docker-compose.yml` — build/run the service in the existing webhook deploy
+- `services/web/src/app/(admin)/admin/reports/page.tsx`, `components/admin/ReportsAnalyticsClient.tsx`, `lib/reportsApi.ts`, `components/admin/AdminSidebar.tsx` — admin "Reports & Analytics" page
+- `docs/admin-reporting-service.md` — phased design doc
+
+### What was built
+
+A separate **Go** service serving the super-admin reporting surface as the **CQRS read side** alongside the Laravel monolith (which keeps all writes). It exposes `overview`, paginated/filterable `stores`/`sellers`/`products`/`orders` lists, cross-entity `search`, and streaming CSV `exports`, plus `/health` and Prometheus `/metrics`. It authenticates by validating the monolith's existing **Sanctum** bearer tokens (SHA-256 hash lookup in `personal_access_tokens` + Spatie `super-admin` role check) using a dedicated **read-only MySQL user** — reusing the auth system without duplicating it. A Next.js admin page consumes it same-origin. Phase 1 reads MySQL directly; an event-driven projection model (transactional outbox → Redis Streams) is documented as optional Phase 2.
+
+### CV-ready bullets
+
+- **Built a standalone Go (chi/sqlx) reporting microservice as the CQRS read side of a Laravel monolith**, exposing admin analytics — overview, entity lists, cross-entity search, and CSV export — behind a same-origin nginx route, and authenticating requests by validating the monolith's existing Sanctum bearer tokens (SHA-256 hash + role lookup) against a least-privilege read-only DB user, so no auth logic was duplicated.
+
+- **Exploited Go concurrency for the read path** — assembled the dashboard overview from ~11 independent SQL aggregations in parallel via `errgroup` (latency ≈ slowest query, not the sum), and implemented **constant-memory streaming CSV exports** that pipe rows straight to the HTTP response (UTF-8 BOM for spreadsheet apps) instead of buffering the dataset.
+
+- **Shipped it production-grade and independently deployable** — multi-stage build to a distroless static image, `/health` + Prometheus `/metrics`, structured `slog` logging, graceful shutdown, GitHub Actions CI, and table-driven unit tests — integrated additively into the existing reverse proxy and webhook deploy with per-commit Git tags for safe rollback.
+
+- **Authored a phased CQRS design doc and a Next.js admin Reports page**, scoping a clean evolution from direct read-replica queries (Phase 1) to an event-driven read model via transactional outbox + Redis Streams projections (Phase 2), with the trade-offs and "why Go" stated honestly.
+
+---
+
 ## Improvements Log
 
 | # | Title | Commit |
@@ -1032,5 +1058,6 @@ JSON-LD is suppressed in template-preview mode (`?preview=true`) so editor previ
 | 13 | Fixed three live production bugs (admin redirect, rating aggregate, store-stats SQL) | `6b7aa0c` |
 | 14 | Enforced TypeScript type-checking in the production build | `734b775` |
 | 15 | Structured data (JSON-LD) & SEO metadata for storefronts | TBD |
+| 16 | Go reporting microservice (CQRS read side) + admin analytics page | `ca25dbd` |
 
-_Backend suite: 235 tests / 683 assertions. Frontend: 48 unit tests. `tsc --noEmit` clean; production `next build` verified._
+_Backend suite: 254 tests / 740 assertions. Frontend: 48 unit tests. `tsc --noEmit` clean; production `next build` verified. admin-reports (Go): `go vet`/unit tests pass, smoke-tested live._
