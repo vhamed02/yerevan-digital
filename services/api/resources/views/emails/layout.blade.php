@@ -14,7 +14,8 @@
         .body { padding: 40px; }
         .body h1 { font-size: 21px; font-weight: 700; color: #18181b; margin: 0 0 12px; letter-spacing: -0.3px; }
         .body p { font-size: 15px; line-height: 1.65; color: #52525b; margin: 0 0 16px; }
-        .btn { display: inline-block; padding: 12px 28px; background: #18181b; color: #ffffff; text-decoration: none; border-radius: 10px; font-size: 15px; font-weight: 600; margin: 8px 0; }
+        .btn { display: inline-block; padding: 12px 28px; background: #18181b; color: #ffffff !important; text-decoration: none; border-radius: 10px; font-size: 15px; font-weight: 600; margin: 8px 0; }
+        .btn:visited, .btn:hover, .btn:active { color: #ffffff !important; }
         .divider { border: none; border-top: 1px solid #ececef; margin: 28px 0; }
         .footer { padding: 28px 40px 36px; text-align: center; }
         .footer p { font-size: 13px; color: #a1a1aa; margin: 4px 0; }
@@ -31,9 +32,16 @@
         .detail .value a { color: #6366f1; text-decoration: none; }
         .quote { background: #fafafa; border: 1px solid #ececef; border-left: 3px solid #818cf8; border-radius: 8px; padding: 18px 20px; margin: 8px 0 4px; font-size: 15px; line-height: 1.65; color: #3f3f46; white-space: pre-line; }
         .eyebrow { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.6px; color: #818cf8; margin: 0 0 6px; }
+        @media only screen and (max-width: 600px) {
+            .wrapper { padding: 20px 12px !important; }
+            .header { padding: 22px 24px !important; }
+            .body { padding: 26px 24px !important; }
+            .footer { padding: 22px 24px 28px !important; }
+        }
     </style>
 </head>
 <body>
+<div style="background-color: #f1f1f3; width: 100%;">
 <div class="wrapper">
     <div class="card">
         <div class="header">
@@ -48,6 +56,7 @@
             <p><a href="https://vendorex.shop">vendorex.shop</a> &nbsp;·&nbsp; <a href="mailto:support@vendorex.shop">support@vendorex.shop</a></p>
         </div>
     </div>
+</div>
 </div>
 </body>
 </html>

@@ -33,7 +33,7 @@
 
 @if($senderEmail)
 <div style="margin-top:28px;">
-    <a href="mailto:{{ $senderEmail }}" class="btn">Reply to {{ $senderName }}</a>
+    <a href="mailto:{{ $senderEmail }}" class="btn" style="color:#ffffff;">Reply to {{ $senderName }}</a>
 </div>
 @endif
 @endsection
