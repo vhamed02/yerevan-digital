@@ -7,6 +7,7 @@ require (
 	github.com/go-sql-driver/mysql v1.8.1
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/prometheus/client_golang v1.20.5
+	golang.org/x/sync v0.7.0
 )
 
 require (

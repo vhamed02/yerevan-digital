@@ -19,6 +19,7 @@ var (
 type Store struct {
 	db            *sqlx.DB
 	userModelType string
+	adminRole     string
 }
 
 func Connect(dsn string) (*sqlx.DB, error) {
@@ -32,9 +33,11 @@ func Connect(dsn string) (*sqlx.DB, error) {
 	return db, nil
 }
 
-func New(db *sqlx.DB, userModelType string) *Store {
-	return &Store{db: db, userModelType: userModelType}
+func New(db *sqlx.DB, userModelType, adminRole string) *Store {
+	return &Store{db: db, userModelType: userModelType, adminRole: adminRole}
 }
+
+func (s *Store) DB() *sqlx.DB { return s.db }
 
 func (s *Store) Ping(ctx context.Context) error {
 	return s.db.PingContext(ctx)
@@ -73,8 +76,8 @@ func (s *Store) AuthenticateAdmin(ctx context.Context, tokenID, tokenHash string
 	err = s.db.GetContext(ctx, &adminRoles,
 		`SELECT COUNT(*) FROM model_has_roles mhr
 		 JOIN roles r ON r.id = mhr.role_id
-		 WHERE mhr.model_id = ? AND mhr.model_type = ? AND r.name = 'admin'`,
-		token.TokenableID, s.userModelType)
+		 WHERE mhr.model_id = ? AND mhr.model_type = ? AND r.name = ?`,
+		token.TokenableID, s.userModelType, s.adminRole)
 	if err != nil {
 		return nil, err
 	}

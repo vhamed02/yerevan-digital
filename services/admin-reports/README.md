@@ -8,8 +8,9 @@ See the full design in [`docs/admin-reporting-service.md`](../../docs/admin-repo
 
 ## Status
 
-**M0 — scaffold.** Service skeleton, configuration, health/metrics, Sanctum-token admin auth,
-and one authenticated endpoint proving the database wiring. No reports yet (M1+).
+**M1 — reports.** Platform overview (parallel fan-out aggregation) plus filterable, paginated
+list endpoints for stores, sellers, products, and orders. Reads the primary MySQL read-only.
+(M0 delivered the scaffold: health/metrics, Sanctum-token admin auth, graceful shutdown, CI.)
 
 ## Endpoints
 
@@ -17,7 +18,14 @@ and one authenticated endpoint proving the database wiring. No reports yet (M1+)
 |--------|------|------|---------|
 | GET | `/health` | none | Liveness + database ping |
 | GET | `/metrics` | none | Prometheus metrics |
-| GET | `/api/admin-reports/me` | admin | Returns the authenticated admin (proves token → user → role wiring) |
+| GET | `/api/admin-reports/me` | admin | Authenticated admin (proves token → user → role wiring) |
+| GET | `/api/admin-reports/overview` | admin | Platform totals, status breakdowns, revenue, last-30-days, top stores — assembled via concurrent fan-out |
+| GET | `/api/admin-reports/stores` | admin | Stores list — filters: `q`, `status`; with order count + revenue |
+| GET | `/api/admin-reports/sellers` | admin | Sellers list — filters: `q`, `status`; with store + lifetime revenue |
+| GET | `/api/admin-reports/products` | admin | Products list — filters: `q`, `status`, `store_id` |
+| GET | `/api/admin-reports/orders` | admin | Orders list — filters: `q`, `status`, `payment_status`, `store_id`, `from`, `to` |
+
+List endpoints accept `page` and `per_page` (default 20, max 100) and return `{ data, meta }`.
 
 ## Auth
 

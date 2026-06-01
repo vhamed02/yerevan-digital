@@ -38,7 +38,7 @@ func main() {
 
 	srv := &http.Server{
 		Addr:              cfg.HTTPAddr,
-		Handler:           httpapi.NewRouter(store.New(db, cfg.AuthUserModel), logger),
+		Handler:           httpapi.NewRouter(store.New(db, cfg.AuthUserModel, cfg.AdminRole), logger),
 		ReadHeaderTimeout: 5 * time.Second,
 		IdleTimeout:       60 * time.Second,
 	}

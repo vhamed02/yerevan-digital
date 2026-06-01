@@ -14,6 +14,7 @@ type Config struct {
 	DBUsername    string
 	DBPassword    string
 	AuthUserModel string
+	AdminRole     string
 }
 
 func Load() Config {
@@ -26,6 +27,7 @@ func Load() Config {
 		DBUsername:    env("ADMIN_REPORTS_DB_USERNAME", env("DB_USERNAME", "vendora")),
 		DBPassword:    env("ADMIN_REPORTS_DB_PASSWORD", env("DB_PASSWORD", "")),
 		AuthUserModel: env("AUTH_USER_MODEL", `App\Models\User`),
+		AdminRole:     env("AUTH_ADMIN_ROLE", "super-admin"),
 	}
 }
 
