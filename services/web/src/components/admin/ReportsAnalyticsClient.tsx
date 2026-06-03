@@ -137,6 +137,47 @@ export default function ReportsAnalyticsClient() {
         </div>
       </div>
 
+      <div className="rounded-xl border border-border bg-surface p-5">
+        <form onSubmit={runSearch} className="flex items-center gap-2">
+          <div className="relative flex-1">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-content-muted" />
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search stores, products, sellers, orders…"
+              className="w-full rounded-lg border border-border bg-surface-secondary py-2 pl-9 pr-3 text-sm text-content-primary outline-none focus:border-brand-500"
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={searching}
+            className="rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-600 disabled:opacity-50"
+          >
+            {searching ? 'Searching…' : 'Search'}
+          </button>
+        </form>
+
+        {results && (
+          <div className="mt-4">
+            {allHits.length === 0 ? (
+              <p className="text-sm text-content-muted">No matches for “{results.query}”.</p>
+            ) : (
+              <ul className="flex flex-col divide-y divide-border">
+                {allHits.map((hit) => (
+                  <li key={`${hit.type}-${hit.id}`} className="flex items-center justify-between gap-3 py-2 text-sm">
+                    <span className="truncate text-content-primary">{hit.label}</span>
+                    <span className="flex items-center gap-2 text-xs text-content-muted">
+                      <span className="truncate">{hit.sublabel}</span>
+                      <span className="rounded bg-surface-secondary px-2 py-0.5">{hit.type}</span>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        )}
+      </div>
+
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
         <StatCard icon={Store} label="Stores" value={overview.stores.total} trend={`${overview.stores.featured} featured`} color="brand" />
         <StatCard icon={Users} label="Sellers" value={overview.sellers.total} color="info" />
@@ -185,47 +226,6 @@ export default function ReportsAnalyticsClient() {
             ))}
           </div>
         </div>
-      </div>
-
-      <div className="rounded-xl border border-border bg-surface p-5">
-        <form onSubmit={runSearch} className="flex items-center gap-2">
-          <div className="relative flex-1">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-content-muted" />
-            <input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search stores, products, sellers, orders…"
-              className="w-full rounded-lg border border-border bg-surface-secondary py-2 pl-9 pr-3 text-sm text-content-primary outline-none focus:border-brand-500"
-            />
-          </div>
-          <button
-            type="submit"
-            disabled={searching}
-            className="rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-600 disabled:opacity-50"
-          >
-            {searching ? 'Searching…' : 'Search'}
-          </button>
-        </form>
-
-        {results && (
-          <div className="mt-4">
-            {allHits.length === 0 ? (
-              <p className="text-sm text-content-muted">No matches for “{results.query}”.</p>
-            ) : (
-              <ul className="flex flex-col divide-y divide-border">
-                {allHits.map((hit) => (
-                  <li key={`${hit.type}-${hit.id}`} className="flex items-center justify-between gap-3 py-2 text-sm">
-                    <span className="truncate text-content-primary">{hit.label}</span>
-                    <span className="flex items-center gap-2 text-xs text-content-muted">
-                      <span className="truncate">{hit.sublabel}</span>
-                      <span className="rounded bg-surface-secondary px-2 py-0.5">{hit.type}</span>
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        )}
       </div>
     </div>
   )
