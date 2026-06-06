@@ -13,8 +13,9 @@ export default function Footer() {
           <div className="flex flex-col gap-3">
             <Link href="/" className="flex items-center gap-2 font-heading text-lg font-bold text-content-primary">
               <span className="flex h-6 w-6 items-center justify-center rounded-md bg-brand-500">
-                <svg className="h-3.5 w-3.5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                  <path d="M5.5 6.5L12 18L18.5 6.5" />
+                <svg className="h-3.5 w-3.5 text-white" viewBox="19.8 42.8 360.4 254.7" fill="currentColor" aria-hidden="true">
+                  <polygon points="35.8,58.8 82.6,58.8 181.2,281.5 133.3,281.5" />
+                  <polygon points="119.7,58.8 168,58.8 198.8,129.8 231,58.8 278.6,58.8 224,184 241.7,226.5 316.1,58.8 364.2,58.8 265.5,281.5 217.9,281.5" />
                 </svg>
               </span>
               Vendorex
