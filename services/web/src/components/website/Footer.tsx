@@ -36,7 +36,7 @@ export default function Footer() {
                 </Link>
               ))}
             </nav>
-            <div className="pt-1">
+            <div className="w-fit pt-1">
               <LanguageSwitcher />
             </div>
           </div>
