@@ -1,5 +1,5 @@
 import { Link } from '@/i18n/navigation'
-import { Store, ExternalLink, Heart } from 'lucide-react'
+import { ExternalLink, Heart } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher'
 
@@ -12,7 +12,11 @@ export default function Footer() {
         <div className="grid grid-cols-1 gap-10 sm:grid-cols-3">
           <div className="flex flex-col gap-3">
             <Link href="/" className="flex items-center gap-2 font-heading text-lg font-bold text-content-primary">
-              <Store className="h-5 w-5 text-brand-500" />
+              <span className="flex h-6 w-6 items-center justify-center rounded-md bg-brand-500">
+                <svg className="h-3.5 w-3.5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M5.5 6.5L12 18L18.5 6.5" />
+                </svg>
+              </span>
               Vendorex
             </Link>
             <p className="text-sm text-content-muted">{t('tagline')}</p>

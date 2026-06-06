@@ -35,9 +35,8 @@ export default function Navbar() {
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link href="/" className="flex items-center gap-2.5">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-500">
-            <svg className="h-4 w-4 text-white" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-              <path d="M2 5.5A3.5 3.5 0 0 1 8 2.5a3.5 3.5 0 0 1 6 3v.5a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-.5Z" />
-              <path d="M1 10.5a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1v-2Z" />
+            <svg className="h-4 w-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M5.5 6.5L12 18L18.5 6.5" />
             </svg>
           </div>
           <span className="font-heading text-lg font-bold text-content-primary tracking-tight">Vendorex</span>
