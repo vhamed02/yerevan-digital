@@ -6,8 +6,8 @@ import { cn } from '@/lib/utils'
 
 const LOCALES = [
   { code: 'hy', flag: '🇦🇲', label: 'Հայ' },
-  { code: 'en', flag: '🇬🇧', label: 'EN' },
   { code: 'ru', flag: '🇷🇺', label: 'РУ' },
+  { code: 'en', flag: '🇬🇧', label: 'EN' },
 ] as const
 
 interface LanguageSwitcherProps {
