@@ -42,7 +42,7 @@ export default function ComponentsPage() {
     <main className="mx-auto max-w-4xl px-6 py-12 flex flex-col gap-12">
       <div>
         <h1 className="font-heading text-3xl font-bold text-content-primary">Component Showcase</h1>
-        <p className="mt-1 text-content-secondary">Vendora design system — all UI primitives</p>
+        <p className="mt-1 text-content-secondary">Vendorex design system — all UI primitives</p>
       </div>
 
       <Section title="Breadcrumb">

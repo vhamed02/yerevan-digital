@@ -26,7 +26,7 @@ export async function generateMetadata(): Promise<Metadata> {
       title,
       description,
       type: 'website',
-      siteName: 'Vendora',
+      siteName: 'Vendorex',
       ...ogLocale(locale),
     },
   }

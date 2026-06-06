@@ -10,7 +10,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params
   const store = await serverAuthGet<AdminStore>(`/admin/stores/${slug}`)
   const name = store?.name.hy || store?.name.en || slug
-  return { title: `${name} — Vendora Admin` }
+  return { title: `${name} — Vendorex Admin` }
 }
 
 export default async function AdminStoreDetailPage({ params }: { params: Promise<{ slug: string }> }) {

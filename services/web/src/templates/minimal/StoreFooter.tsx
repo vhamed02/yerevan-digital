@@ -51,7 +51,7 @@ export function StoreFooter({ store }: StoreFooterProps) {
           <p className="text-xs text-gray-300">
             Powered by{' '}
             <Link href="/" className="hover:text-gray-400">
-              Vendora
+              Vendorex
             </Link>
           </p>
         </div>

@@ -6,7 +6,7 @@ import { OrderConfirmationClient } from './OrderConfirmationClient'
 export const dynamic = 'force-dynamic'
 
 export async function generateMetadata(): Promise<Metadata> {
-  return { title: 'Order Status | Vendora' }
+  return { title: 'Order Status | Vendorex' }
 }
 
 export default async function OrderConfirmationPage({

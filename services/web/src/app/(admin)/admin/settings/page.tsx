@@ -6,7 +6,7 @@ import type { AdminSettings } from '@/types'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Settings — Vendora Admin',
+  title: 'Settings — Vendorex Admin',
 }
 
 export default async function AdminSettingsPage() {

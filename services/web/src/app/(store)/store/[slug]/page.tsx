@@ -24,7 +24,7 @@ export async function generateMetadata({
   const name = pickLang(store.name, locale)
   const description = pickLang(store.meta_description, locale) || pickLang(store.description, locale) || undefined
   return {
-    title: pickLang(store.meta_title, locale) || `${name} | Vendora`,
+    title: pickLang(store.meta_title, locale) || `${name} | Vendorex`,
     description,
     alternates: localizedAlternates(`/store/${slug}`, locale),
     openGraph: {

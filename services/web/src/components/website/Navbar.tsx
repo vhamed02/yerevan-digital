@@ -40,7 +40,7 @@ export default function Navbar() {
               <path d="M1 10.5a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1v-2Z" />
             </svg>
           </div>
-          <span className="font-heading text-lg font-bold text-content-primary tracking-tight">Vendora</span>
+          <span className="font-heading text-lg font-bold text-content-primary tracking-tight">Vendorex</span>
         </Link>
 
         <nav className="hidden items-center gap-1 md:flex">

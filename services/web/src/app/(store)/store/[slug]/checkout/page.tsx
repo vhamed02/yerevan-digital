@@ -17,7 +17,7 @@ export async function generateMetadata({
   const locale = await getLocale()
   const data = await serverGet<StorefrontStore>(`/store/${slug}/info`)
   const name = data ? pickLang(data.name, locale) : ''
-  return { title: `Checkout — ${name} | Vendora` }
+  return { title: `Checkout — ${name} | Vendorex` }
 }
 
 export default async function CheckoutPage({

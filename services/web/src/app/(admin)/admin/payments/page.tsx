@@ -6,7 +6,7 @@ import type { AdminPaymentGateway } from '@/types'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Payment Gateways — Vendora Admin',
+  title: 'Payment Gateways — Vendorex Admin',
 }
 
 export default async function AdminPaymentsPage() {

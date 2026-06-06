@@ -4,7 +4,7 @@ import { Link } from '@/i18n/navigation'
 import ForgotPasswordForm from '@/components/auth/ForgotPasswordForm'
 
 export const metadata: Metadata = {
-  title: 'Reset Password — Vendora',
+  title: 'Reset Password — Vendorex',
 }
 
 export default function ForgotPasswordPage() {
@@ -14,7 +14,7 @@ export default function ForgotPasswordPage() {
         <div className="mb-8 text-center">
           <Link href="/" className="inline-flex items-center gap-2 font-heading text-xl font-bold text-content-primary">
             <Store className="h-6 w-6 text-brand-500" />
-            Vendora
+            Vendorex
           </Link>
           <h1 className="mt-4 font-heading text-2xl font-bold text-content-primary">Reset your password</h1>
           <p className="mt-1 text-sm text-content-secondary">We'll send a reset link to your email</p>

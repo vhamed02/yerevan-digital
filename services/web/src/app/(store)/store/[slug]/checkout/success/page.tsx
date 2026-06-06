@@ -7,7 +7,7 @@ import { CartClearer } from './CartClearer'
 export const dynamic = 'force-dynamic'
 
 export async function generateMetadata(): Promise<Metadata> {
-  return { title: 'Order Confirmed | Vendora' }
+  return { title: 'Order Confirmed | Vendorex' }
 }
 
 export default async function CheckoutSuccessPage({

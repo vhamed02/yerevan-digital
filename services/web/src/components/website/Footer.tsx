@@ -13,7 +13,7 @@ export default function Footer() {
           <div className="flex flex-col gap-3">
             <Link href="/" className="flex items-center gap-2 font-heading text-lg font-bold text-content-primary">
               <Store className="h-5 w-5 text-brand-500" />
-              Vendora
+              Vendorex
             </Link>
             <p className="text-sm text-content-muted">{t('tagline')}</p>
           </div>

@@ -10,8 +10,8 @@ import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 export const revalidate = 60
 
 export const metadata: Metadata = {
-  title: 'Browse Stores — Vendora',
-  description: 'Discover Armenian online stores on Vendora.',
+  title: 'Browse Stores — Vendorex',
+  description: 'Discover Armenian online stores on Vendorex.',
 }
 
 interface PageProps {

@@ -1,7 +1,7 @@
 {
   "seo": {
     "home": {
-      "title": "Vendora — Armenian Online Store Builder",
+      "title": "Vendorex — Armenian Online Store Builder",
       "description": "Create your Armenian online store in minutes. Accept Idram payments, manage products, and grow your business."
     }
   },
@@ -112,7 +112,7 @@
     "title": "Build Your",
     "title_highlight": "Online Store",
     "title_end": "Today",
-    "subtitle": "Join hundreds of Armenian businesses selling online with Vendora. No coding, no hassle.",
+    "subtitle": "Join hundreds of Armenian businesses selling online with Vendorex. No coding, no hassle.",
     "cta_primary": "Start for Free",
     "cta_secondary": "Browse Stores",
     "badge_stores": "320+ Stores",
@@ -153,7 +153,7 @@
   "cta": {
     "label": "Get Started Today",
     "heading": "Ready to start selling?",
-    "subheading": "Join hundreds of Armenian businesses already growing with Vendora.",
+    "subheading": "Join hundreds of Armenian businesses already growing with Vendorex.",
     "button": "Create Your Free Store",
     "secondary": "Browse active stores",
     "fine_print": "Free plan available. No credit card required."
@@ -166,7 +166,7 @@
     "contact": "Contact",
     "terms": "Terms of Use",
     "privacy": "Privacy Policy",
-    "copyright": "© 2026 Vendora. All rights reserved."
+    "copyright": "© 2026 Vendorex. All rights reserved."
   },
   "stats": {
     "stores": "Registered Stores",
@@ -175,7 +175,7 @@
   },
   "featuredStores": {
     "label": "Featured",
-    "heading": "Active Stores on Vendora",
+    "heading": "Active Stores on Vendorex",
     "explore": "Explore All Stores"
   },
   "storefront": {

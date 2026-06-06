@@ -1,5 +1,5 @@
 [Unit]
-Description=Vendora GitHub Webhook Receiver
+Description=Vendorex GitHub Webhook Receiver
 After=network.target
 
 [Service]

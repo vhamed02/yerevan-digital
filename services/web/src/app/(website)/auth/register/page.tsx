@@ -6,8 +6,8 @@ import { serverGet } from '@/lib/server-api'
 import type { PublicCategory } from '@/types'
 
 export const metadata: Metadata = {
-  title: 'Create Your Store — Vendora',
-  description: 'Sign up and launch your Armenian online store on Vendora.',
+  title: 'Create Your Store — Vendorex',
+  description: 'Sign up and launch your Armenian online store on Vendorex.',
 }
 
 export default async function RegisterPage() {
@@ -22,7 +22,7 @@ export default async function RegisterPage() {
         <div className="mb-8 text-center">
           <Link href="/" className="inline-flex items-center gap-2 font-heading text-xl font-bold text-content-primary">
             <Store className="h-6 w-6 text-brand-500" />
-            Vendora
+            Vendorex
           </Link>
           <h1 className="mt-4 font-heading text-2xl font-bold text-content-primary">Create your store</h1>
           <p className="mt-1 text-sm text-content-secondary">Join hundreds of Armenian businesses selling online</p>

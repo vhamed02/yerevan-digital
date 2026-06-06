@@ -24,7 +24,7 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? 'https://radif.org'),
-  title: 'Vendora',
+  title: 'Vendorex',
   description: 'Armenian store builder platform',
 }
 

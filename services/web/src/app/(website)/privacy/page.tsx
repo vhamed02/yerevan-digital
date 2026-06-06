@@ -12,7 +12,7 @@ export const revalidate = 3600
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale()
   const page = await serverGet<Page>('/pages/privacy')
-  if (!page) return { title: 'Privacy Policy — Vendora' }
+  if (!page) return { title: 'Privacy Policy — Vendorex' }
   const title = pickLang(page.meta_title, locale) || pickLang(page.title, locale)
   const description = pickLang(page.meta_description, locale) || undefined
   return { title, description, alternates: localizedAlternates('/privacy', locale) }
