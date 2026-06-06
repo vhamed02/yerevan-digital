@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils'
 
 const LOCALES = [
   { code: 'hy', flag: '🇦🇲', label: 'Հայ' },
-  { code: 'ru', flag: '🇷🇺', label: 'РУ' },
+  { code: 'ru', flag: '🇷🇺', label: 'RU' },
   { code: 'en', flag: '🇬🇧', label: 'EN' },
 ] as const
 
