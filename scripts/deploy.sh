@@ -62,7 +62,7 @@ printf '%b\n' "$HR"
 # ── build ─────────────────────────────────────────────────────────────────────
 section "Building containers"
 T=$(date +%s)
-$COMPOSE build --build-arg CACHEBUST="$(git rev-parse HEAD)" web api queue admin-reports
+$COMPOSE build web api queue admin-reports
 ok "web + api + queue built"
 took $T
 
@@ -105,6 +105,15 @@ section "Reloading nginx"
 T=$(date +%s)
 $COMPOSE exec -T nginx nginx -s reload
 ok "nginx reloaded"
+took $T
+
+# ── prune ─────────────────────────────────────────────────────────────────────
+# Keep the build cache bounded — drop layers older than 7 days so it can't grow
+# unbounded across deploys (the dependency layer is reused, not pruned).
+section "Trimming old build cache"
+T=$(date +%s)
+docker builder prune -f --filter until=168h >/dev/null 2>&1 || true
+ok "Build cache trimmed (kept last 7 days)"
 took $T
 
 # ── footer ────────────────────────────────────────────────────────────────────
