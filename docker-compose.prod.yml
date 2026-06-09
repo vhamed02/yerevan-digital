@@ -132,17 +132,6 @@ services:
       timeout: 10s
       retries: 3
 
-  scheduler:
-    <<: *api-common
-    command: php artisan schedule:work
-    networks:
-      - vendora-backend
-    depends_on:
-      mysql:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-
 networks:
   vendora-backend:
     driver: bridge
