@@ -9,10 +9,12 @@ use App\Listeners\RecordProductView;
 use App\Listeners\SendNewOrderNotifications;
 use App\Listeners\SendOrderStatusNotification;
 use App\Models\Order;
+use App\Models\Post;
 use App\Models\Product;
 use App\Models\Store;
 use App\Models\User;
 use App\Observers\OrderObserver;
+use App\Observers\PostObserver;
 use App\Observers\ProductObserver;
 use App\Observers\StoreObserver;
 use App\Observers\UserObserver;
@@ -42,6 +44,7 @@ class EventServiceProvider extends ServiceProvider
         Store::class   => StoreObserver::class,
         Order::class   => OrderObserver::class,
         Product::class => ProductObserver::class,
+        Post::class    => PostObserver::class,
     ];
 
     public function boot(): void

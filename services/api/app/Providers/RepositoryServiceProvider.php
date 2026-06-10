@@ -8,6 +8,7 @@ use App\Repositories\Contracts\CategoryRepositoryInterface;
 use App\Repositories\Contracts\OrderRepositoryInterface;
 use App\Repositories\Contracts\PageRepositoryInterface;
 use App\Repositories\Contracts\PaymentGatewayRepositoryInterface;
+use App\Repositories\Contracts\PostRepositoryInterface;
 use App\Repositories\Contracts\ProductRepositoryInterface;
 use App\Repositories\Contracts\ProductReviewRepositoryInterface;
 use App\Repositories\Contracts\ProductVariantRepositoryInterface;
@@ -21,6 +22,7 @@ use App\Repositories\Eloquent\CategoryRepository;
 use App\Repositories\Eloquent\OrderRepository;
 use App\Repositories\Eloquent\PageRepository;
 use App\Repositories\Eloquent\PaymentGatewayRepository;
+use App\Repositories\Eloquent\PostRepository;
 use App\Repositories\Eloquent\ProductRepository;
 use App\Repositories\Eloquent\ProductReviewRepository;
 use App\Repositories\Eloquent\ProductVariantRepository;
@@ -52,6 +54,7 @@ class RepositoryServiceProvider extends ServiceProvider
         StoreTemplateRepositoryInterface::class       => StoreTemplateRepository::class,
         StoreTemplateConfigRepositoryInterface::class => StoreTemplateConfigRepository::class,
         PageRepositoryInterface::class                => PageRepository::class,
+        PostRepositoryInterface::class                => PostRepository::class,
         ProductVariantRepositoryInterface::class      => ProductVariantRepository::class,
         ProductViewRepositoryInterface::class         => ProductViewRepository::class,
     ];

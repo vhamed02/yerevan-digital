@@ -9,6 +9,7 @@ use App\Http\Controllers\HealthController;
 use App\Http\Controllers\CaptchaController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\PageController;
+use App\Http\Controllers\PostController;
 use App\Http\Controllers\PublicStoreController;
 use App\Http\Controllers\StatsController;
 use App\Http\Middleware\EnsureUserIsAdmin;
@@ -29,6 +30,8 @@ Route::prefix('v1')->middleware('throttle:api')->group(function () {
     Route::get('health', [HealthController::class, 'check']);
     Route::get('stats', [StatsController::class, 'index']);
     Route::get('pages/{slug}', [PageController::class, 'show']);
+    Route::get('posts', [PostController::class, 'index']);
+    Route::get('posts/{slug}', [PostController::class, 'show']);
     Route::get('stores', [PublicStoreController::class, 'index']);
     Route::get('stores/featured', [PublicStoreController::class, 'featured']);
     Route::get('stores/check-slug', [PublicStoreController::class, 'checkSlug'])->middleware('throttle:slug-check');
@@ -93,6 +96,12 @@ Route::prefix('v1')->middleware('throttle:api')->group(function () {
         Route::get('pages/{slug}', [Admin\PageController::class, 'show']);
         Route::put('pages/{slug}', [Admin\PageController::class, 'update']);
         Route::delete('pages/{slug}', [Admin\PageController::class, 'destroy']);
+
+        Route::get('posts', [Admin\PostController::class, 'index']);
+        Route::post('posts', [Admin\PostController::class, 'store']);
+        Route::get('posts/{slug}', [Admin\PostController::class, 'show']);
+        Route::put('posts/{slug}', [Admin\PostController::class, 'update']);
+        Route::delete('posts/{slug}', [Admin\PostController::class, 'destroy']);
 
         Route::post('media/upload', [Admin\MediaController::class, 'upload']);
 
