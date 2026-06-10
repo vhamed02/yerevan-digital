@@ -18,6 +18,8 @@ The GitHub webhook triggers `scripts/deploy.sh` automatically, which:
 - Runs `optimize:clear`, `cache:clear`, `migrate --force`
 - Reloads nginx
 
+**Never wait for the deploy to finish.** After pushing, only confirm the webhook triggered — the new commit hash appears in `/var/log/vendora/deploy.log` — then move on. Do not poll the live site or watch the build.
+
 Git identity: `user.name="Vendora Dev"`, `user.email=vhamed02@gmail.com`  
 Deploy SSH key: `/home/deploy/.ssh/github_deploy`
 
