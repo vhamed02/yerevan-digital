@@ -197,6 +197,17 @@ docker compose -f docker-compose.yml -f docker-compose.prod.yml exec api php art
 
 ---
 
+## Blog system (added 2026-06-10)
+
+Trilingual (hy/en/ru) blog for SEO. One shared English-canonical slug per post; display falls back locale→en→hy via `pickLang`.
+
+- **Backend:** `posts` table, `Post` model + `PostStatus` enum, `PostRepository`, admin CRUD at `/api/v1/admin/posts` (slug auto-generated via `SlugService`), public `/api/v1/posts[/{slug}]` (published-only). Public payloads cached in Redis as plain arrays with a version key (`blog:posts:ver`); `PostObserver` flushes on save/delete.
+- **Admin UI:** `/admin/blog` — `BlogAdminClient` (list) + `PostEditorClient` (3-lang TipTap editor, cover via `media/upload`, per-language SEO fields, draft/publish).
+- **Public:** `(website)/blog` + `blog/[slug]` — hreflang + canonical, OG article, `BlogPosting` + `BreadcrumbList` JSON-LD, localized dates (`lib/blog.ts`), reading time. RSS at `/blog/rss.xml?lang=hy|en|ru`. Blog URLs in `sitemap.ts` with per-locale alternates. `LatestPosts` section on the homepage (hidden when no posts).
+- **ISR:** pages cache API responses ~5 min — new/edited posts appear on the live site within that window.
+
+---
+
 ## Architecture notes
 
 - **Each seller has exactly one store.** The seller middleware, dashboard, and all seller API routes are scoped to a single store per user. Multi-store would require a significant refactor.
