@@ -350,6 +350,8 @@
     "by": "Автор: {name}",
     "previous": "Назад",
     "next": "Далее",
-    "breadcrumbHome": "Главная"
+    "breadcrumbHome": "Главная",
+    "fromBlog": "Из блога",
+    "viewAll": "Все публикации"
   }
 }

@@ -14,7 +14,10 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: `${t('title')} — Vendorex`,
     description: t('subtitle'),
-    alternates: localizedAlternates('/blog', locale),
+    alternates: {
+      ...localizedAlternates('/blog', locale),
+      types: { 'application/rss+xml': '/blog/rss.xml' },
+    },
     openGraph: {
       title: `${t('title')} — Vendorex`,
       description: t('subtitle'),

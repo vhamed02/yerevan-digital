@@ -4,6 +4,7 @@ import HeroSection from '@/components/website/HeroSection'
 import HowItWorks from '@/components/website/HowItWorks'
 import FeaturesSection from '@/components/website/FeaturesSection'
 import FeaturedStores from '@/components/website/FeaturedStores'
+import LatestPosts from '@/components/website/LatestPosts'
 import StatsBar from '@/components/website/StatsBar'
 import CtaSection from '@/components/website/CtaSection'
 import { getLocale, getTranslations } from 'next-intl/server'
@@ -48,6 +49,9 @@ export default async function LandingPage() {
       <FeaturesSection />
       <Suspense>
         <FeaturedStores />
+      </Suspense>
+      <Suspense>
+        <LatestPosts />
       </Suspense>
       <StatsBar stats={fallbackStats} />
       <CtaSection />

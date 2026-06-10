@@ -507,7 +507,7 @@ export type AdminPostListItem = Pick<
 
 export type PublicPostListItem = Pick<
   Post,
-  'slug' | 'title' | 'excerpt' | 'cover' | 'author_name' | 'published_at'
+  'slug' | 'title' | 'excerpt' | 'cover' | 'author_name' | 'published_at' | 'updated_at'
 >
 
 export type PublicPost = Pick<

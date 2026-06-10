@@ -66,6 +66,7 @@ class PostRepository implements PostRepositoryInterface
                 'cover'        => $post->cover,
                 'author_name'  => $post->author_name,
                 'published_at' => $post->published_at?->toIso8601String(),
+                'updated_at'   => $post->updated_at?->toIso8601String(),
             ])->all(),
             'meta' => [
                 'current_page' => $paginator->currentPage(),

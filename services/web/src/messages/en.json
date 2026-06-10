@@ -350,6 +350,8 @@
     "by": "By {name}",
     "previous": "Previous",
     "next": "Next",
-    "breadcrumbHome": "Home"
+    "breadcrumbHome": "Home",
+    "fromBlog": "From the Blog",
+    "viewAll": "View all posts"
   }
 }

@@ -350,6 +350,8 @@
     "by": "Հեղինակ՝ {name}",
     "previous": "Նախորդ",
     "next": "Հաջորդ",
-    "breadcrumbHome": "Գլխավոր"
+    "breadcrumbHome": "Գլխավոր",
+    "fromBlog": "Մեր բլոգից",
+    "viewAll": "Բոլոր հրապարակումները"
   }
 }
