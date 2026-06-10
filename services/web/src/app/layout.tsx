@@ -26,6 +26,9 @@ export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? 'https://radif.org'),
   title: 'Vendorex',
   description: 'Armenian store builder platform',
+  verification: {
+    google: 'a9gg2CrnhI6oMi1y9-wmk-Pmg4SxNdLeJmSjJFalAjs',
+  },
 }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
