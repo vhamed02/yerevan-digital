@@ -20,6 +20,12 @@ The GitHub webhook triggers `scripts/deploy.sh` automatically, which:
 
 **Never wait for the deploy to finish.** After pushing, only confirm the webhook triggered — the new commit hash appears in `/var/log/vendora/deploy.log` — then move on. Do not poll the live site or watch the build.
 
+If the webhook doesn't fire (GitHub occasionally skips a delivery — verify with the first command), re-send a push event:
+```bash
+gh api repos/vhamed02/vendora/hooks/624681417/deliveries --jq '.[:3][].delivered_at'
+gh api -X POST repos/vhamed02/vendora/hooks/624681417/tests
+```
+
 Git identity: `user.name="Vendora Dev"`, `user.email=vhamed02@gmail.com`  
 Deploy SSH key: `/home/deploy/.ssh/github_deploy`
 
