@@ -504,3 +504,14 @@ export type AdminPostListItem = Pick<
   Post,
   'id' | 'slug' | 'title' | 'status' | 'author_name' | 'published_at' | 'updated_at'
 >
+
+export type PublicPostListItem = Pick<
+  Post,
+  'slug' | 'title' | 'excerpt' | 'cover' | 'author_name' | 'published_at'
+>
+
+export type PublicPost = Pick<
+  Post,
+  | 'slug' | 'title' | 'excerpt' | 'content' | 'cover'
+  | 'author_name' | 'published_at' | 'updated_at' | 'meta_title' | 'meta_description'
+>

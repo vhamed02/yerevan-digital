@@ -51,6 +51,12 @@ export default function Navbar() {
             {t('stores')}
           </Link>
           <Link
+            href="/blog"
+            className="rounded-md px-3 py-2 text-sm font-medium text-content-primary/65 hover:bg-surface-secondary hover:text-content-primary transition-colors"
+          >
+            {t('blog')}
+          </Link>
+          <Link
             href="/about"
             className="rounded-md px-3 py-2 text-sm font-medium text-content-primary/65 hover:bg-surface-secondary hover:text-content-primary transition-colors"
           >
@@ -104,6 +110,13 @@ export default function Navbar() {
               onClick={() => setMobileOpen(false)}
             >
               {t('stores')}
+            </Link>
+            <Link
+              href="/blog"
+              className="rounded-md px-3 py-2.5 text-sm font-medium text-content-primary/70 hover:bg-surface-secondary hover:text-content-primary"
+              onClick={() => setMobileOpen(false)}
+            >
+              {t('blog')}
             </Link>
             <Link
               href="/about"

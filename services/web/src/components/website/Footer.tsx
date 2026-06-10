@@ -27,6 +27,7 @@ export default function Footer() {
             <p className="text-xs font-semibold uppercase tracking-wider text-content-muted">{t('links_label')}</p>
             <nav className="flex flex-col gap-2">
               {[
+                { label: t('blog'), href: '/blog' },
                 { label: t('about'), href: '/about' },
                 { label: t('contact'), href: '/contact' },
                 { label: t('terms'), href: '/terms' },
