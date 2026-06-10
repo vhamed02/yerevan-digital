@@ -477,3 +477,30 @@ export interface Page {
   is_published: boolean
   updated_at: string
 }
+
+export interface PostCover {
+  original: string
+  thumbnail: string
+  medium: string
+  large: string
+}
+
+export interface Post {
+  id: number
+  slug: string
+  title: MultiLang
+  excerpt?: MultiLang | null
+  content: MultiLang
+  cover?: PostCover | null
+  author_name: string
+  status: 'draft' | 'published'
+  published_at?: string | null
+  meta_title?: MultiLang | null
+  meta_description?: MultiLang | null
+  updated_at: string
+}
+
+export type AdminPostListItem = Pick<
+  Post,
+  'id' | 'slug' | 'title' | 'status' | 'author_name' | 'published_at' | 'updated_at'
+>

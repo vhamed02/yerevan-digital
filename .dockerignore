@@ -8,5 +8,5 @@
 services/web/.next
 services/web/out
 services/api/vendor
-node_modules
+**/node_modules
 *.log

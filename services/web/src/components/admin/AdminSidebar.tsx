@@ -17,6 +17,7 @@ import {
   FileText,
   MessageSquare,
   BarChart3,
+  Newspaper,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import useAuthStore from '@/stores/auth.store'
@@ -32,6 +33,7 @@ const navItems = [
   { href: '/admin/templates', label: 'Templates', icon: Palette },
   { href: '/admin/payments', label: 'Payments', icon: CreditCard },
   { href: '/admin/pages', label: 'Pages', icon: FileText },
+  { href: '/admin/blog', label: 'Blog', icon: Newspaper },
   { href: '/admin/reviews', label: 'Reviews', icon: MessageSquare },
   { href: '/admin/settings', label: 'Settings', icon: Settings },
 ]
