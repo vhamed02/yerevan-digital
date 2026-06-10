@@ -108,12 +108,14 @@ ok "nginx reloaded"
 took $T
 
 # ── prune ─────────────────────────────────────────────────────────────────────
-# Keep the build cache bounded — drop layers older than 7 days so it can't grow
-# unbounded across deploys (the dependency layer is reused, not pruned).
+# Bound the build cache by size, evicting least-recently-used entries first.
+# Not `--filter until=`: that prunes by CREATION age, so it deletes layers
+# built long ago but still cache-hit on every deploy — exactly the composer
+# and php-extension layers we need to keep.
 section "Trimming old build cache"
 T=$(date +%s)
-docker builder prune -f --filter until=168h >/dev/null 2>&1 || true
-ok "Build cache trimmed (kept last 7 days)"
+docker builder prune -f --max-used-space 10GB >/dev/null 2>&1 || true
+ok "Build cache trimmed (LRU, bounded at 10GB)"
 took $T
 
 # ── footer ────────────────────────────────────────────────────────────────────
