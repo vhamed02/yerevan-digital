@@ -35,11 +35,12 @@ Deploy SSH key: `/home/deploy/.ssh/github_deploy`
 
 ## Infrastructure
 
-- **Server:** Ubuntu 24, radif.org, repo at `/home/deploy/vendora`
+- **Server:** Ubuntu 24, hostname `vendorex`, repo at `/home/deploy/vendora`
+- **Domains:** `vendorex.shop` (frontend) / `api.vendorex.shop` (API), both Cloudflare-proxied; TLS terminates at Cloudflare (nginx listens on 80 only). The old `radif.org` zone is stale (522) — don't use it. `/etc/hosts` maps `vendorex.shop` to 127.0.1.1, so server-local curl tests need `--resolve` or `http://localhost` + Host header.
 - **Stack:** Laravel 13 / PHP 8.5 API + Next.js 16.2.6 frontend, MySQL 8, Redis 7, Docker Compose
 - **Networks:** `vendora-backend` (api, mysql, mongodb, redis), `vendora-frontend` (nginx, web, api)
 - **SSR API path:** Next.js server-side calls `http://nginx:8080/api/v1/...` — nginx listens on 8080 and proxies to PHP-FPM at `api:9000`
-- **Client-side API path:** `https://radif.org/api/v1/...`
+- **Client-side API path:** `https://api.vendorex.shop/api/v1/...`
 
 ---
 
@@ -189,6 +190,10 @@ Run after deploy:
 ```bash
 docker compose -f docker-compose.yml -f docker-compose.prod.yml exec api php artisan db:seed --class=DemoSeeder
 ```
+
+**Production was purged of all demo/mock data on 2026-06-10** — do not reseed DemoSeeder there. Maintenance commands:
+- `php artisan demo:purge [--dry-run] [--force] [--user=email]` — hard-deletes demo sellers + dependents (never touches super admins)
+- `php artisan admin:create {email} [--name=] [--password=]` — create/promote a super admin (generates a strong password when omitted)
 
 ---
 
