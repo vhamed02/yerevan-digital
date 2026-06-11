@@ -41,6 +41,7 @@ Deploy SSH key: `/home/deploy/.ssh/github_deploy`
 - **Networks:** `vendora-backend` (api, mysql, mongodb, redis), `vendora-frontend` (nginx, web, api)
 - **SSR API path:** Next.js server-side calls `http://nginx:8080/api/v1/...` — nginx listens on 8080 and proxies to PHP-FPM at `api:9000`
 - **Client-side API path:** `https://api.vendorex.shop/api/v1/...`
+- **Base images are digest-pinned** (all Dockerfiles): unpinned tags re-resolve from the registry every build, and upstream releases silently bust the whole layer cache (15-min PHP extension recompiles). To upgrade a base image, change the digest deliberately and expect one slow rebuild.
 
 ---
 

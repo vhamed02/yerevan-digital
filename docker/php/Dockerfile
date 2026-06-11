@@ -1,6 +1,9 @@
-FROM php:8.5-fpm-alpine
+# Base images are digest-pinned: unpinned tags re-resolve from the registry on
+# every build, and any upstream release silently busts the whole layer cache.
+# To upgrade: change the digest deliberately, expect one slow rebuild.
+FROM php:8.5-fpm-alpine@sha256:cb4a96fe4ee2888dc2fc5383b72de4a9be045fa8252b33f441ef3435fd22b465
 
-COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/bin/
+COPY --from=mlocati/php-extension-installer@sha256:24b0e392309d7085c05b3dc2429bf1c0d934b7d07ded31d212367405e4554a84 /usr/bin/install-php-extensions /usr/bin/
 
 RUN install-php-extensions \
         pdo_mysql \
