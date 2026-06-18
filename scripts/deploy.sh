@@ -6,7 +6,7 @@ REPO_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 # Pull first, then re-exec so the rest of the script runs from the freshly-pulled version
 if [ -z "${_DEPLOY_PULLED:-}" ]; then
   git -C "$REPO_DIR" update-index --assume-unchanged scripts/hooks.json
-  git -C "$REPO_DIR" pull origin main
+  git -C "$REPO_DIR" pull origin master
   export _DEPLOY_PULLED=1
   exec bash "$REPO_DIR/scripts/deploy.sh"
 fi

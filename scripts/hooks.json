@@ -1,14 +1,14 @@
 [
   {
     "id": "deploy",
-    "execute-command": "/home/deploy/vendora/scripts/deploy.sh",
-    "command-working-directory": "/home/deploy/vendora",
+    "execute-command": "/home/vendorex/scripts/deploy.sh",
+    "command-working-directory": "/home/vendorex",
     "response-message": "Deployment queued.",
     "trigger-rule": {
       "and": [
         {
           "match": {
-            "type": "payload-hash-sha256",
+            "type": "payload-hmac-sha256",
             "secret": "REPLACE_WITH_YOUR_SECRET",
             "parameter": {
               "source": "header",
@@ -19,7 +19,7 @@
         {
           "match": {
             "type": "value",
-            "value": "refs/heads/main",
+            "value": "refs/heads/master",
             "parameter": {
               "source": "payload",
               "name": "ref"
