@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Auth\CustomerRegisterRequest;
 use App\Http\Requests\Auth\ForgotPasswordRequest;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
@@ -35,6 +36,30 @@ class AuthController extends Controller
         $token = $user->createToken('api')->plainTextToken;
 
         $user->notify(new WelcomeSellerNotification());
+
+        return $this->success(
+            $this->buildAuthResponse($user, $token),
+            'Registration successful.',
+            201
+        );
+    }
+
+    public function registerCustomer(CustomerRegisterRequest $request): JsonResponse
+    {
+        $user = User::create([
+            'name'     => $request->name,
+            'email'    => $request->email,
+            'password' => $request->password,
+            'phone'    => $request->phone,
+            'role'     => UserRole::Customer,
+            'locale'   => in_array(app()->getLocale(), config('app.supported_locales'), true)
+                ? app()->getLocale()
+                : config('app.locale'),
+        ]);
+
+        $user->assignRole('customer');
+
+        $token = $user->createToken('api')->plainTextToken;
 
         return $this->success(
             $this->buildAuthResponse($user, $token),

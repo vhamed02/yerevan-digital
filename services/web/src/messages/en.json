@@ -1,4 +1,52 @@
 {
+  "account": {
+    "myOrders": "My Orders",
+    "noOrders": "You have no orders yet.",
+    "browseStores": "Browse stores",
+    "signInPrompt": "Sign in to view your orders.",
+    "signIn": "Sign in",
+    "progress": "Order progress",
+    "items": "Items",
+    "subtotal": "Subtotal",
+    "discount": "Discount",
+    "shipping": "Shipping",
+    "tax": "Tax",
+    "total": "Total",
+    "customer": "Customer",
+    "shippingAddress": "Shipping address",
+    "payment": "Payment",
+    "backToOrders": "Back to orders",
+    "orderNotFound": "Order not found.",
+    "track": {
+      "nav": "Track order",
+      "title": "Track your order",
+      "subtitle": "Enter your order number and email to see its status.",
+      "orderNumber": "Order number",
+      "email": "Email",
+      "submit": "Track order",
+      "notFound": "Order not found. Check the order number and email.",
+      "orderNumberRequired": "Order number is required",
+      "emailInvalid": "Enter a valid email"
+    },
+    "register": {
+      "title": "Create your account",
+      "subtitle": "Track your orders and check out faster.",
+      "name": "Full name",
+      "email": "Email",
+      "phone": "Phone (optional)",
+      "password": "Password",
+      "confirm": "Confirm password",
+      "submit": "Create account",
+      "haveAccount": "Already have an account?",
+      "signIn": "Sign in",
+      "nameRequired": "Name is required",
+      "emailInvalid": "Enter a valid email",
+      "passwordShort": "Password must be at least 8 characters",
+      "confirmRequired": "Please confirm your password",
+      "passwordMismatch": "Passwords do not match",
+      "failed": "Registration failed. Please try again."
+    }
+  },
   "seo": {
     "home": {
       "title": "Vendorex — Armenian Online Store Builder",

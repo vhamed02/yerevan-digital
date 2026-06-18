@@ -58,6 +58,7 @@ class CreateOrderAction
 
             $order = $this->orders->create([
                 'store_id'         => $data->storeId,
+                'customer_id'      => $data->customerId,
                 'status'           => OrderStatus::Pending,
                 'payment_status'   => PaymentStatus::Pending,
                 'subtotal'         => $subtotal,

@@ -43,7 +43,7 @@ export default function LoginForm() {
       const res = await api.post<LoginResponse>('/auth/login', data)
       login({ user: res.data.user, token: res.data.token, store: res.data.store })
       const role = res.data.user.role
-      router.push(role === 'super_admin' ? '/admin' : '/seller')
+      router.push(role === 'super_admin' ? '/admin' : role === 'customer' ? '/account/orders' : '/seller')
     } catch {
       toast.error('Invalid email or password')
     }
@@ -99,6 +99,13 @@ export default function LoginForm() {
         New seller?{' '}
         <Link href="/auth/register" className="font-medium text-brand-500 hover:text-brand-600 transition-colors">
           Create your store →
+        </Link>
+      </p>
+
+      <p className="text-center text-sm text-content-secondary">
+        New customer?{' '}
+        <Link href="/account/register" className="font-medium text-brand-500 hover:text-brand-600 transition-colors">
+          Create an account →
         </Link>
       </p>
     </form>

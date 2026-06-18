@@ -5,6 +5,8 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Admin;
 use App\Http\Controllers\Seller;
 use App\Http\Controllers\Store;
+use App\Http\Controllers\Customer;
+use App\Http\Controllers\OrderTrackingController;
 use App\Http\Controllers\HealthController;
 use App\Http\Controllers\CaptchaController;
 use App\Http\Controllers\ContactController;
@@ -25,6 +27,7 @@ RateLimiter::for('checkout', fn($request) => Limit::perMinute(10)->by($request->
 RateLimiter::for('slug-check', fn($request) => Limit::perMinute(20)->by($request->ip()));
 RateLimiter::for('contact', fn($request) => Limit::perMinute(3)->by($request->ip()));
 RateLimiter::for('review',  fn($request) => Limit::perMinute(3)->by($request->ip()));
+RateLimiter::for('track',   fn($request) => Limit::perMinute(10)->by($request->ip()));
 
 Route::prefix('v1')->middleware('throttle:api')->group(function () {
     Route::get('health', [HealthController::class, 'check']);
@@ -38,10 +41,12 @@ Route::prefix('v1')->middleware('throttle:api')->group(function () {
     Route::get('categories', [PublicStoreController::class, 'categories']);
     Route::post('contact', [ContactController::class, 'send'])->middleware('throttle:contact');
     Route::get('captcha', [CaptchaController::class, 'generate']);
+    Route::post('orders/track', [OrderTrackingController::class, 'track'])->middleware('throttle:track');
 
     Route::prefix('auth')->group(function () {
         Route::middleware('throttle:auth')->group(function () {
             Route::post('register', [AuthController::class, 'register']);
+            Route::post('customer/register', [AuthController::class, 'registerCustomer']);
             Route::post('login', [AuthController::class, 'login']);
             Route::post('forgot-password', [AuthController::class, 'forgotPassword']);
             Route::post('reset-password', [AuthController::class, 'resetPassword']);
@@ -50,6 +55,12 @@ Route::prefix('v1')->middleware('throttle:api')->group(function () {
             Route::post('logout', [AuthController::class, 'logout']);
             Route::get('me', [AuthController::class, 'me']);
         });
+    });
+
+    Route::prefix('customer')->middleware('auth:sanctum')->group(function () {
+        Route::get('orders', [Customer\OrderController::class, 'index']);
+        Route::get('orders/{uuid}', [Customer\OrderController::class, 'show']);
+        Route::patch('profile', [Customer\ProfileController::class, 'update']);
     });
 
     Route::prefix('admin')->middleware(['auth:sanctum', EnsureUserIsAdmin::class])->group(function () {

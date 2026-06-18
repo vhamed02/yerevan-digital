@@ -2,8 +2,49 @@ export interface User {
   id: number
   name: string
   email: string
-  role: 'super_admin' | 'seller'
+  role: 'super_admin' | 'seller' | 'customer'
   avatar?: string
+  phone?: string
+  locale?: string
+}
+
+export interface AccountOrderItem {
+  product_name: MultiLang
+  variant_name?: string | null
+  sku?: string | null
+  quantity: number
+  unit_price: number
+  total_price: number
+}
+
+export interface AccountOrder {
+  uuid: string
+  order_number: string
+  status: 'pending' | 'paid' | 'processing' | 'shipped' | 'delivered' | 'cancelled' | 'refunded'
+  payment_status: 'pending' | 'paid' | 'failed' | 'refunded'
+  payment_method?: string | null
+  subtotal: number
+  discount: number
+  shipping_cost: number
+  tax: number
+  total: number
+  currency: string
+  customer_name: string
+  customer_email: string
+  customer_phone?: string | null
+  shipping_address?: {
+    line1?: string
+    city?: string
+    postal_code?: string
+    country?: string
+  } | null
+  notes?: string | null
+  created_at: string
+  paid_at?: string | null
+  shipped_at?: string | null
+  delivered_at?: string | null
+  store?: { slug: string; name: MultiLang }
+  items: AccountOrderItem[]
 }
 
 export interface Store {

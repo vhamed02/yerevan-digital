@@ -20,6 +20,12 @@ interface OrderRepositoryInterface
 
     public function findPublicByStoreAndUuid(int $storeId, string $uuid, array $with = []): Order;
 
+    public function paginateByCustomer(int $customerId, array $filters): LengthAwarePaginator;
+
+    public function findByCustomerAndUuid(int $customerId, string $uuid, array $with = []): Order;
+
+    public function findByOrderNumberAndEmail(string $orderNumber, string $email): ?Order;
+
     public function countToday(): int;
 
     public function countYesterday(): int;

@@ -13,9 +13,12 @@ export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const t = useTranslations('nav')
+  const ta = useTranslations('account')
   const { isAuthenticated, user, logout } = useAuthStore()
 
-  const dashboardHref = user?.role === 'super_admin' ? '/admin' : '/seller'
+  const isCustomer = user?.role === 'customer'
+  const dashboardHref = user?.role === 'super_admin' ? '/admin' : isCustomer ? '/account/orders' : '/seller'
+  const dashboardLabel = isCustomer ? ta('myOrders') : t('dashboard')
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12)
@@ -68,6 +71,12 @@ export default function Navbar() {
           >
             {t('contact')}
           </Link>
+          <Link
+            href="/track"
+            className="rounded-md px-3 py-2 text-sm font-medium text-content-primary/65 hover:bg-surface-secondary hover:text-content-primary transition-colors"
+          >
+            {ta('track.nav')}
+          </Link>
         </nav>
 
         <div className="hidden items-center gap-2 md:flex">
@@ -75,7 +84,7 @@ export default function Navbar() {
           {isAuthenticated ? (
             <>
               <Link href={dashboardHref}>
-                <Button size="sm" variant="ghost">{t('dashboard')}</Button>
+                <Button size="sm" variant="ghost">{dashboardLabel}</Button>
               </Link>
               <Button size="sm" variant="outline" onClick={logout}>{t('logout')}</Button>
             </>
@@ -132,10 +141,17 @@ export default function Navbar() {
             >
               {t('contact')}
             </Link>
+            <Link
+              href="/track"
+              className="rounded-md px-3 py-2.5 text-sm font-medium text-content-primary/70 hover:bg-surface-secondary hover:text-content-primary"
+              onClick={() => setMobileOpen(false)}
+            >
+              {ta('track.nav')}
+            </Link>
             {isAuthenticated ? (
               <>
                 <Link href={dashboardHref} className="rounded-md px-3 py-2.5 text-sm font-medium text-content-primary/70 hover:bg-surface-secondary" onClick={() => setMobileOpen(false)}>
-                  {t('dashboard')}
+                  {dashboardLabel}
                 </Link>
                 <button className="rounded-md px-3 py-2.5 text-left text-sm font-medium text-content-primary/70 hover:bg-surface-secondary" onClick={() => { logout(); setMobileOpen(false) }}>
                   {t('logout')}

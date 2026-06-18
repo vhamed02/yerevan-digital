@@ -13,5 +13,6 @@ readonly class CheckoutData
         public array   $shippingAddress,
         public ?string $notes,
         public string  $paymentMethod,
+        public ?int    $customerId = null,
     ) {}
 }

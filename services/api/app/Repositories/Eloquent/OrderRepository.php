@@ -61,6 +61,32 @@ class OrderRepository implements OrderRepositoryInterface
             ->firstOrFail();
     }
 
+    public function paginateByCustomer(int $customerId, array $filters): LengthAwarePaginator
+    {
+        return Order::where('customer_id', $customerId)
+            ->with('store')
+            ->when($filters['status'] ?? null, fn($q, $v) => $q->where('status', $v))
+            ->when($filters['payment_status'] ?? null, fn($q, $v) => $q->where('payment_status', $v))
+            ->latest()
+            ->paginate(20);
+    }
+
+    public function findByCustomerAndUuid(int $customerId, string $uuid, array $with = []): Order
+    {
+        return Order::where('customer_id', $customerId)
+            ->where('uuid', $uuid)
+            ->with($with)
+            ->firstOrFail();
+    }
+
+    public function findByOrderNumberAndEmail(string $orderNumber, string $email): ?Order
+    {
+        return Order::where('order_number', $orderNumber)
+            ->whereRaw('LOWER(customer_email) = ?', [mb_strtolower($email)])
+            ->with(['items', 'store'])
+            ->first();
+    }
+
     public function countToday(): int
     {
         return Order::whereBetween('created_at', [today(), today()->endOfDay()])->count();

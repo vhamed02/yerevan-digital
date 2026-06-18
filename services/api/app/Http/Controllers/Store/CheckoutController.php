@@ -18,6 +18,7 @@ class CheckoutController extends Controller
 
         $order = $this->createOrder->execute(new CheckoutData(
             storeId:         $store->id,
+            customerId:      $request->user('sanctum')?->id,
             items:           $request->validated('items'),
             customerName:    $request->validated('full_name'),
             customerEmail:   $request->validated('email'),
