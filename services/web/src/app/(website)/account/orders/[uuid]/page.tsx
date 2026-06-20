@@ -17,7 +17,7 @@ export default async function AccountOrderDetailPage({ params }: { params: Promi
   const t = await getTranslations('account')
 
   return (
-    <main className="mx-auto min-h-[calc(100vh-64px)] max-w-4xl px-4 py-10">
+    <main className="mx-auto max-w-4xl px-4 py-10">
       <Link
         href="/account/orders"
         className="mb-6 inline-flex items-center gap-1 text-sm text-content-secondary transition-colors hover:text-content-primary"
