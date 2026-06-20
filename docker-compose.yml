@@ -22,7 +22,6 @@ services:
       - web
     networks:
       - vendora-frontend
-      - iranip_net          # reach iranip-nginx-1 to serve irani-ip.ir
     restart: unless-stopped
 
   api:
@@ -121,11 +120,6 @@ networks:
     driver: bridge
   vendora-frontend:
     driver: bridge
-  # Owned by the iranip stack (docker-compose.prod.yml, name: iranip_net).
-  # Declared external so this front-door nginx can resolve iranip-nginx-1 by
-  # name. The iranip stack must be up before recreating this nginx.
-  iranip_net:
-    external: true
 
 volumes:
   mysql_data:
