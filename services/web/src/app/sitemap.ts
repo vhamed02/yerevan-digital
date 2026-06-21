@@ -46,10 +46,22 @@ async function fetchAllPosts(): Promise<PublicPostListItem[]> {
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = process.env.NEXT_PUBLIC_APP_URL ?? 'https://vendorex.shop'
 
+  // Build hreflang alternates for a localized path, including x-default.
+  // Mirrors the per-page <link rel="alternate" hreflang> emitted by lib/seo.ts.
+  const altLanguages = (path: string): Record<string, string> => {
+    const languages: Record<string, string> = {}
+    for (const l of routing.locales) {
+      languages[l] = `${base}${localePath(l, path)}`
+    }
+    languages['x-default'] = `${base}${localePath(routing.defaultLocale, path)}`
+    return languages
+  }
+
   const staticEntries: MetadataRoute.Sitemap = STATIC_PAGES.map((entry) => ({
     ...entry,
     url: `${base}${entry.url}`,
     lastModified: new Date(),
+    alternates: { languages: altLanguages(entry.url) },
   }))
 
   const stores = await fetchAllStores()
@@ -60,24 +72,30 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'weekly' as const,
       priority: 0.8,
       lastModified: new Date(),
+      alternates: { languages: altLanguages(`/stores/${store.slug}`) },
     },
     {
       url: `${base}/store/${store.slug}`,
       changeFrequency: 'daily' as const,
       priority: 0.9,
       lastModified: new Date(),
+      alternates: { languages: altLanguages(`/store/${store.slug}`) },
     },
   ])
 
   const productResults = await Promise.all(
     stores.map(async (store) => {
       const products = await fetchStoreProducts(store.slug)
-      return products.map((product): MetadataRoute.Sitemap[number] => ({
-        url: `${base}/store/${store.slug}/products/${product.slug}`,
-        changeFrequency: 'weekly',
-        priority: 0.7,
-        lastModified: new Date(),
-      }))
+      return products.map((product): MetadataRoute.Sitemap[number] => {
+        const path = `/store/${store.slug}/products/${product.slug}`
+        return {
+          url: `${base}${path}`,
+          changeFrequency: 'weekly',
+          priority: 0.7,
+          lastModified: new Date(),
+          alternates: { languages: altLanguages(path) },
+        }
+      })
     })
   )
 
@@ -88,11 +106,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     changeFrequency: 'weekly' as const,
     priority: 0.7,
     lastModified: new Date(post.updated_at ?? post.published_at ?? Date.now()),
-    alternates: {
-      languages: Object.fromEntries(
-        routing.locales.map((l) => [l, `${base}${localePath(l, `/blog/${post.slug}`)}`])
-      ),
-    },
+    alternates: { languages: altLanguages(`/blog/${post.slug}`) },
   }))
 
   return [...staticEntries, ...storeEntries, ...productResults.flat(), ...postEntries]
