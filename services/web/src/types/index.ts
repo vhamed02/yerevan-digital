@@ -556,3 +556,10 @@ export type PublicPost = Pick<
   | 'slug' | 'title' | 'excerpt' | 'content' | 'cover'
   | 'author_name' | 'published_at' | 'updated_at' | 'meta_title' | 'meta_description'
 >
+
+export interface PublicComment {
+  id: number
+  author_name: string
+  body: string
+  created_at: string
+}

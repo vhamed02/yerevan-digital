@@ -12,6 +12,7 @@ use App\Http\Controllers\CaptchaController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\BlogCommentController;
 use App\Http\Controllers\PublicStoreController;
 use App\Http\Controllers\StatsController;
 use App\Http\Middleware\EnsureUserIsAdmin;
@@ -27,6 +28,7 @@ RateLimiter::for('checkout', fn($request) => Limit::perMinute(10)->by($request->
 RateLimiter::for('slug-check', fn($request) => Limit::perMinute(20)->by($request->ip()));
 RateLimiter::for('contact', fn($request) => Limit::perMinute(3)->by($request->ip()));
 RateLimiter::for('review',  fn($request) => Limit::perMinute(3)->by($request->ip()));
+RateLimiter::for('comment', fn($request) => Limit::perMinute(3)->by($request->ip()));
 RateLimiter::for('track',   fn($request) => Limit::perMinute(10)->by($request->ip()));
 
 Route::prefix('v1')->middleware('throttle:api')->group(function () {
@@ -35,6 +37,8 @@ Route::prefix('v1')->middleware('throttle:api')->group(function () {
     Route::get('pages/{slug}', [PageController::class, 'show']);
     Route::get('posts', [PostController::class, 'index']);
     Route::get('posts/{slug}', [PostController::class, 'show']);
+    Route::get('posts/{slug}/comments', [BlogCommentController::class, 'index']);
+    Route::post('posts/{slug}/comments', [BlogCommentController::class, 'store'])->middleware('throttle:comment');
     Route::get('stores', [PublicStoreController::class, 'index']);
     Route::get('stores/featured', [PublicStoreController::class, 'featured']);
     Route::get('stores/check-slug', [PublicStoreController::class, 'checkSlug'])->middleware('throttle:slug-check');
@@ -119,6 +123,10 @@ Route::prefix('v1')->middleware('throttle:api')->group(function () {
         Route::get('reviews', [Admin\ProductReviewController::class, 'index']);
         Route::patch('reviews/{review}/approve', [Admin\ProductReviewController::class, 'approve']);
         Route::delete('reviews/{review}', [Admin\ProductReviewController::class, 'destroy']);
+
+        Route::get('comments', [Admin\BlogCommentController::class, 'index']);
+        Route::patch('comments/{comment}/approve', [Admin\BlogCommentController::class, 'approve']);
+        Route::delete('comments/{comment}', [Admin\BlogCommentController::class, 'destroy']);
     });
 
     Route::prefix('seller')->middleware(['auth:sanctum', EnsureUserIsSeller::class])->group(function () {

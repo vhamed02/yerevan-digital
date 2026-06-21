@@ -18,6 +18,7 @@ import {
   MessageSquare,
   BarChart3,
   Newspaper,
+  MessageCircle,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import useAuthStore from '@/stores/auth.store'
@@ -35,6 +36,7 @@ const navItems = [
   { href: '/admin/pages', label: 'Pages', icon: FileText },
   { href: '/admin/blog', label: 'Blog', icon: Newspaper },
   { href: '/admin/reviews', label: 'Reviews', icon: MessageSquare },
+  { href: '/admin/comments', label: 'Comments', icon: MessageCircle },
   { href: '/admin/settings', label: 'Settings', icon: Settings },
 ]
 

@@ -1,4 +1,23 @@
 {
+  "comments": {
+    "heading": "Comments",
+    "empty": "No comments yet. Be the first to share your thoughts.",
+    "formHeading": "Leave a comment",
+    "successPending": "Thanks! Your comment was submitted and is awaiting approval.",
+    "name": "Name",
+    "namePlaceholder": "Your name",
+    "emailOptional": "Email (optional, not published)",
+    "message": "Comment",
+    "messagePlaceholder": "Share your thoughts...",
+    "captcha": "Solve the sum",
+    "refresh": "Refresh",
+    "enterSum": "Answer",
+    "submit": "Post comment",
+    "submitting": "Sending...",
+    "fillRequired": "Please enter your name and a comment.",
+    "fillCaptcha": "Please solve the captcha.",
+    "submitFailed": "Could not submit your comment. Please try again."
+  },
   "account": {
     "myOrders": "My Orders",
     "noOrders": "You have no orders yet.",

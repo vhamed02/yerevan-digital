@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Repositories\Contracts\AdminSellerRepositoryInterface;
 use App\Repositories\Contracts\AdminStoreRepositoryInterface;
+use App\Repositories\Contracts\BlogCommentRepositoryInterface;
 use App\Repositories\Contracts\CategoryRepositoryInterface;
 use App\Repositories\Contracts\OrderRepositoryInterface;
 use App\Repositories\Contracts\PageRepositoryInterface;
@@ -18,6 +19,7 @@ use App\Repositories\Contracts\StoreTemplateConfigRepositoryInterface;
 use App\Repositories\Contracts\StoreTemplateRepositoryInterface;
 use App\Repositories\Eloquent\AdminSellerRepository;
 use App\Repositories\Eloquent\AdminStoreRepository;
+use App\Repositories\Eloquent\BlogCommentRepository;
 use App\Repositories\Eloquent\CategoryRepository;
 use App\Repositories\Eloquent\OrderRepository;
 use App\Repositories\Eloquent\PageRepository;
@@ -45,6 +47,7 @@ class RepositoryServiceProvider extends ServiceProvider
     public array $bindings = [
         AdminSellerRepositoryInterface::class         => AdminSellerRepository::class,
         AdminStoreRepositoryInterface::class          => AdminStoreRepository::class,
+        BlogCommentRepositoryInterface::class         => BlogCommentRepository::class,
         ProductRepositoryInterface::class             => ProductRepository::class,
         OrderRepositoryInterface::class               => OrderRepository::class,
         CategoryRepositoryInterface::class            => CategoryRepository::class,
