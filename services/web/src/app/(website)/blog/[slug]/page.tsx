@@ -1,5 +1,7 @@
 import type { Metadata } from 'next'
-import Image from 'next/image'
+import { ParallaxImage } from '@/components/website/ParallaxImage'
+import { PostContent } from '@/components/website/PostContent'
+import { CommentSection } from '@/components/website/CommentSection'
 import { notFound } from 'next/navigation'
 import { getLocale, getTranslations } from 'next-intl/server'
 import { ChevronLeft, Clock } from 'lucide-react'
@@ -72,7 +74,7 @@ export default async function BlogPostPage({ params }: PageProps) {
   const postUrl = `${BASE_URL}${localePath(locale, `/blog/${slug}`)}`
 
   return (
-    <main className="mx-auto max-w-3xl px-4 py-10 sm:px-6 lg:px-8">
+    <main className="mx-auto max-w-4xl px-4 py-10 sm:px-6 lg:px-8">
       <JsonLd
         data={{
           '@context': 'https://schema.org',
@@ -124,23 +126,21 @@ export default async function BlogPostPage({ params }: PageProps) {
         </header>
 
         {post.cover && (
-          <div className="relative mb-8 aspect-[16/9] overflow-hidden rounded-xl">
-            <Image
-              src={post.cover.large}
-              alt={title}
-              fill
-              priority
-              sizes="(max-width: 768px) 100vw, 768px"
-              className="object-cover"
-            />
-          </div>
+          <ParallaxImage
+            src={post.cover.large}
+            alt={title}
+            priority
+            sizes="(max-width: 896px) 100vw, 896px"
+          />
         )}
 
-        <div
+        <PostContent
           className="prose max-w-none text-content-primary/85 prose-headings:font-heading prose-headings:text-content-primary prose-a:text-brand-600"
-          dangerouslySetInnerHTML={{ __html: content }}
+          html={content}
         />
       </article>
+
+      <CommentSection slug={slug} />
     </main>
   )
 }
