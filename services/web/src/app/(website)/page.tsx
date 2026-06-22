@@ -2,10 +2,14 @@ import type { Metadata } from 'next'
 import { Suspense } from 'react'
 import HeroSection from '@/components/website/HeroSection'
 import HowItWorks from '@/components/website/HowItWorks'
+import TemplatesShowcase from '@/components/website/TemplatesShowcase'
 import FeaturesSection from '@/components/website/FeaturesSection'
+import Testimonials from '@/components/website/Testimonials'
 import FeaturedStores from '@/components/website/FeaturedStores'
+import PricingTeaser from '@/components/website/PricingTeaser'
 import LatestPosts from '@/components/website/LatestPosts'
 import StatsBar from '@/components/website/StatsBar'
+import FaqSection from '@/components/website/FaqSection'
 import CtaSection from '@/components/website/CtaSection'
 import { getLocale, getTranslations } from 'next-intl/server'
 import { serverGet } from '@/lib/server-api'
@@ -46,14 +50,18 @@ export default async function LandingPage() {
     <>
       <HeroSection />
       <HowItWorks />
+      <TemplatesShowcase />
       <FeaturesSection />
+      <Testimonials />
       <Suspense>
         <FeaturedStores />
       </Suspense>
+      <PricingTeaser />
+      <StatsBar stats={fallbackStats} />
+      <FaqSection />
       <Suspense>
         <LatestPosts />
       </Suspense>
-      <StatsBar stats={fallbackStats} />
       <CtaSection />
     </>
   )
