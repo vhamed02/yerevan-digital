@@ -7,15 +7,17 @@ const FEATURES = [
     Icon: Palette,
     iconBg: 'bg-violet-100',
     iconColor: 'text-violet-600',
-    accent: 'group-hover:border-violet-200',
+    hoverBorder: 'hover:border-violet-200',
+    glow: 'from-violet-50',
     span: 'md:col-span-2',
   },
   {
     key: 'payments',
     Icon: CreditCard,
-    iconBg: 'bg-green-100',
-    iconColor: 'text-green-600',
-    accent: 'group-hover:border-green-200',
+    iconBg: 'bg-emerald-100',
+    iconColor: 'text-emerald-600',
+    hoverBorder: 'hover:border-emerald-200',
+    glow: 'from-emerald-50',
     span: '',
   },
   {
@@ -23,7 +25,8 @@ const FEATURES = [
     Icon: LayoutDashboard,
     iconBg: 'bg-sky-100',
     iconColor: 'text-sky-600',
-    accent: 'group-hover:border-sky-200',
+    hoverBorder: 'hover:border-sky-200',
+    glow: 'from-sky-50',
     span: '',
   },
   {
@@ -31,7 +34,8 @@ const FEATURES = [
     Icon: Package,
     iconBg: 'bg-orange-100',
     iconColor: 'text-orange-600',
-    accent: 'group-hover:border-orange-200',
+    hoverBorder: 'hover:border-orange-200',
+    glow: 'from-orange-50',
     span: 'md:col-span-2',
   },
   {
@@ -39,7 +43,8 @@ const FEATURES = [
     Icon: Globe,
     iconBg: 'bg-pink-100',
     iconColor: 'text-pink-600',
-    accent: 'group-hover:border-pink-200',
+    hoverBorder: 'hover:border-pink-200',
+    glow: 'from-pink-50',
     span: 'md:col-span-2',
   },
   {
@@ -47,7 +52,8 @@ const FEATURES = [
     Icon: Link2,
     iconBg: 'bg-brand-100',
     iconColor: 'text-brand-600',
-    accent: 'group-hover:border-brand-200',
+    hoverBorder: 'hover:border-brand-200',
+    glow: 'from-brand-50',
     span: '',
   },
 ] as const
@@ -56,7 +62,7 @@ export default function FeaturesSection() {
   const t = useTranslations('features')
 
   return (
-    <section className="bg-surface-secondary py-24">
+    <section className="relative bg-surface-secondary py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-16 text-center">
           <span className="mb-4 inline-block rounded-full border border-brand-200 bg-brand-50 px-4 py-1.5 text-sm font-medium text-brand-700">
@@ -71,15 +77,21 @@ export default function FeaturesSection() {
         </div>
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-          {FEATURES.map(({ key, Icon, iconBg, iconColor, accent, span }) => (
+          {FEATURES.map(({ key, Icon, iconBg, iconColor, hoverBorder, glow, span }) => (
             <div
               key={key}
-              className={`group flex flex-col gap-4 rounded-2xl border border-border bg-white p-6 transition-all duration-200 hover:shadow-md ${accent} ${span}`}
+              className={`group relative flex flex-col gap-4 overflow-hidden rounded-2xl border border-border bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg ${hoverBorder} ${span}`}
             >
-              <div className={`flex h-11 w-11 items-center justify-center rounded-xl ${iconBg}`}>
+              <div
+                className={`pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-gradient-to-br to-transparent opacity-0 blur-2xl transition-opacity duration-300 group-hover:opacity-100 ${glow}`}
+                aria-hidden="true"
+              />
+              <div
+                className={`relative flex h-12 w-12 items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-110 ${iconBg}`}
+              >
                 <Icon className={`h-5 w-5 ${iconColor}`} />
               </div>
-              <div className="flex flex-col gap-1.5">
+              <div className="relative flex flex-col gap-1.5">
                 <h3 className="font-heading text-base font-semibold text-content-primary">
                   {t(`${key}_title` as any)}
                 </h3>

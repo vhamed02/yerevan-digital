@@ -1,9 +1,31 @@
+import { ArrowRight } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
 const STEPS = [
-  { number: '01', bg: 'bg-brand-50', numColor: 'text-brand-600', borderColor: 'border-brand-100', icon: '🏪' },
-  { number: '02', bg: 'bg-violet-50', numColor: 'text-violet-600', borderColor: 'border-violet-100', icon: '📦' },
-  { number: '03', bg: 'bg-green-50', numColor: 'text-green-600', borderColor: 'border-green-100', icon: '💸' },
+  {
+    number: '01',
+    icon: '🏪',
+    iconBg: 'bg-brand-50',
+    ring: 'ring-brand-100',
+    badge: 'bg-brand-500',
+    glow: 'group-hover:shadow-brand-200/70',
+  },
+  {
+    number: '02',
+    icon: '📦',
+    iconBg: 'bg-violet-50',
+    ring: 'ring-violet-100',
+    badge: 'bg-violet-500',
+    glow: 'group-hover:shadow-violet-200/70',
+  },
+  {
+    number: '03',
+    icon: '💸',
+    iconBg: 'bg-emerald-50',
+    ring: 'ring-emerald-100',
+    badge: 'bg-emerald-500',
+    glow: 'group-hover:shadow-emerald-200/70',
+  },
 ]
 
 export default function HowItWorks() {
@@ -30,24 +52,38 @@ export default function HowItWorks() {
           </p>
         </div>
 
-        <div className="relative grid grid-cols-1 gap-6 sm:grid-cols-3">
-          {/* Dashed connector line (desktop) */}
-          <div className="absolute left-[calc(16.67%+1.5rem)] right-[calc(16.67%+1.5rem)] top-12 hidden h-px border-t-2 border-dashed border-border sm:block" aria-hidden="true" />
-
-          {steps.map((step) => (
-            <div key={step.number} className="flex flex-col items-center text-center sm:px-2">
-              {/* Icon circle */}
-              <div className={`relative z-10 mb-6 flex h-24 w-24 flex-col items-center justify-center gap-1 rounded-2xl border-2 ${step.borderColor} ${step.bg} shadow-sm`}>
-                <span className="text-3xl leading-none" aria-hidden="true">{step.icon}</span>
-                <span className={`font-heading text-xs font-black ${step.numColor} opacity-70`}>{step.number}</span>
+        <div className="relative grid grid-cols-1 gap-6 sm:grid-cols-3 sm:gap-5">
+          {steps.map((step, i) => (
+            <div key={step.number} className="relative flex">
+              <div
+                className={`group relative flex w-full flex-col items-center rounded-2xl border border-border bg-white p-8 text-center shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ${step.glow}`}
+              >
+                <span
+                  className={`absolute -top-3 right-6 rounded-full px-2.5 py-1 font-heading text-xs font-black tracking-wider text-white ${step.badge}`}
+                >
+                  {step.number}
+                </span>
+                <div
+                  className={`mb-6 flex h-20 w-20 items-center justify-center rounded-2xl ring-8 transition-transform duration-300 group-hover:scale-105 ${step.iconBg} ${step.ring}`}
+                >
+                  <span className="text-4xl leading-none" aria-hidden="true">
+                    {step.icon}
+                  </span>
+                </div>
+                <h3 className="mb-2 font-heading text-lg font-bold text-content-primary">{step.title}</h3>
+                <p className="text-sm leading-relaxed text-content-primary/50">{step.description}</p>
               </div>
 
-              <h3 className="mb-2 font-heading text-lg font-bold text-content-primary">
-                {step.title}
-              </h3>
-              <p className="text-sm leading-relaxed text-content-primary/50">
-                {step.description}
-              </p>
+              {i < steps.length - 1 && (
+                <div
+                  className="absolute -right-4 top-1/2 z-10 hidden -translate-y-1/2 sm:block"
+                  aria-hidden="true"
+                >
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full border border-border bg-white shadow-sm">
+                    <ArrowRight className="h-4 w-4 text-content-primary/40" />
+                  </div>
+                </div>
+              )}
             </div>
           ))}
         </div>
