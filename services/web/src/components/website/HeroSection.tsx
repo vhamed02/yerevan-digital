@@ -37,7 +37,7 @@ export default function HeroSection() {
         aria-hidden="true"
       />
 
-      <div className="relative mx-auto flex w-full max-w-7xl flex-col items-center gap-14 px-4 py-20 sm:px-6 lg:flex-row lg:gap-16 lg:px-8 lg:py-28">
+      <div className="relative mx-auto flex w-full max-w-7xl flex-col items-center gap-14 px-4 py-16 sm:px-6 lg:flex-row lg:gap-16 lg:px-8 lg:py-24">
         <div className="flex flex-1 flex-col items-center gap-7 text-center lg:items-start lg:text-left">
           <div className="inline-flex items-center gap-2 rounded-full border border-brand-200 bg-white/70 px-4 py-1.5 text-sm font-medium text-brand-700 shadow-sm backdrop-blur">
             <span className="text-base">🇦🇲</span>
@@ -131,7 +131,7 @@ function HeroMockup({
   return (
     <div className="relative w-full max-w-[460px]">
       <div
-        className="pointer-events-none absolute -inset-6 -z-10 rounded-[2.5rem] opacity-60 blur-2xl"
+        className="animate-glow-pulse pointer-events-none absolute -inset-6 -z-10 rounded-[2.5rem] opacity-60 blur-2xl"
         style={{ background: 'linear-gradient(135deg, #e0e7ff 0%, #f3e8ff 100%)' }}
         aria-hidden="true"
       />
@@ -148,7 +148,7 @@ function HeroMockup({
           </div>
         </div>
 
-        <div className="relative h-24 overflow-hidden bg-gradient-to-r from-brand-500 to-violet-500">
+        <div className="animate-hue-drift relative h-24 overflow-hidden bg-gradient-to-r from-brand-500 to-violet-500">
           <div
             className="absolute inset-0 opacity-20"
             style={{
@@ -231,7 +231,7 @@ function HeroMockup({
         </div>
       </div>
 
-      <div className="absolute -left-6 top-16 flex items-center gap-3 rounded-2xl border border-border bg-white/90 px-4 py-3 shadow-xl backdrop-blur">
+      <div className="animate-float absolute -left-6 top-16 flex items-center gap-3 rounded-2xl border border-border bg-white/90 px-4 py-3 shadow-xl backdrop-blur">
         <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-50">
           <ShoppingBag className="h-4 w-4 text-brand-600" />
         </div>
@@ -241,7 +241,7 @@ function HeroMockup({
         </div>
       </div>
 
-      <div className="absolute -right-6 top-1/3 flex items-center gap-3 rounded-2xl border border-border bg-white/90 px-4 py-3 shadow-xl backdrop-blur">
+      <div className="animate-float-slow absolute -right-6 top-1/3 flex items-center gap-3 rounded-2xl border border-border bg-white/90 px-4 py-3 shadow-xl backdrop-blur">
         <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-violet-50">
           <Zap className="h-4 w-4 text-violet-600" />
         </div>
@@ -251,7 +251,7 @@ function HeroMockup({
         </div>
       </div>
 
-      <div className="absolute -right-4 bottom-8 flex items-center gap-3 rounded-2xl border border-border bg-white/90 px-4 py-3 shadow-xl backdrop-blur">
+      <div className="animate-float-delayed absolute -right-4 bottom-8 flex items-center gap-3 rounded-2xl border border-border bg-white/90 px-4 py-3 shadow-xl backdrop-blur">
         <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-green-50">
           <TrendingUp className="h-4 w-4 text-green-600" />
         </div>

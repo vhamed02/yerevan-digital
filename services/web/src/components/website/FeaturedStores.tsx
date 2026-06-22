@@ -17,7 +17,7 @@ export default async function FeaturedStores() {
   if (stores.length === 0) return null
 
   return (
-    <section className="bg-surface-secondary py-24">
+    <section className="bg-surface-secondary py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-10 flex items-end justify-between">
           <div>

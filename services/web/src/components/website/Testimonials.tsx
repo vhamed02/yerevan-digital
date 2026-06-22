@@ -11,7 +11,7 @@ export default function Testimonials() {
   const t = useTranslations('testimonials')
 
   return (
-    <section className="relative overflow-hidden bg-surface-secondary py-24">
+    <section className="relative overflow-hidden bg-surface-secondary py-20">
       <div
         className="pointer-events-none absolute inset-0 opacity-40"
         style={{

@@ -7,7 +7,7 @@ export default function CtaSection() {
   const t = useTranslations('cta')
 
   return (
-    <section className="bg-white py-24">
+    <section className="bg-white py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div
           className="relative overflow-hidden rounded-[2rem] px-8 py-20 text-center shadow-2xl shadow-brand-500/20 sm:px-16"

@@ -75,7 +75,7 @@ export default function StatsBar({ stats }: { stats: PlatformStats }) {
   const t = useTranslations('stats')
 
   return (
-    <section className="relative overflow-hidden bg-brand-50 py-20">
+    <section className="relative overflow-hidden bg-brand-50 py-16">
       <div
         className="pointer-events-none absolute inset-0 opacity-50"
         style={{

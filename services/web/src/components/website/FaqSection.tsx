@@ -11,7 +11,7 @@ export default function FaqSection() {
   const [open, setOpen] = useState<string | null>('1')
 
   return (
-    <section id="faq" className="relative bg-surface-secondary py-24">
+    <section id="faq" className="relative bg-surface-secondary py-20">
       <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
         <div className="mb-14 text-center">
           <span className="mb-4 inline-block rounded-full border border-brand-200 bg-brand-50 px-4 py-1.5 text-sm font-medium text-brand-700">

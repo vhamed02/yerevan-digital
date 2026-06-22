@@ -122,3 +122,31 @@ body {
   .article-body figure img,
   .article-body figure ~ * { transform: none !important; }
 }
+
+@keyframes float-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-9px); }
+}
+.animate-float { animation: float-bob 6s ease-in-out infinite; }
+.animate-float-slow { animation: float-bob 8s ease-in-out infinite; }
+.animate-float-delayed { animation: float-bob 7s ease-in-out infinite; animation-delay: -3s; }
+
+@keyframes glow-pulse {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50% { opacity: 0.82; transform: scale(1.05); }
+}
+.animate-glow-pulse { animation: glow-pulse 7s ease-in-out infinite; }
+
+@keyframes hue-drift {
+  0%, 100% { filter: hue-rotate(0deg); }
+  50% { filter: hue-rotate(14deg); }
+}
+.animate-hue-drift { animation: hue-drift 9s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-float,
+  .animate-float-slow,
+  .animate-float-delayed,
+  .animate-glow-pulse,
+  .animate-hue-drift { animation: none !important; }
+}

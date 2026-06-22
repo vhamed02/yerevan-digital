@@ -8,7 +8,7 @@ export default async function LatestPosts() {
   const locale = await getLocale()
   const t = await getTranslations('blog')
 
-  const posts = await serverGet<PaginatedResponse<PublicPostListItem>>('/posts?per_page=3', {
+  const posts = await serverGet<PaginatedResponse<PublicPostListItem>>('/posts?per_page=4', {
     next: { revalidate: 300 },
   })
 
@@ -17,7 +17,7 @@ export default async function LatestPosts() {
 
   return (
     <section className="bg-surface-secondary">
-      <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="mb-8 flex items-end justify-between">
           <h2 className="font-heading text-2xl font-bold text-content-primary sm:text-3xl">
             {t('fromBlog')}
@@ -29,7 +29,7 @@ export default async function LatestPosts() {
             {t('viewAll')} →
           </Link>
         </div>
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {items.map((post) => (
             <PostCard key={post.slug} post={post} locale={locale} readMoreLabel={t('readMore')} />
           ))}
