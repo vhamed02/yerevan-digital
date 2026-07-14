@@ -348,7 +348,7 @@ export default function PostEditorClient({ post }: Props) {
                 {(metaTitle[lang] || title[lang]) && (
                   <div className="rounded-lg border border-border bg-surface-secondary p-3 text-xs">
                     <p className="truncate font-medium text-blue-600">{metaTitle[lang] || title[lang]}</p>
-                    <p className="mt-0.5 truncate text-green-700">vendorex.shop/blog/{post.slug}</p>
+                    <p className="mt-0.5 truncate text-green-700">yerevan.digital/blog/{post.slug}</p>
                     <p className="mt-1 line-clamp-2 text-content-secondary">
                       {metaDesc[lang] || excerpt[lang]}
                     </p>

@@ -44,7 +44,7 @@ async function fetchAllPosts(): Promise<PublicPostListItem[]> {
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const base = process.env.NEXT_PUBLIC_APP_URL ?? 'https://vendorex.shop'
+  const base = process.env.NEXT_PUBLIC_APP_URL ?? 'https://yerevan.digital'
 
   // Build hreflang alternates for a localized path, including x-default.
   // Mirrors the per-page <link rel="alternate" hreflang> emitted by lib/seo.ts.

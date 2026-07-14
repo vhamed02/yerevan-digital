@@ -273,7 +273,7 @@ export default function PageEditorClient({ page }: Props) {
                 {metaTitle[lang] && (
                   <div className="rounded-lg border border-border bg-surface-secondary p-3 text-xs">
                     <p className="truncate font-medium text-blue-600">{title[lang]}</p>
-                    <p className="mt-0.5 truncate text-green-700">vendorex.shop/{page.slug}</p>
+                    <p className="mt-0.5 truncate text-green-700">yerevan.digital/{page.slug}</p>
                     <p className="mt-1 line-clamp-2 text-content-secondary">
                       {metaDesc[lang]}
                     </p>

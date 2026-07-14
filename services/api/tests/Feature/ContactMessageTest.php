@@ -77,7 +77,7 @@ class ContactMessageTest extends TestCase
 
         $this->assertStringContainsString('Vendorex', $html);
         $this->assertStringNotContainsString('>Vendorex</span>', $html);
-        $this->assertStringContainsString('vendorex.shop', $html);
+        $this->assertStringContainsString('yerevan.digital', $html);
         $this->assertStringContainsString('Hamed Najari', $html);
         $this->assertStringContainsString('hamed@example.com', $html);
         $this->assertStringContainsString('+905317696426', $html);

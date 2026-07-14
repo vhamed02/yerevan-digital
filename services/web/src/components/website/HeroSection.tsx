@@ -144,7 +144,7 @@ function HeroMockup({
           </div>
           <div className="flex flex-1 items-center gap-2 rounded-lg border border-border bg-white px-3 py-1.5">
             <span className="h-2 w-2 rounded-full bg-green-400" />
-            <span className="text-xs text-content-primary/40">vendorex.shop/armine-boutique</span>
+            <span className="text-xs text-content-primary/40">yerevan.digital/armine-boutique</span>
           </div>
         </div>
 
@@ -168,7 +168,7 @@ function HeroMockup({
           <div className="mb-1 flex items-start justify-between">
             <div>
               <h3 className="font-heading text-base font-bold text-content-primary">Armine&apos;s Boutique</h3>
-              <p className="text-xs text-content-primary/40">vendorex.shop/armine</p>
+              <p className="text-xs text-content-primary/40">yerevan.digital/armine</p>
             </div>
             <span className="flex items-center gap-1 rounded-full bg-green-50 px-2.5 py-1 text-xs font-medium text-green-700">
               <span className="h-1.5 w-1.5 rounded-full bg-green-500" />

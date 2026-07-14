@@ -212,7 +212,7 @@ retention). *Kafka/NATS JetStream noted as scale-up options — not now.*
 ## 10. Integration & deployment
 
 - New container in `docker-compose` on `vendora-backend` (+ `vendora-frontend` for nginx).
-- nginx route (e.g. `/api/admin-reports/*` or `admin-api.vendorex.shop`) → Go service.
+- nginx route (e.g. `/api/admin-reports/*` or `admin-api.yerevan.digital`) → Go service.
 - Next.js admin panel calls it (SSR via nginx internal name, client via the public path).
 - Fits the existing deploy flow (webhook → `deploy.sh` builds/recreates containers).
 - **Production rigor (the part that actually impresses):**

@@ -36,11 +36,11 @@ Deploy SSH key: `/home/deploy/.ssh/github_deploy`
 ## Infrastructure
 
 - **Server:** Ubuntu 24, hostname `vendorex`, repo at `/home/deploy/vendora`
-- **Domains:** `vendorex.shop` (frontend) / `api.vendorex.shop` (API), both Cloudflare-proxied; TLS terminates at Cloudflare (nginx listens on 80 only). The old `radif.org` zone is stale (522) — don't use it. `/etc/hosts` maps `vendorex.shop` to 127.0.1.1, so server-local curl tests need `--resolve` or `http://localhost` + Host header.
+- **Domains:** `yerevan.digital` (frontend) / `api.yerevan.digital` (API), both Cloudflare-proxied; TLS terminates at Cloudflare (nginx listens on 80 only). The old `radif.org` zone is stale (522) — don't use it. `/etc/hosts` maps `yerevan.digital` to 127.0.1.1, so server-local curl tests need `--resolve` or `http://localhost` + Host header.
 - **Stack:** Laravel 13 / PHP 8.5 API + Next.js 16.2.6 frontend, MySQL 8, Redis 7, Docker Compose
 - **Networks:** `vendora-backend` (api, mysql, mongodb, redis), `vendora-frontend` (nginx, web, api)
 - **SSR API path:** Next.js server-side calls `http://nginx:8080/api/v1/...` — nginx listens on 8080 and proxies to PHP-FPM at `api:9000`
-- **Client-side API path:** `https://api.vendorex.shop/api/v1/...`
+- **Client-side API path:** `https://api.yerevan.digital/api/v1/...`
 - **Base images are digest-pinned** (all Dockerfiles): unpinned tags re-resolve from the registry every build, and upstream releases silently bust the whole layer cache (15-min PHP extension recompiles). To upgrade a base image, change the digest deliberately and expect one slow rebuild.
 
 ---

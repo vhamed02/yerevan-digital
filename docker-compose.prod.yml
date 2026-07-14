@@ -26,12 +26,16 @@ services:
     networks:
       - vendora-frontend
     restart: unless-stopped
+    mem_limit: 96m
+    memswap_limit: 192m
 
   api:
     <<: *api-common
     environment:
       APP_ENV: production
       APP_DEBUG: "false"
+    mem_limit: 128m
+    memswap_limit: 256m
     networks:
       - vendora-backend
       - vendora-frontend
@@ -63,6 +67,8 @@ services:
     networks:
       - vendora-frontend
     restart: unless-stopped
+    mem_limit: 128m
+    memswap_limit: 256m
     healthcheck:
       disable: true
 
@@ -77,11 +83,14 @@ services:
       --slow-query-log=1
       --slow-query-log-file=/var/log/mysql/slow.log
       --long-query-time=1
+      --max-connections=60
     volumes:
       - mysql_data:/var/lib/mysql
     networks:
       - vendora-backend
     restart: unless-stopped
+    mem_limit: 512m
+    memswap_limit: 768m
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD}"]
       interval: 10s
@@ -99,6 +108,8 @@ services:
     networks:
       - vendora-backend
     restart: unless-stopped
+    mem_limit: 192m
+    memswap_limit: 320m
 
   redis:
     image: redis:7-alpine
@@ -108,6 +119,8 @@ services:
     networks:
       - vendora-backend
     restart: unless-stopped
+    mem_limit: 64m
+    memswap_limit: 128m
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
@@ -129,6 +142,12 @@ services:
       interval: 60s
       timeout: 10s
       retries: 3
+    mem_limit: 160m
+    memswap_limit: 256m
+
+  admin-reports:
+    mem_limit: 64m
+    memswap_limit: 128m
 
 networks:
   vendora-backend:

@@ -4,7 +4,7 @@ import { localePath } from '@/lib/seo'
 import { routing } from '@/i18n/routing'
 import type { PaginatedResponse, PublicPostListItem } from '@/types'
 
-const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://vendorex.shop'
+const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://yerevan.digital'
 
 const FEED_META: Record<string, { title: string; description: string }> = {
   hy: { title: 'Vendorex Բլոգ', description: 'Ուղեցույցներ և խորհուրդներ Հայաստանում առցանց վաճառքի համար' },

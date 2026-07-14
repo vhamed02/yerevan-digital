@@ -15,7 +15,7 @@ import type { PublicPost } from '@/types'
 
 export const revalidate = 300
 
-const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://vendorex.shop'
+const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://yerevan.digital'
 
 function getPost(slug: string): Promise<PublicPost | null> {
   return serverGet<PublicPost>(`/posts/${slug}`, { next: { revalidate: 300 } })

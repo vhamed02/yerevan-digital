@@ -53,7 +53,7 @@
         <hr class="divider">
         <div class="footer">
             <p>{{ __('emails.layout.tagline', [], $locale ?? config('app.locale')) }}</p>
-            <p><a href="https://vendorex.shop">vendorex.shop</a> &nbsp;·&nbsp; <a href="mailto:support@vendorex.shop">support@vendorex.shop</a></p>
+            <p><a href="https://yerevan.digital">yerevan.digital</a> &nbsp;·&nbsp; <a href="mailto:support@yerevan.digital">support@yerevan.digital</a></p>
         </div>
     </div>
 </div>
