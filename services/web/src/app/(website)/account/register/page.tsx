@@ -5,7 +5,7 @@ import { Link } from '@/i18n/navigation'
 import CustomerRegisterForm from '@/components/auth/CustomerRegisterForm'
 
 export const metadata: Metadata = {
-  title: 'Create account — Vendorex',
+  title: 'Create account — Yerevan Digital',
 }
 
 export default async function CustomerRegisterPage() {
@@ -17,7 +17,7 @@ export default async function CustomerRegisterPage() {
         <div className="mb-8 text-center">
           <Link href="/" className="inline-flex items-center gap-2 font-heading text-xl font-bold text-content-primary">
             <ShoppingBag className="h-6 w-6 text-brand-500" />
-            Vendorex
+            Yerevan Digital
           </Link>
           <h1 className="mt-4 font-heading text-2xl font-bold text-content-primary">{t('register.title')}</h1>
           <p className="mt-1 text-sm text-content-secondary">{t('register.subtitle')}</p>

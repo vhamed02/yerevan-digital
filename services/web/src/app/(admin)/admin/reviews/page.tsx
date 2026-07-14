@@ -5,7 +5,7 @@ import ReviewsAdminClient from '@/components/admin/ReviewsAdminClient'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Reviews — Vendorex Admin',
+  title: 'Reviews — Yerevan Digital Admin',
 }
 
 interface PageProps {

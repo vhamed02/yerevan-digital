@@ -4,7 +4,7 @@ import { Link } from '@/i18n/navigation'
 import ResetPasswordForm from '@/components/auth/ResetPasswordForm'
 
 export const metadata: Metadata = {
-  title: 'Set New Password — Vendorex',
+  title: 'Set New Password — Yerevan Digital',
 }
 
 interface PageProps {
@@ -20,7 +20,7 @@ export default async function ResetPasswordPage({ searchParams }: PageProps) {
         <div className="mb-8 text-center">
           <Link href="/" className="inline-flex items-center gap-2 font-heading text-xl font-bold text-content-primary">
             <Store className="h-6 w-6 text-brand-500" />
-            Vendorex
+            Yerevan Digital
           </Link>
           <h1 className="mt-4 font-heading text-2xl font-bold text-content-primary">Set new password</h1>
           <p className="mt-1 text-sm text-content-secondary">Enter your new password below</p>

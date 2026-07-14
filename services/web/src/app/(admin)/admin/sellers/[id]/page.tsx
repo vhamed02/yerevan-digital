@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic'
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params
   const seller = await serverAuthGet<AdminSeller>(`/admin/sellers/${id}`)
-  return { title: `${seller?.name ?? 'Seller'} — Vendorex Admin` }
+  return { title: `${seller?.name ?? 'Seller'} — Yerevan Digital Admin` }
 }
 
 export default async function SellerDetailPage({ params }: { params: Promise<{ id: string }> }) {

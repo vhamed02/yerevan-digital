@@ -6,7 +6,7 @@ import type { AdminPostListItem, PaginatedResponse } from '@/types'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Blog — Vendorex Admin',
+  title: 'Blog — Yerevan Digital Admin',
 }
 
 const emptyList: PaginatedResponse<AdminPostListItem> = {

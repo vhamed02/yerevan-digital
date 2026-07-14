@@ -6,7 +6,7 @@ import AccountOrdersClient from './AccountOrdersClient'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'My Orders — Vendorex',
+  title: 'My Orders — Yerevan Digital',
 }
 
 export default async function AccountOrdersPage() {

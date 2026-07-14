@@ -6,7 +6,7 @@ import { getTranslations } from 'next-intl/server'
 export const dynamic = 'force-dynamic'
 
 export async function generateMetadata(): Promise<Metadata> {
-  return { title: 'Payment Failed | Vendorex' }
+  return { title: 'Payment Failed | Yerevan Digital' }
 }
 
 export default async function CheckoutFailedPage({

@@ -14,7 +14,7 @@ interface SettingsAdminClientProps {
 }
 
 const defaultSettings: AdminSettings = {
-  platform_name: 'Vendorex',
+  platform_name: 'Yerevan Digital',
   platform_name_hy: 'Վենդորա',
   registration_enabled: true,
   registration_require_approval: true,

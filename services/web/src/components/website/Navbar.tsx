@@ -43,7 +43,7 @@ export default function Navbar() {
               <polygon points="119.7,58.8 168,58.8 198.8,129.8 231,58.8 278.6,58.8 224,184 241.7,226.5 316.1,58.8 364.2,58.8 265.5,281.5 217.9,281.5" />
             </svg>
           </div>
-          <span className="font-heading text-lg font-bold text-content-primary tracking-tight">Vendorex</span>
+          <span className="font-heading text-lg font-bold text-content-primary tracking-tight">Yerevan Digital</span>
         </Link>
 
         <nav className="hidden items-center gap-1 md:flex">

@@ -6,7 +6,7 @@ import type { SellerProduct, PublicCategory, PaginatedResponse } from '@/types'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Products — Vendorex Seller',
+  title: 'Products — Yerevan Digital Seller',
 }
 
 interface PageProps {

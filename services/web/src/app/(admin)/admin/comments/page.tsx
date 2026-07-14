@@ -5,7 +5,7 @@ import CommentsAdminClient from '@/components/admin/CommentsAdminClient'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Comments — Vendorex Admin',
+  title: 'Comments — Yerevan Digital Admin',
 }
 
 interface PageProps {

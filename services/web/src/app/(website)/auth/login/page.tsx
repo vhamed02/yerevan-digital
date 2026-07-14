@@ -4,7 +4,7 @@ import { Link } from '@/i18n/navigation'
 import LoginForm from '@/components/auth/LoginForm'
 
 export const metadata: Metadata = {
-  title: 'Sign In — Vendorex',
+  title: 'Sign In — Yerevan Digital',
 }
 
 export default function LoginPage() {
@@ -14,7 +14,7 @@ export default function LoginPage() {
         <div className="mb-8 text-center">
           <Link href="/" className="inline-flex items-center gap-2 font-heading text-xl font-bold text-content-primary">
             <Store className="h-6 w-6 text-brand-500" />
-            Vendorex
+            Yerevan Digital
           </Link>
           <h1 className="mt-4 font-heading text-2xl font-bold text-content-primary">Welcome back</h1>
           <p className="mt-1 text-sm text-content-secondary">Sign in to your account</p>

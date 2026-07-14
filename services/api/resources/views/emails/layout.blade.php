@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Vendorex')</title>
+    <title>@yield('title', 'Yerevan Digital')</title>
     <style>
         body { margin: 0; padding: 0; background-color: #f4f4f5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #18181b; -webkit-font-smoothing: antialiased; }
         .wrapper { max-width: 600px; margin: 0 auto; padding: 40px 20px; }
@@ -45,7 +45,7 @@
 <div class="wrapper">
     <div class="card">
         <div class="header">
-            <span class="logo">Vendorex<span class="dot">.</span></span>
+            <span class="logo">Yerevan Digital<span class="dot">.</span></span>
         </div>
         <div class="body">
             @yield('content')

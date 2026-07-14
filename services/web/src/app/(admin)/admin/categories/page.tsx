@@ -6,7 +6,7 @@ import type { AdminCategory } from '@/types'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Categories — Vendorex Admin',
+  title: 'Categories — Yerevan Digital Admin',
 }
 
 export default async function CategoriesPage() {

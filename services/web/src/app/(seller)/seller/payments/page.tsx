@@ -6,7 +6,7 @@ import type { StoreGatewayConfig } from '@/types'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Payments — Vendorex Seller',
+  title: 'Payments — Yerevan Digital Seller',
 }
 
 export default async function SellerPaymentsPage() {

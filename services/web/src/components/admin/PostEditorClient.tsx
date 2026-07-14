@@ -38,7 +38,7 @@ export default function PostEditorClient({ post }: Props) {
   const [published, setPublished] = useState(post.status === 'published')
   const [cover, setCover] = useState<PostCover | null>(post.cover ?? null)
   const [uploadingCover, setUploadingCover] = useState(false)
-  const [authorName, setAuthorName] = useState(post.author_name ?? 'Vendorex')
+  const [authorName, setAuthorName] = useState(post.author_name ?? 'Yerevan Digital')
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const [titleHy, setTitleHy] = useState(post.title.hy ?? '')

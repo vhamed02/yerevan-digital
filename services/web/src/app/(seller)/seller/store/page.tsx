@@ -6,7 +6,7 @@ import type { SellerStore, PublicCategory } from '@/types'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Store Settings — Vendorex Seller',
+  title: 'Store Settings — Yerevan Digital Seller',
 }
 
 export default async function StoreSettingsPage() {

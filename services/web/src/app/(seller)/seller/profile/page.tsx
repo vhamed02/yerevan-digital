@@ -6,7 +6,7 @@ import type { User } from '@/types'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'My Profile — Vendorex Seller',
+  title: 'My Profile — Yerevan Digital Seller',
 }
 
 export default async function SellerProfilePage() {

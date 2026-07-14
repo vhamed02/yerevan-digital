@@ -5,7 +5,7 @@
 @section('content')
 <p class="eyebrow">Contact form</p>
 <h1>New message from {{ $senderName }}</h1>
-<p>Someone reached out through the Vendorex contact form. Their details are below.</p>
+<p>Someone reached out through the Yerevan Digital contact form. Their details are below.</p>
 
 <table class="detail" role="presentation" cellpadding="0" cellspacing="0">
     <tr>

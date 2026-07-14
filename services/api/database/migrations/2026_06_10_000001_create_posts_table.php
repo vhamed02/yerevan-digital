@@ -15,7 +15,7 @@ return new class extends Migration
             $table->json('excerpt')->nullable();
             $table->json('content');
             $table->json('cover')->nullable();
-            $table->string('author_name', 100)->default('Vendorex');
+            $table->string('author_name', 100)->default('Yerevan Digital');
             $table->enum('status', ['draft', 'published'])->default('draft');
             $table->timestamp('published_at')->nullable();
             $table->json('meta_title')->nullable();

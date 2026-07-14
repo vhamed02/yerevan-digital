@@ -11,7 +11,7 @@ import type { SellerDashboardData, Store } from '@/types'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Dashboard — Vendorex Seller',
+  title: 'Dashboard — Yerevan Digital Seller',
 }
 
 export default async function SellerDashboardPage() {

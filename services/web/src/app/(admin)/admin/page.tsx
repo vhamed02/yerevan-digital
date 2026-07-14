@@ -10,7 +10,7 @@ import type { AdminDashboardData } from '@/types'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Dashboard — Vendorex Admin',
+  title: 'Dashboard — Yerevan Digital Admin',
 }
 
 export default async function AdminDashboardPage() {

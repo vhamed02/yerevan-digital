@@ -6,7 +6,7 @@ import type { SellerTemplate, StoreDesignSettings } from '@/types'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Store Design — Vendorex Seller',
+  title: 'Store Design — Yerevan Digital Seller',
 }
 
 export default async function StoreDesignPage() {

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Products — Vendorex Admin',
+  title: 'Products — Yerevan Digital Admin',
 }
 
 export default function AdminProductsPage() {

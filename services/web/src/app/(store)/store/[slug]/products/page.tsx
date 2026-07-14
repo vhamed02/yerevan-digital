@@ -24,7 +24,7 @@ export async function generateMetadata({
   if (!store) return {}
   const name = pickLang(store.name, locale)
   return {
-    title: `Products — ${name} | Vendorex`,
+    title: `Products — ${name} | Yerevan Digital`,
     alternates: localizedAlternates(`/store/${slug}/products`, locale),
   }
 }

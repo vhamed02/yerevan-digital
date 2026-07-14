@@ -31,7 +31,7 @@ export async function generateMetadata(): Promise<Metadata> {
       title,
       description,
       type: 'website',
-      siteName: 'Vendorex',
+      siteName: 'Yerevan Digital',
       ...ogLocale(locale),
     },
   }

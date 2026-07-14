@@ -29,7 +29,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { slug } = await params
   const locale = await getLocale()
   const post = await getPost(slug)
-  if (!post) return { title: 'Vendorex Blog' }
+  if (!post) return { title: 'Yerevan Digital Blog' }
 
   const title = pickLang(post.meta_title, locale) || pickLang(post.title, locale)
   const description =
@@ -37,7 +37,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const og = ogLocale(locale)
 
   return {
-    title: `${title} — Vendorex`,
+    title: `${title} — Yerevan Digital`,
     description,
     alternates: localizedAlternates(`/blog/${slug}`, locale),
     openGraph: {
@@ -86,7 +86,7 @@ export default async function BlogPostPage({ params }: PageProps) {
           dateModified: post.updated_at,
           inLanguage: locale,
           author: { '@type': 'Organization', name: post.author_name },
-          publisher: { '@type': 'Organization', name: 'Vendorex', url: BASE_URL },
+          publisher: { '@type': 'Organization', name: 'Yerevan Digital', url: BASE_URL },
           mainEntityOfPage: { '@type': 'WebPage', '@id': postUrl },
         }}
       />

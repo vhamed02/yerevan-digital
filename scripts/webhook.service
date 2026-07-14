@@ -1,5 +1,5 @@
 [Unit]
-Description=Vendorex GitHub Webhook Receiver
+Description=Yerevan Digital GitHub Webhook Receiver
 After=network.target
 
 [Service]

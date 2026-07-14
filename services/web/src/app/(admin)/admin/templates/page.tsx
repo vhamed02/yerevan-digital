@@ -6,7 +6,7 @@ import type { AdminTemplate } from '@/types'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Templates — Vendorex Admin',
+  title: 'Templates — Yerevan Digital Admin',
 }
 
 export default async function TemplatesPage() {

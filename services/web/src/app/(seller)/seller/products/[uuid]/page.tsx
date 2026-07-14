@@ -10,7 +10,7 @@ export async function generateMetadata({ params }: { params: Promise<{ uuid: str
   const { uuid } = await params
   const product = await serverAuthGet<SellerProduct>(`/seller/products/${uuid}`)
   const name = product?.name.hy || product?.name.en || 'Edit Product'
-  return { title: `Edit: ${name} — Vendorex Seller` }
+  return { title: `Edit: ${name} — Yerevan Digital Seller` }
 }
 
 export default async function ProductDetailPage({ params }: { params: Promise<{ uuid: string }> }) {

@@ -20,7 +20,7 @@ class PostFactory extends Factory
             'title'       => ['hy' => $title, 'en' => $title],
             'excerpt'     => ['hy' => fake()->sentence(), 'en' => fake()->sentence()],
             'content'     => ['hy' => '<p>' . fake()->paragraph() . '</p>', 'en' => '<p>' . fake()->paragraph() . '</p>'],
-            'author_name' => 'Vendorex',
+            'author_name' => 'Yerevan Digital',
             'status'      => PostStatus::Draft,
         ];
     }

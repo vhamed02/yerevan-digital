@@ -8,7 +8,7 @@ import OrderStatusView from '@/components/account/OrderStatusView'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Order — Vendorex',
+  title: 'Order — Yerevan Digital',
 }
 
 export default async function AccountOrderDetailPage({ params }: { params: Promise<{ uuid: string }> }) {

@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic'
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params
-  return { title: `Edit: ${slug} — Vendorex Admin` }
+  return { title: `Edit: ${slug} — Yerevan Digital Admin` }
 }
 
 export default async function PageEditorPage({ params }: { params: Promise<{ slug: string }> }) {

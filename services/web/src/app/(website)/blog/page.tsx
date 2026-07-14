@@ -12,14 +12,14 @@ export async function generateMetadata(): Promise<Metadata> {
   const og = ogLocale(locale)
 
   return {
-    title: `${t('title')} — Vendorex`,
+    title: `${t('title')} — Yerevan Digital`,
     description: t('subtitle'),
     alternates: {
       ...localizedAlternates('/blog', locale),
       types: { 'application/rss+xml': '/blog/rss.xml' },
     },
     openGraph: {
-      title: `${t('title')} — Vendorex`,
+      title: `${t('title')} — Yerevan Digital`,
       description: t('subtitle'),
       locale: og.locale,
       alternateLocale: og.alternateLocale,

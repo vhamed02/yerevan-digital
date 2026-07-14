@@ -7,9 +7,9 @@ import type { PaginatedResponse, PublicPostListItem } from '@/types'
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://yerevan.digital'
 
 const FEED_META: Record<string, { title: string; description: string }> = {
-  hy: { title: 'Vendorex Բլոգ', description: 'Ուղեցույցներ և խորհուրդներ Հայաստանում առցանց վաճառքի համար' },
-  en: { title: 'Vendorex Blog', description: 'Guides and tips for selling online in Armenia' },
-  ru: { title: 'Vendorex Блог', description: 'Гайды и советы по онлайн-продажам в Армении' },
+  hy: { title: 'Yerevan Digital Բլոգ', description: 'Ուղեցույցներ և խորհուրդներ Հայաստանում առցանց վաճառքի համար' },
+  en: { title: 'Yerevan Digital Blog', description: 'Guides and tips for selling online in Armenia' },
+  ru: { title: 'Yerevan Digital Блог', description: 'Гайды и советы по онлайн-продажам в Армении' },
 }
 
 function escapeXml(value: string): string {
