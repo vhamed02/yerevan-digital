@@ -1,5 +1,9 @@
 # Vendora — Claude Code Project Memory
 
+**Roadmap & phase status: [`docs/ROADMAP.md`](docs/ROADMAP.md)** — what's done (P0, P1), what's
+next (P2, P3), known open bugs, and decisions not to re-litigate. Read it before starting
+feature work. This file is the *how*; that one is the *what*.
+
 ## Deploy workflow (CRITICAL)
 
 **Never run docker commands manually.** All changes must be committed and pushed to git.
