@@ -78,8 +78,12 @@ Route::prefix('v1')->middleware('throttle:api')->group(function () {
         Route::put('sellers/{seller}/password', [Admin\SellerController::class, 'updatePassword']);
         Route::delete('sellers/{seller}', [Admin\SellerController::class, 'destroy']);
 
+        Route::get('commissions', [Admin\CommissionController::class, 'index']);
+        Route::get('commissions/summary', [Admin\CommissionController::class, 'summary']);
+
         Route::get('stores', [Admin\StoreController::class, 'index']);
         Route::post('stores', [Admin\StoreController::class, 'store']);
+        Route::patch('stores/{store}/commission-rate', [Admin\CommissionController::class, 'updateStoreRate']);
         Route::get('stores/{store}', [Admin\StoreController::class, 'show']);
         Route::patch('stores/{store}/approve', [Admin\StoreController::class, 'approve']);
         Route::patch('stores/{store}/suspend', [Admin\StoreController::class, 'suspend']);

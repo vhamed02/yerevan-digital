@@ -41,14 +41,16 @@ class Store extends Model implements AuditableContract
         'meta_title',
         'meta_description',
         'is_featured',
+        'commission_rate',
     ];
 
     protected function casts(): array
     {
         return [
-            'social_links' => 'array',
-            'status'       => StoreStatus::class,
-            'is_featured'  => 'boolean',
+            'social_links'    => 'array',
+            'status'          => StoreStatus::class,
+            'is_featured'     => 'boolean',
+            'commission_rate' => 'decimal:4',
         ];
     }
 

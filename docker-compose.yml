@@ -101,6 +101,17 @@ services:
       redis:
         condition: service_healthy
 
+  scheduler:
+    <<: *api-common
+    command: php artisan schedule:work
+    networks:
+      - vendora-backend
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
   admin-reports:
     build:
       context: ./services/admin-reports

@@ -145,6 +145,24 @@ services:
     mem_limit: 160m
     memswap_limit: 256m
 
+  scheduler:
+    <<: *api-common
+    command: php artisan schedule:work
+    networks:
+      - vendora-backend
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "php", "-r", "exit(0);"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+    mem_limit: 128m
+    memswap_limit: 256m
+
   admin-reports:
     mem_limit: 64m
     memswap_limit: 128m

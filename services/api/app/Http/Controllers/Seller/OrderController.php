@@ -10,13 +10,18 @@ use App\Http\Resources\Seller\OrderDetailResource;
 use App\Http\Resources\Seller\OrderResource;
 use App\Jobs\ExportOrdersJob;
 use App\Repositories\Contracts\OrderRepositoryInterface;
+use App\Services\CommissionService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class OrderController extends Controller
 {
-    public function __construct(private readonly OrderRepositoryInterface $orders) {}
+    public function __construct(
+        private readonly OrderRepositoryInterface $orders,
+        private readonly CommissionService        $commissions,
+    ) {}
 
     public function index(Request $request): JsonResponse
     {
@@ -65,9 +70,19 @@ class OrderController extends Controller
             default                => [],
         };
 
-        $this->orders->update($order, array_merge(['status' => $newStatus], $extra));
+        $freshOrder = DB::transaction(function () use ($order, $newStatus, $extra) {
+            $this->orders->update($order, array_merge(['status' => $newStatus], $extra));
 
-        $freshOrder = $order->fresh();
+            $freshOrder = $order->fresh();
+
+            // A store is never charged commission on an order it did not keep.
+            // No-ops when the order never accrued (e.g. cancelled before payment).
+            if (in_array($newStatus, [OrderStatus::Cancelled, OrderStatus::Refunded], true)) {
+                $this->commissions->reverse($freshOrder, "order_{$newStatus->value}");
+            }
+
+            return $freshOrder;
+        });
 
         event(new OrderStatusChanged($freshOrder));
 

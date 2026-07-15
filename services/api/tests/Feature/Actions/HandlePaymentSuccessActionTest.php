@@ -22,7 +22,7 @@ class HandlePaymentSuccessActionTest extends TestCase
     {
         parent::setUp();
         $this->seed(PermissionSeeder::class);
-        $this->action = new HandlePaymentSuccessAction();
+        $this->action = app(HandlePaymentSuccessAction::class);
     }
 
     public function test_sets_status_to_processing_and_payment_to_paid(): void
