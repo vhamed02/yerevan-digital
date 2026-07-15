@@ -128,6 +128,47 @@ class AdminCommissionTest extends TestCase
             ->assertJsonValidationErrors('commission_rate');
     }
 
+    public function test_store_detail_exposes_the_override_and_the_effective_rate(): void
+    {
+        $store = Store::factory()->create(['commission_rate' => null]);
+
+        // Inheriting: no override, effective rate comes from the platform default.
+        $this->actingAsAdmin()
+            ->getJson("/api/v1/admin/stores/{$store->slug}")
+            ->assertOk()
+            ->assertJsonPath('data.commission_rate', null)
+            ->assertJsonPath('data.effective_commission_rate', '0.05');
+
+        $store->update(['commission_rate' => '0.0250']);
+
+        // Overridden: both reflect the store's own rate.
+        $this->actingAsAdmin()
+            ->getJson("/api/v1/admin/stores/{$store->slug}")
+            ->assertOk()
+            ->assertJsonPath('data.commission_rate', '0.0250')
+            ->assertJsonPath('data.effective_commission_rate', '0.0250');
+    }
+
+    public function test_platform_default_rate_can_be_set_through_settings(): void
+    {
+        $this->actingAsAdmin()
+            ->patchJson('/api/v1/admin/settings', ['settings' => ['commission_rate' => '0.03']])
+            ->assertOk();
+
+        $this->actingAsAdmin()
+            ->getJson('/api/v1/admin/commissions/summary')
+            ->assertOk()
+            ->assertJsonPath('data.default_rate', '0.03');
+    }
+
+    public function test_an_out_of_range_platform_default_rate_is_rejected(): void
+    {
+        $this->actingAsAdmin()
+            ->patchJson('/api/v1/admin/settings', ['settings' => ['commission_rate' => '5']])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors('settings.commission_rate');
+    }
+
     public function test_a_seller_cannot_read_the_commission_ledger(): void
     {
         $seller = User::factory()->seller()->create();

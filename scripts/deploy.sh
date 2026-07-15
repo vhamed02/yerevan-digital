@@ -62,14 +62,14 @@ printf '%b\n' "$HR"
 # ── build ─────────────────────────────────────────────────────────────────────
 section "Building containers"
 T=$(date +%s)
-$COMPOSE build web api queue admin-reports
-ok "web + api + queue built"
+$COMPOSE build web api queue scheduler admin-reports
+ok "web + api + queue + scheduler built"
 took $T
 
 # ── start ─────────────────────────────────────────────────────────────────────
 section "Starting services"
 T=$(date +%s)
-$COMPOSE up -d --no-deps web api queue admin-reports
+$COMPOSE up -d --no-deps web api queue scheduler admin-reports
 ok "Containers up"
 took $T
 

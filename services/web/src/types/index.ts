@@ -205,12 +205,40 @@ export interface AdminSeller {
   store?: AdminStore
 }
 
+export interface AdminCommission {
+  id: number
+  uuid: string
+  type: 'accrual' | 'reversal'
+  /** Decimal fraction, e.g. "0.0500" = 5%. */
+  rate: string
+  base_amount: string
+  /** Signed: positive on accrual, negative on reversal. */
+  amount: string
+  currency: string
+  reason?: string | null
+  created_at: string
+  store?: { id: number; name: MultiLang; slug: string }
+  order?: { uuid: string; order_number: string; total: string }
+}
+
+export interface AdminCommissionSummary {
+  accrued: string
+  reversed: string
+  net: string
+  currency: string
+  default_rate: string
+}
+
 export interface AdminStore {
   id: number
   name: MultiLang
   slug: string
   status: 'pending' | 'active' | 'suspended'
   is_featured: boolean
+  /** null = inheriting the platform default. */
+  commission_rate?: string | null
+  /** What is actually charged, after falling back to the platform default. */
+  effective_commission_rate?: string
   logo_url?: string
   banner_url?: string
   description?: MultiLang

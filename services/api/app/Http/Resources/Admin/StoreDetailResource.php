@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Admin;
 
+use App\Services\CommissionService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -26,6 +27,9 @@ class StoreDetailResource extends JsonResource
             'email'               => $this->email,
             'social_links'        => $this->social_links,
             'custom_domain'       => $this->custom_domain,
+            // null = inheriting the platform default; effective_* is what actually gets charged.
+            'commission_rate'           => $this->commission_rate,
+            'effective_commission_rate' => app(CommissionService::class)->rateFor($this->id),
             'products_count'      => $this->products_count ?? 0,
             'orders_count'        => $this->orders_count ?? 0,
             'revenue'             => $this->orders_sum_total ?? 0,

@@ -7,6 +7,7 @@ import { ChevronLeft, Package, ShoppingCart, TrendingUp } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { StatusBadge } from '@/components/ui/StatusBadge'
 import StatCard from './StatCard'
+import StoreCommissionCard from './StoreCommissionCard'
 import ApproveStoreDialog from './ApproveStoreDialog'
 import SuspendDialog from './SuspendDialog'
 import DeleteDialog from './DeleteDialog'
@@ -93,6 +94,8 @@ export default function StoreDetailAdminClient({ store }: StoreDetailAdminClient
         </div>
 
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+          <StoreCommissionCard store={store} />
+
           {store.seller && (
             <div className="rounded-xl border border-border bg-surface p-5">
               <p className="mb-3 text-sm font-semibold text-content-primary">Seller</p>

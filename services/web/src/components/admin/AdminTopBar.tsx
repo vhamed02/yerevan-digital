@@ -15,6 +15,7 @@ const routeLabels: Record<string, string> = {
   '/admin/categories': 'Categories',
   '/admin/templates': 'Templates',
   '/admin/payments': 'Payments',
+  '/admin/commissions': 'Commissions',
   '/admin/settings': 'Settings',
 }
 
