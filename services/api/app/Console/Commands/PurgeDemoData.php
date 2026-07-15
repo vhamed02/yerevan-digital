@@ -74,11 +74,14 @@ class PurgeDemoData extends Command
         DB::transaction(function () use ($emails, $userIds, $storeIds, $productIds, $orderIds): void {
             DB::table('order_items')->whereIn('order_id', $orderIds)->delete();
             DB::table('commissions')->whereIn('store_id', $storeIds)->delete();
+            DB::table('shipping_zones')->whereIn('store_id', $storeIds)->delete();
             DB::table('transactions')->whereIn('store_id', $storeIds)->delete();
             DB::table('product_reviews')->whereIn('store_id', $storeIds)->delete();
             DB::table('product_images')->whereIn('product_id', $productIds)->delete();
             DB::table('product_variants')->whereIn('product_id', $productIds)->delete();
             DB::table('orders')->whereIn('id', $orderIds)->delete();
+            // After orders: orders.coupon_id points here (null on delete).
+            DB::table('coupons')->whereIn('store_id', $storeIds)->delete();
             DB::table('products')->whereIn('id', $productIds)->delete();
             DB::table('store_payment_gateways')->whereIn('store_id', $storeIds)->delete();
             DB::table('store_settings')->whereIn('store_id', $storeIds)->delete();
@@ -134,6 +137,8 @@ class PurgeDemoData extends Command
         return [
             'order_items'            => DB::table('order_items')->whereIn('order_id', $orderIds)->count(),
             'commissions'            => DB::table('commissions')->whereIn('store_id', $storeIds)->count(),
+            'coupons'                => DB::table('coupons')->whereIn('store_id', $storeIds)->count(),
+            'shipping_zones'         => DB::table('shipping_zones')->whereIn('store_id', $storeIds)->count(),
             'transactions'           => DB::table('transactions')->whereIn('store_id', $storeIds)->count(),
             'product_reviews'        => DB::table('product_reviews')->whereIn('store_id', $storeIds)->count(),
             'product_images'         => DB::table('product_images')->whereIn('product_id', $productIds)->count(),

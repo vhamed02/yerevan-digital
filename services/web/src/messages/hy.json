@@ -313,7 +313,13 @@
       "required": "Պարտադիր",
       "selectPaymentError": "Ընտրեք վճարի եղանակ",
       "qty": "Քան.",
-      "placeOrder": "Պատվիրել և վճարել"
+      "placeOrder": "Պատվիրել և վճարել",
+      "coupon": "Կուպոնի կոդ",
+      "couponPlaceholder": "Մուտքագրեք կոդը",
+      "couponApply": "Կիրառել",
+      "couponRemove": "Հեռացնել",
+      "couponApplied": "Կուպոնը կիրառված է",
+      "discount": "Զեղչ"
     },
     "home": {
       "all": "Բոլոր",

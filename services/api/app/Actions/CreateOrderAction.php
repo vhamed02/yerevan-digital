@@ -10,6 +10,9 @@ use App\Models\Order;
 use App\Repositories\Contracts\OrderRepositoryInterface;
 use App\Repositories\Contracts\ProductRepositoryInterface;
 use App\Repositories\Contracts\ProductVariantRepositoryInterface;
+use App\Services\CouponService;
+use App\Services\ShippingService;
+use App\Support\Money;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -19,6 +22,8 @@ class CreateOrderAction
         private readonly ProductRepositoryInterface        $products,
         private readonly ProductVariantRepositoryInterface $variants,
         private readonly OrderRepositoryInterface          $orders,
+        private readonly CouponService                     $coupons,
+        private readonly ShippingService                   $shipping,
     ) {}
 
     public function execute(CheckoutData $data): Order
@@ -56,16 +61,32 @@ class CreateOrderAction
                 ];
             }
 
+            // Hand off to exact decimal maths for everything downstream of the
+            // item loop, so discount/shipping/total never drift on a float.
+            $subtotalAmount = Money::of(number_format($subtotal, 2, '.', ''));
+
+            [$coupon, $discount] = $this->resolveCoupon($data, $subtotalAmount);
+
+            $shippingCost = $this->shipping->quote(
+                $data->storeId,
+                $data->shippingAddress['city'] ?? null,
+                $subtotalAmount,
+            )['cost'];
+
+            $total = Money::add(Money::sub($subtotalAmount, $discount), $shippingCost);
+
             $order = $this->orders->create([
                 'store_id'         => $data->storeId,
                 'customer_id'      => $data->customerId,
+                'coupon_id'        => $coupon?->id,
+                'coupon_code'      => $coupon?->code,
                 'status'           => OrderStatus::Pending,
                 'payment_status'   => PaymentStatus::Pending,
-                'subtotal'         => $subtotal,
-                'discount'         => 0,
-                'shipping_cost'    => 0,
+                'subtotal'         => $subtotalAmount,
+                'discount'         => $discount,
+                'shipping_cost'    => $shippingCost,
                 'tax'              => 0,
-                'total'            => $subtotal,
+                'total'            => $total,
                 'currency'         => 'AMD',
                 'locale'           => in_array(app()->getLocale(), config('app.supported_locales'), true)
                     ? app()->getLocale()
@@ -104,6 +125,10 @@ class CreateOrderAction
                 }
             }
 
+            // Safe against the usage limit: the row stays locked for the rest of
+            // this transaction, so concurrent checkouts queue behind it.
+            $coupon?->increment('used_count');
+
             return $order;
         });
 
@@ -112,4 +137,27 @@ class CreateOrderAction
         return $order;
     }
 
+    /**
+     * @return array{0: \App\Models\Coupon|null, 1: string}
+     */
+    private function resolveCoupon(CheckoutData $data, string $subtotal): array
+    {
+        if ($data->couponCode === null || trim($data->couponCode) === '') {
+            return [null, Money::ZERO];
+        }
+
+        $coupon = $this->coupons->findByCodeForUpdate($data->storeId, $data->couponCode);
+
+        if (! $coupon) {
+            throw ValidationException::withMessages([
+                'coupon_code' => 'This coupon code is not valid.',
+            ]);
+        }
+
+        if ($reason = $this->coupons->reasonUnusable($coupon, $subtotal)) {
+            throw ValidationException::withMessages(['coupon_code' => $reason]);
+        }
+
+        return [$coupon, $this->coupons->discountFor($coupon, $subtotal)];
+    }
 }

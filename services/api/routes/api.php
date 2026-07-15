@@ -30,6 +30,8 @@ RateLimiter::for('contact', fn($request) => Limit::perMinute(3)->by($request->ip
 RateLimiter::for('review',  fn($request) => Limit::perMinute(3)->by($request->ip()));
 RateLimiter::for('comment', fn($request) => Limit::perMinute(3)->by($request->ip()));
 RateLimiter::for('track',   fn($request) => Limit::perMinute(10)->by($request->ip()));
+// Public code lookup — throttled so it can't be used to enumerate coupon codes.
+RateLimiter::for('coupon',  fn($request) => Limit::perMinute(10)->by($request->ip()));
 
 Route::prefix('v1')->middleware('throttle:api')->group(function () {
     Route::get('health', [HealthController::class, 'check']);
@@ -176,6 +178,17 @@ Route::prefix('v1')->middleware('throttle:api')->group(function () {
         Route::get('orders/{uuid}', [Seller\OrderController::class, 'show']);
         Route::patch('orders/{uuid}/status', [Seller\OrderController::class, 'updateStatus']);
 
+        Route::get('coupons', [Seller\CouponController::class, 'index']);
+        Route::post('coupons', [Seller\CouponController::class, 'store']);
+        Route::get('coupons/{uuid}', [Seller\CouponController::class, 'show']);
+        Route::patch('coupons/{uuid}', [Seller\CouponController::class, 'update']);
+        Route::delete('coupons/{uuid}', [Seller\CouponController::class, 'destroy']);
+
+        Route::get('shipping-zones', [Seller\ShippingZoneController::class, 'index']);
+        Route::post('shipping-zones', [Seller\ShippingZoneController::class, 'store']);
+        Route::patch('shipping-zones/{uuid}', [Seller\ShippingZoneController::class, 'update']);
+        Route::delete('shipping-zones/{uuid}', [Seller\ShippingZoneController::class, 'destroy']);
+
         Route::get('payments/available', [Seller\PaymentController::class, 'available']);
         Route::get('payments/configured', [Seller\PaymentController::class, 'configured']);
         Route::post('payments/configure', [Seller\PaymentController::class, 'configure']);
@@ -190,6 +203,9 @@ Route::prefix('v1')->middleware('throttle:api')->group(function () {
         Route::get('{slug}/products/{productSlug}', [Store\ProductController::class, 'show']);
         Route::get('{slug}/categories', [Store\StoreController::class, 'categories']);
         Route::get('{slug}/orders/{uuid}', [Store\StoreController::class, 'showOrder']);
+        Route::get('{slug}/shipping/zones', [Store\ShippingController::class, 'zones']);
+        Route::post('{slug}/shipping/quote', [Store\ShippingController::class, 'quote']);
+        Route::post('{slug}/coupons/preview', [Store\CouponController::class, 'preview'])->middleware('throttle:coupon');
         Route::post('{slug}/checkout', [Store\CheckoutController::class, 'checkout'])->middleware('throttle:checkout');
         Route::post('{slug}/payments/initiate', [Store\PaymentController::class, 'initiate']);
         Route::post('{slug}/payments/callback/{gateway}', [Store\PaymentController::class, 'callback']);

@@ -7,6 +7,8 @@ import { z } from 'zod/v4'
 import Image from 'next/image'
 import { useTranslations } from 'next-intl'
 import { useStoreCart } from '@/stores/cart.store'
+import { useCheckoutTotals } from '@/hooks/useCheckoutTotals'
+import { CouponField } from '@/components/store/CouponField'
 import api from '@/lib/api'
 import type { CheckoutFormProps } from '../types'
 
@@ -68,6 +70,18 @@ export function CheckoutForm({ storeSlug, store }: CheckoutFormProps) {
   })
 
   const selectedMethod = watch('payment_method')
+  const selectedCity = watch('city') ?? ''
+
+  const {
+    couponCode,
+    discount,
+    shippingCost,
+    total: payableTotal,
+    couponError,
+    applying,
+    applyCoupon,
+    removeCoupon,
+  } = useCheckoutTotals(storeSlug, total, selectedCity)
 
   async function onSubmit(data: CheckoutData) {
     setSubmitError(null)
@@ -76,6 +90,7 @@ export function CheckoutForm({ storeSlug, store }: CheckoutFormProps) {
         `/store/${storeSlug}/checkout`,
         {
           ...data,
+          coupon_code: couponCode,
           items: items.map((i) => ({
             product_id: i.productId,
             variant_id: i.variantId ?? null,
@@ -260,18 +275,40 @@ export function CheckoutForm({ storeSlug, store }: CheckoutFormProps) {
               </ul>
             )}
 
+            {mounted && items.length > 0 && (
+              <div className="border-t border-gray-200 pb-4 pt-4">
+                <CouponField
+                  couponCode={couponCode}
+                  couponError={couponError}
+                  applying={applying}
+                  onApply={applyCoupon}
+                  onRemove={removeCoupon}
+                />
+              </div>
+            )}
+
             <div className="border-t border-gray-200 pt-4">
               <div className="flex items-center justify-between text-sm text-gray-600">
                 <span>{t('checkout.subtotal')}</span>
                 <span>{total.toLocaleString()} ֏</span>
               </div>
+              {discount > 0 && (
+                <div className="mt-1 flex items-center justify-between text-sm text-green-600">
+                  <span>{t('checkout.discount')}</span>
+                  <span>−{discount.toLocaleString()} ֏</span>
+                </div>
+              )}
               <div className="mt-1 flex items-center justify-between text-sm text-gray-600">
                 <span>{t('checkout.shipping')}</span>
-                <span className="text-green-600">{t('checkout.free')}</span>
+                {shippingCost > 0 ? (
+                  <span>{shippingCost.toLocaleString()} ֏</span>
+                ) : (
+                  <span className="text-green-600">{t('checkout.free')}</span>
+                )}
               </div>
               <div className="mt-3 flex items-center justify-between text-base font-bold text-gray-900">
                 <span>{t('checkout.total')}</span>
-                <span>{total.toLocaleString()} ֏</span>
+                <span>{payableTotal.toLocaleString()} ֏</span>
               </div>
             </div>
 

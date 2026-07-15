@@ -31,12 +31,17 @@ class CheckoutController extends Controller
             ],
             notes:         $request->validated('notes'),
             paymentMethod: $request->validated('payment_method'),
+            couponCode:    $request->validated('coupon_code'),
         ));
 
         return $this->success([
             'uuid'            => $order->uuid,
             'order_number'    => $order->order_number,
+            'subtotal'        => (float) $order->subtotal,
+            'discount'        => (float) $order->discount,
+            'shipping_cost'   => (float) $order->shipping_cost,
             'total'           => (float) $order->total,
+            'coupon_code'     => $order->coupon_code,
             'currency'        => $order->currency,
             'payment_gateway' => $order->payment_method,
         ], 'Order created.', 201);

@@ -9,6 +9,8 @@ import { Link } from '@/i18n/navigation'
 import { ShieldCheck, Lock, ChevronRight, ShoppingBag, Check } from 'lucide-react'
 import { useLocale, useTranslations } from 'next-intl'
 import { useStoreCart } from '@/stores/cart.store'
+import { useCheckoutTotals } from '@/hooks/useCheckoutTotals'
+import { CouponField } from '@/components/store/CouponField'
 import api from '@/lib/api'
 import { pickLang } from '@/lib/i18n'
 import type { CheckoutFormProps } from '../types'
@@ -93,6 +95,18 @@ export function CheckoutForm({ storeSlug, store }: CheckoutFormProps) {
   })
 
   const selectedMethod = watch('payment_method')
+  const selectedCity = watch('city') ?? ''
+
+  const {
+    couponCode,
+    discount,
+    shippingCost,
+    total: payableTotal,
+    couponError,
+    applying,
+    applyCoupon,
+    removeCoupon,
+  } = useCheckoutTotals(storeSlug, total, selectedCity)
 
   async function goToStep2() {
     const ok = await trigger(['full_name', 'email', 'phone', 'address', 'city', 'country'])
@@ -104,6 +118,7 @@ export function CheckoutForm({ storeSlug, store }: CheckoutFormProps) {
     try {
       const orderRes = await api.post<{ uuid: string }>(`/store/${storeSlug}/checkout`, {
         ...data,
+        coupon_code: couponCode,
         items: items.map((i) => ({ product_id: i.productId, variant_id: i.variantId ?? null, quantity: i.quantity })),
       })
       const uuid = orderRes.data.uuid
@@ -350,19 +365,47 @@ export function CheckoutForm({ storeSlug, store }: CheckoutFormProps) {
                 )}
               </div>
 
+              {mounted && items.length > 0 && (
+                <div className="border-t border-gray-100 px-5 py-4">
+                  <CouponField
+                    couponCode={couponCode}
+                    couponError={couponError}
+                    applying={applying}
+                    onApply={applyCoupon}
+                    onRemove={removeCoupon}
+                  />
+                </div>
+              )}
+
               <div className="border-t border-gray-100 px-5 py-4">
                 <div className="flex flex-col gap-2">
                   <div className="flex items-center justify-between text-sm text-gray-500">
                     <span>{t('checkout.subtotal')}</span>
                     <span>{total.toLocaleString()} ֏</span>
                   </div>
+                  {discount > 0 && (
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-gray-500">{t('checkout.discount')}</span>
+                      <span className="font-semibold text-emerald-600">
+                        −{discount.toLocaleString()} ֏
+                      </span>
+                    </div>
+                  )}
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-gray-500">{t('checkout.shipping')}</span>
-                    <span className="font-semibold text-emerald-600">{t('checkout.free')}</span>
+                    {shippingCost > 0 ? (
+                      <span className="font-semibold text-gray-900">
+                        {shippingCost.toLocaleString()} ֏
+                      </span>
+                    ) : (
+                      <span className="font-semibold text-emerald-600">{t('checkout.free')}</span>
+                    )}
                   </div>
                   <div className="mt-2 flex items-center justify-between border-t border-gray-100 pt-3 text-base">
                     <span className="font-black text-gray-900">{t('checkout.total')}</span>
-                    <span className="text-xl font-black text-gray-900">{total.toLocaleString()} ֏</span>
+                    <span className="text-xl font-black text-gray-900">
+                      {payableTotal.toLocaleString()} ֏
+                    </span>
                   </div>
                 </div>
               </div>

@@ -7,23 +7,19 @@ use App\Models\Commission;
 use App\Models\Order;
 use App\Models\Store;
 use App\Models\StoreSetting;
+use App\Support\Money;
 
 /**
  * Records platform commission against orders.
  *
- * Every amount here is a decimal string run through bcmath — money never
- * touches a float. Results are rounded half-up to 2 decimal places.
+ * All arithmetic goes through {@see Money} — decimal strings via bcmath, never
+ * floats, rounded half-up.
  *
  * Callers are responsible for wrapping accrue()/reverse() in the same database
  * transaction as the order state change they accompany.
  */
 class CommissionService
 {
-    private const SCALE = 2;
-
-    /** Working scale for intermediate products, before rounding. */
-    private const CALC_SCALE = 8;
-
     /**
      * Write the commission owed on a paid order. Idempotent per order.
      */
@@ -67,7 +63,7 @@ class CommissionService
                 // Mirror the original rate/base so the pair reconciles exactly.
                 'rate'        => $accrual->rate,
                 'base_amount' => $accrual->base_amount,
-                'amount'      => bcsub('0', (string) $accrual->amount, self::SCALE),
+                'amount'      => Money::negate((string) $accrual->amount),
                 'currency'    => $accrual->currency,
                 'reason'      => $reason,
             ],
@@ -104,14 +100,14 @@ class CommissionService
      */
     public function baseFor(Order $order): string
     {
-        $base = bcsub((string) $order->subtotal, (string) $order->discount, self::SCALE);
-
-        return bccomp($base, '0', self::SCALE) < 0 ? '0.00' : $base;
+        return Money::atLeastZero(
+            Money::sub(Money::of($order->subtotal), Money::of($order->discount))
+        );
     }
 
     public function calculate(string $base, string $rate): string
     {
-        return $this->roundHalfUp(bcmul($base, $rate, self::CALC_SCALE));
+        return Money::mul($base, $rate);
     }
 
     /**
@@ -124,14 +120,5 @@ class CommissionService
             && is_numeric($rate)
             && bccomp((string) $rate, '0', 4) >= 0
             && bccomp((string) $rate, '1', 4) <= 0;
-    }
-
-    private function roundHalfUp(string $value): string
-    {
-        $offset = bccomp($value, '0', self::CALC_SCALE) < 0 ? '-0.005' : '0.005';
-
-        // bcadd truncates at the target scale, so offsetting by a half-unit first
-        // turns that truncation into a half-up round (away from zero).
-        return bcadd($value, $offset, self::SCALE);
     }
 }

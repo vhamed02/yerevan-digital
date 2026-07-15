@@ -16,6 +16,8 @@ import {
   Settings,
   LogOut,
   User,
+  Ticket,
+  Truck,
 } from 'lucide-react'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import { useLocale } from 'next-intl'
@@ -26,6 +28,8 @@ const navItems = [
   { href: '/seller', label: 'Overview', icon: LayoutDashboard, exact: true },
   { href: '/seller/products', label: 'Products', icon: Package },
   { href: '/seller/orders', label: 'Orders', icon: ShoppingCart },
+  { href: '/seller/coupons', label: 'Coupons', icon: Ticket },
+  { href: '/seller/shipping', label: 'Shipping', icon: Truck },
   { href: '/seller/payments', label: 'Payments', icon: CreditCard },
   { href: '/seller/store/design', label: 'Design', icon: Palette },
   { href: '/seller/store', label: 'Settings', icon: Settings },

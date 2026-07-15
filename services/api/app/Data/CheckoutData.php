@@ -14,5 +14,6 @@ readonly class CheckoutData
         public ?string $notes,
         public string  $paymentMethod,
         public ?int    $customerId = null,
+        public ?string $couponCode = null,
     ) {}
 }

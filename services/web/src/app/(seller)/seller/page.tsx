@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { Package, ShoppingCart, TrendingUp, Clock, Plus, Bell, Palette, ExternalLink } from 'lucide-react'
+import { Package, ShoppingCart, TrendingUp, Clock, Plus, Bell, Palette, ExternalLink, Receipt, Eye, Trophy } from 'lucide-react'
 import StatCard from '@/components/admin/StatCard'
 import StoreStatusBanner from '@/components/seller/StoreStatusBanner'
 import { RevenueBarChart, OrderStatusDonut } from '@/components/seller/SellerCharts'
@@ -24,6 +24,7 @@ export default async function SellerDashboardPage() {
   const revenueChart = dashboardData?.revenue_chart ?? []
   const ordersByStatus = dashboardData?.orders_by_status ?? []
   const recentOrders = dashboardData?.recent_orders ?? []
+  const topProducts = dashboardData?.top_products ?? []
   const store = storeData
 
   return (
@@ -52,6 +53,27 @@ export default async function SellerDashboardPage() {
           trend={stats ? `Today: ${stats.revenue_today.toLocaleString()} ֏` : undefined}
           color="success"
         />
+        <StatCard
+          icon={Receipt}
+          label="Average Order"
+          value={stats ? `${stats.average_order_value.toLocaleString()} ֏` : '—'}
+          trend={stats ? `${stats.paid_orders} paid orders` : undefined}
+          color="brand"
+        />
+        <StatCard
+          icon={Eye}
+          label="Conversion"
+          value={stats ? `${stats.conversion_rate}%` : '—'}
+          trend={stats ? `${stats.total_views.toLocaleString()} product views` : undefined}
+          color="info"
+        />
+        <StatCard
+          icon={TrendingUp}
+          label="Total Revenue"
+          value={stats ? `${stats.total_revenue.toLocaleString()} ֏` : '—'}
+          trend="Paid orders only"
+          color="success"
+        />
       </div>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
@@ -63,6 +85,44 @@ export default async function SellerDashboardPage() {
           <p className="mb-4 text-sm font-semibold text-content-primary">Order Status</p>
           <OrderStatusDonut data={ordersByStatus} />
         </div>
+      </div>
+
+      <div className="rounded-xl border border-border bg-surface p-5">
+        <div className="mb-4 flex items-center gap-2">
+          <Trophy className="h-4 w-4 text-brand-500" />
+          <p className="text-sm font-semibold text-content-primary">Best Sellers</p>
+        </div>
+        {topProducts.length === 0 ? (
+          <p className="py-6 text-center text-sm text-content-muted">
+            No paid orders yet — best sellers appear once products start selling.
+          </p>
+        ) : (
+          <ul className="flex flex-col gap-3">
+            {topProducts.map((product, index) => (
+              <li key={product.product_id} className="flex items-center gap-3">
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand-500/10 text-xs font-semibold text-brand-500">
+                  {index + 1}
+                </span>
+                {product.uuid ? (
+                  <Link
+                    href={`/seller/products/${product.uuid}`}
+                    className="min-w-0 flex-1 truncate text-sm text-content-primary hover:text-brand-500"
+                  >
+                    {product.name.hy || product.name.en}
+                  </Link>
+                ) : (
+                  <span className="min-w-0 flex-1 truncate text-sm text-content-primary">
+                    {product.name.hy || product.name.en}
+                  </span>
+                )}
+                <span className="shrink-0 text-xs text-content-muted">{product.units} sold</span>
+                <span className="shrink-0 text-sm font-semibold tabular-nums text-content-primary">
+                  {product.revenue.toLocaleString()} ֏
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
 
       <div className="rounded-xl border border-border bg-surface p-5">

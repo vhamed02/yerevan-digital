@@ -313,7 +313,13 @@
       "required": "Обязательно",
       "selectPaymentError": "Выберите способ оплаты",
       "qty": "Кол-во",
-      "placeOrder": "Оформить и оплатить"
+      "placeOrder": "Оформить и оплатить",
+      "coupon": "Промокод",
+      "couponPlaceholder": "Введите код",
+      "couponApply": "Применить",
+      "couponRemove": "Удалить",
+      "couponApplied": "Промокод применён",
+      "discount": "Скидка"
     },
     "home": {
       "all": "Все",

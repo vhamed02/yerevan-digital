@@ -189,6 +189,25 @@ How the platform actually earns money — the pricing page promises a per-sale c
 
 ---
 
+## Coupons & shipping (added 2026-07-15)
+
+Both are applied in `CreateOrderAction`, inside the order transaction. Order maths is
+`total = subtotal - discount + shipping_cost + tax`.
+
+- **Money:** `App\Support\Money` is the single home for decimal arithmetic (bcmath, round half-up). `CommissionService`, `CouponService` and `ShippingService` all go through it. **Never do money maths with floats** — `0.05 * 100.10` is exactly 5.005 and floats round it the wrong way. The item-pricing loop in `CreateOrderAction` still uses floats (pre-existing); everything after it is exact.
+- **Coupons:** codes are uppercased on save and unique **per store** (two stores can both use `SALE10`). `StoreCouponRequest::prepareForValidation()` uppercases before the unique rule, or lowercase input passes validation and then trips the DB constraint. Checkout locks the row (`findByCodeForUpdate`) so concurrent orders can't both beat `usage_limit`. Discounts only ever come off the subtotal, never shipping — which keeps the commission base honest.
+- **Shipping:** first active zone listing the checkout city wins, else the store's `is_default` fallback zone, else free. **A store with no zones ships free**, so enabling this never silently starts charging. At most one fallback per store — the controller demotes the previous one.
+- **Storefront:** `useCheckoutTotals` + `CouponField` are shared by both checkout templates (`_shared` and `spark` — spark does *not* re-export `_shared`, so changes must land in both). Cart-side coupon/shipping figures are advisory; checkout re-resolves both server-side and that's what's charged.
+- **Public `coupons/preview` is throttled** (`throttle:coupon`) — an unauthenticated code lookup is a code-enumeration target.
+
+## Seller analytics
+
+`Order::scopeRevenueCounted()` defines revenue once: **paid, and not cancelled or refunded** — the same set commission accrues/reverses over. Use it for anything money-shaped; before 2026-07-15 the dashboard summed *all* orders, counting pending and cancelled ones as revenue.
+
+`topProductsByStore()` groups by `product_id` only and resolves names in PHP — grouping on the translatable JSON name column isn't portable across MySQL/SQLite. It returns the product **uuid** because seller product routes key on uuid, not id. `conversion_rate` is paid orders ÷ product views (directional; there's no session tracking).
+
+---
+
 ## Demo seeders
 
 `database/seeders/DemoSeeder.php` — 6 Armenian stores, 50+ products, ~180 orders.

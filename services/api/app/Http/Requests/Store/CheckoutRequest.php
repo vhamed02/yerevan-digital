@@ -22,6 +22,7 @@ class CheckoutRequest extends FormRequest
             'country'            => ['required', 'string', 'max:100'],
             'notes'              => ['nullable', 'string', 'max:500'],
             'payment_method'     => ['required', 'string'],
+            'coupon_code'        => ['nullable', 'string', 'max:50'],
         ];
     }
 }

@@ -372,10 +372,17 @@ export interface SellerVariant {
 export interface SellerDashboardStats {
   total_products: number
   active_products: number
+  total_views: number
   total_orders: number
   orders_this_month: number
+  /** Paid, non-cancelled orders — the ones revenue is measured over. */
+  paid_orders: number
+  total_revenue: number
   revenue_this_month: number
   revenue_today: number
+  average_order_value: number
+  /** Paid orders as a percentage of product views. */
+  conversion_rate: number
 }
 
 export interface SellerRevenueChartPoint {
@@ -383,11 +390,61 @@ export interface SellerRevenueChartPoint {
   revenue: number
 }
 
+export interface SellerTopProduct {
+  product_id: number
+  /** null if the product has since been hard-deleted. */
+  uuid: string | null
+  name: MultiLang
+  units: number
+  revenue: number
+}
+
 export interface SellerDashboardData {
   stats: SellerDashboardStats
   revenue_chart: SellerRevenueChartPoint[]
   orders_by_status: AdminOrderStatusPoint[]
+  top_products: SellerTopProduct[]
   recent_orders: Order[]
+}
+
+export interface SellerCoupon {
+  uuid: string
+  code: string
+  type: 'fixed' | 'percent'
+  value: string
+  min_order_amount: string
+  max_discount_amount: string | null
+  /** null = unlimited redemptions. */
+  usage_limit: number | null
+  used_count: number
+  starts_at: string | null
+  ends_at: string | null
+  is_active: boolean
+  is_expired: boolean
+  is_exhausted: boolean
+  created_at: string
+}
+
+export interface SellerShippingZone {
+  uuid: string
+  name: MultiLang
+  cities: string[]
+  rate: string
+  /** Subtotal at or above which this zone ships free. null = never. */
+  free_over: string | null
+  is_default: boolean
+  is_active: boolean
+  sort_order: number
+  created_at: string
+}
+
+export interface CouponPreview {
+  code: string
+  type: 'fixed' | 'percent'
+  value: string
+  subtotal: string
+  discount: string
+  total: string
 }
 
 export interface SellerStore {

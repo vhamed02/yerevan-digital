@@ -20,6 +20,8 @@ class Order extends Model
         'uuid',
         'store_id',
         'customer_id',
+        'coupon_id',
+        'coupon_code',
         'order_number',
         'status',
         'payment_status',
@@ -75,6 +77,18 @@ class Order extends Model
                 'order_number' => sprintf('VEND-%d-%05d', (int) now()->year, $order->id),
             ]);
         });
+    }
+
+    /**
+     * Orders that count as revenue: actually paid, and not since cancelled or
+     * refunded. Mirrors when commission accrues and reverses, so seller revenue
+     * and platform commission are always measured over the same set of orders.
+     */
+    public function scopeRevenueCounted(Builder $query): Builder
+    {
+        return $query
+            ->where('payment_status', PaymentStatus::Paid)
+            ->whereNotIn('status', [OrderStatus::Cancelled, OrderStatus::Refunded]);
     }
 
     public function scopeByStore(Builder $query, int $storeId): Builder

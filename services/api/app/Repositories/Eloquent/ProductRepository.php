@@ -145,6 +145,7 @@ class ProductRepository implements ProductRepositoryInterface
         return [
             'total_products'  => (clone $base)->count(),
             'active_products' => (clone $base)->where('status', ProductStatus::Active)->count(),
+            'total_views'     => (int) (clone $base)->sum('view_count'),
         ];
     }
 

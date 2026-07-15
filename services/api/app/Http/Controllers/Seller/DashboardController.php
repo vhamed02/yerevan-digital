@@ -26,10 +26,19 @@ class DashboardController extends Controller
         $productStats = $this->products->countStatsByStore($store->id);
         $orderStats   = $this->orders->statsByStore($store->id);
 
+        $stats = array_merge($productStats, $orderStats);
+
+        // Storefront views that turned into a paid order. Views are counted per
+        // product, so this is a directional signal rather than session tracking.
+        $stats['conversion_rate'] = $stats['total_views'] > 0
+            ? round($stats['paid_orders'] / $stats['total_views'] * 100, 2)
+            : 0.0;
+
         return $this->success([
-            'stats'            => array_merge($productStats, $orderStats),
+            'stats'            => $stats,
             'revenue_chart'    => $this->orders->revenueChartByStore($store->id),
             'orders_by_status' => $this->orders->ordersByStatusByStore($store->id),
+            'top_products'     => $this->orders->topProductsByStore($store->id, 5),
             'recent_orders'    => $this->orders->recentByStore($store->id, 5)
                 ->map(fn($order) => (new OrderResource($order))->resolve())
                 ->values()

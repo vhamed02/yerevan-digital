@@ -313,7 +313,13 @@
       "required": "Required",
       "selectPaymentError": "Select a payment method",
       "qty": "Qty",
-      "placeOrder": "Place order"
+      "placeOrder": "Place order",
+      "coupon": "Coupon code",
+      "couponPlaceholder": "Enter code",
+      "couponApply": "Apply",
+      "couponRemove": "Remove",
+      "couponApplied": "Coupon applied",
+      "discount": "Discount"
     },
     "home": {
       "all": "All",
