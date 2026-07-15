@@ -1,8 +1,8 @@
 [
   {
     "id": "deploy",
-    "execute-command": "/home/vendorex/scripts/deploy.sh",
-    "command-working-directory": "/home/vendorex",
+    "execute-command": "/home/yerevan-digital/scripts/deploy.sh",
+    "command-working-directory": "/home/yerevan-digital",
     "response-message": "Deployment queued.",
     "trigger-rule": {
       "and": [
