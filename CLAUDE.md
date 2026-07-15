@@ -9,8 +9,8 @@
 git add <files>
 git commit -m "Your message"
 
-# Push (must use deploy user — root lacks SSH key)
-sudo -u deploy git -C /home/deploy/vendora push origin main
+# Push (root has the SSH key; there is no deploy user)
+git -C /home/yerevan-digital push origin master
 ```
 
 The GitHub webhook triggers `scripts/deploy.sh` automatically, which:
@@ -20,14 +20,12 @@ The GitHub webhook triggers `scripts/deploy.sh` automatically, which:
 
 **Never wait for the deploy to finish.** After pushing, only confirm the webhook triggered — the new commit hash appears in `/var/log/vendora/deploy.log` — then move on. Do not poll the live site or watch the build.
 
-If the webhook doesn't fire (GitHub occasionally skips a delivery — verify with the first command), re-send a push event:
-```bash
-gh api repos/vhamed02/vendora/hooks/624681417/deliveries --jq '.[:3][].delivered_at'
-gh api -X POST repos/vhamed02/vendora/hooks/624681417/tests
-```
+Webhook plumbing: GitHub (`vhamed02/yerevan-digital`) → `webhook.service` (adnanh/webhook) on port 9001, hooks loaded from **`/etc/webhook.conf`** (NOT the repo's `scripts/hooks.json`, which is only a template and is kept `--assume-unchanged`). Verify deliveries with `journalctl -u webhook -n 20`.
 
-Git identity: `user.name="Vendora Dev"`, `user.email=vhamed02@gmail.com`  
-Deploy SSH key: `/home/deploy/.ssh/github_deploy`
+A matched-but-failed hook still returns HTTP 200 to GitHub, so GitHub reports the webhook as healthy while nothing deploys. If pushes stop deploying, check for `error in exec` in the webhook log before suspecting GitHub. (This is exactly what happened after the rebrand: `/etc/webhook.conf` kept the pre-rename `/home/vendorex` path and auto-deploy was silently dead from 2026-06-22 to 2026-07-15.)
+
+Git identity: `user.name="vhamed02"`, `user.email=vhamed02@gmail.com`  
+`gh` CLI is **not installed** on this server.
 
 **Do not mention "Claude" in commit messages.**
 
@@ -35,10 +33,11 @@ Deploy SSH key: `/home/deploy/.ssh/github_deploy`
 
 ## Infrastructure
 
-- **Server:** Ubuntu 24, hostname `vendorex`, repo at `/home/deploy/vendora`
+- **Server:** Ubuntu 24, hostname `yerevan.digital`, repo at `/home/yerevan-digital` (the old `/home/deploy/vendora` and `/home/vendorex` paths are gone; `/home/vendorex` still holds an unused `docker/`+`services/` fragment from the rename)
 - **Domains:** `yerevan.digital` (frontend) / `api.yerevan.digital` (API), both Cloudflare-proxied; TLS terminates at Cloudflare (nginx listens on 80 only). The old `radif.org` zone is stale (522) — don't use it. `/etc/hosts` maps `yerevan.digital` to 127.0.1.1, so server-local curl tests need `--resolve` or `http://localhost` + Host header.
 - **Stack:** Laravel 13 / PHP 8.5 API + Next.js 16.2.6 frontend, MySQL 8, Redis 7, Docker Compose
 - **Networks:** `vendora-backend` (api, mysql, mongodb, redis), `vendora-frontend` (nginx, web, api)
+- **Workers:** `queue` runs `queue:work` (emails/notifications) and `scheduler` runs `schedule:work`. `QUEUE_CONNECTION=redis`, so if `queue` is down, mail silently never sends; anything registered in `routes/console.php` needs `scheduler` up.
 - **SSR API path:** Next.js server-side calls `http://nginx:8080/api/v1/...` — nginx listens on 8080 and proxies to PHP-FPM at `api:9000`
 - **Client-side API path:** `https://api.yerevan.digital/api/v1/...`
 - **Base images are digest-pinned** (all Dockerfiles): unpinned tags re-resolve from the registry every build, and upstream releases silently bust the whole layer cache (15-min PHP extension recompiles). To upgrade a base image, change the digest deliberately and expect one slow rebuild.
@@ -101,7 +100,7 @@ Missing `assignRole()` causes 403 on all seller API calls even though `users.rol
 
 ### 4. Order status transitions
 
-`ALLOWED_TRANSITIONS` in `Seller/OrderController.php` governs valid status changes:
+`OrderStatus::allowedTransitions()` (in `app/Enums/OrderStatus.php`, **not** the controller) governs valid status changes:
 ```php
 'pending'    => ['paid', 'processing', 'cancelled'],
 'paid'       => ['processing', 'cancelled'],
@@ -172,6 +171,21 @@ updateStore: (partial) =>
 ```
 
 `SellerLayoutClient` verifies localStorage against the API on load to self-heal stale state. Pages render `null` until `storeChecked` is true, preventing premature wizard display.
+
+---
+
+## Commission engine (added 2026-07-15)
+
+How the platform actually earns money — the pricing page promises a per-sale commission.
+
+- **Ledger:** `commissions` is **append-only**. Never update or delete a row; undo by writing a `reversal`. A store's balance is `SUM(amount)` (accruals positive, reversals negative). `unique(order_id, type)` is the idempotency guard — a replayed gateway callback cannot double-charge.
+- **Atomicity (the whole design):** `CommissionService::accrue()` runs *inside* the same `DB::transaction` as the order flipping to paid, in `HandlePaymentSuccessAction`. An order can never be paid without its commission landing with it. **Never** move this to a queued listener or a separate service — that trades the ACID guarantee for reconciliation drift on money. (Go's `admin-reports` is the read side of a CQRS split; Laravel keeps all writes.)
+- **Reversal:** `Seller/OrderController::updateStatus` reverses on `cancelled`/`refunded`. Nothing transitions *to* `refunded` today, so `cancelled` is the live path.
+- **Base:** `subtotal - discount`, clamped at 0 — shipping and tax are pass-through and excluded. Revisit when shipping zones land.
+- **Rate:** `stores.commission_rate` → `commission_rate` platform setting (`store_settings` with `store_id IS NULL`) → `config/commission.php` (`COMMISSION_DEFAULT_RATE`, currently **5%**). Rate + base are snapshotted per row, so changing a rate never rewrites history.
+- **Money maths:** bcmath on decimal strings, rounded **half-up**. Never use floats — `100.10 * 0.05` is exactly `5.005`, which binary floats round the wrong way.
+- **Admin:** `GET /admin/commissions`, `GET /admin/commissions/summary`, `PATCH /admin/stores/{store}/commission-rate` (route key is the **slug**, not the id). Sending `commission_rate: null` clears the override.
+- **Purge:** `PurgeDemoData` must delete `commissions` before `orders` — the FK is `restrictOnDelete`.
 
 ---
 
