@@ -101,6 +101,18 @@ services:
       redis:
         condition: service_healthy
 
+  meilisearch:
+    image: getmeili/meilisearch:v1.11
+    environment:
+      MEILI_MASTER_KEY: ${MEILISEARCH_KEY}
+      MEILI_ENV: production
+      MEILI_NO_ANALYTICS: "true"
+    volumes:
+      - meilisearch_data:/meili_data
+    networks:
+      - vendora-backend
+    restart: unless-stopped
+
   scheduler:
     <<: *api-common
     command: php artisan schedule:work
@@ -137,3 +149,4 @@ volumes:
   mongodb_data:
   redis_data:
   storage_data:
+  meilisearch_data:

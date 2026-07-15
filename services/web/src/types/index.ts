@@ -438,6 +438,17 @@ export interface SellerShippingZone {
   created_at: string
 }
 
+export interface SellerDomain {
+  custom_domain: string | null
+  verified: boolean
+  verified_at: string | null
+  dns: {
+    txt_name: string
+    txt_value: string
+    a_record: string
+  } | null
+}
+
 export interface CouponPreview {
   code: string
   type: 'fixed' | 'percent'

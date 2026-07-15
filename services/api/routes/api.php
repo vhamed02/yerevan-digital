@@ -10,6 +10,7 @@ use App\Http\Controllers\OrderTrackingController;
 use App\Http\Controllers\HealthController;
 use App\Http\Controllers\CaptchaController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\DomainController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\BlogCommentController;
@@ -41,6 +42,7 @@ Route::prefix('v1')->middleware('throttle:api')->group(function () {
     Route::get('posts/{slug}', [PostController::class, 'show']);
     Route::get('posts/{slug}/comments', [BlogCommentController::class, 'index']);
     Route::post('posts/{slug}/comments', [BlogCommentController::class, 'store'])->middleware('throttle:comment');
+    Route::get('domains/resolve', [DomainController::class, 'resolve']);
     Route::get('stores', [PublicStoreController::class, 'index']);
     Route::get('stores/featured', [PublicStoreController::class, 'featured']);
     Route::get('stores/check-slug', [PublicStoreController::class, 'checkSlug'])->middleware('throttle:slug-check');
@@ -67,6 +69,11 @@ Route::prefix('v1')->middleware('throttle:api')->group(function () {
         Route::get('orders', [Customer\OrderController::class, 'index']);
         Route::get('orders/{uuid}', [Customer\OrderController::class, 'show']);
         Route::patch('profile', [Customer\ProfileController::class, 'update']);
+
+        Route::get('wishlist', [Customer\WishlistController::class, 'index']);
+        Route::get('wishlist/ids', [Customer\WishlistController::class, 'ids']);
+        Route::post('wishlist', [Customer\WishlistController::class, 'store']);
+        Route::delete('wishlist/{productUuid}', [Customer\WishlistController::class, 'destroy']);
     });
 
     Route::prefix('admin')->middleware(['auth:sanctum', EnsureUserIsAdmin::class])->group(function () {
@@ -177,6 +184,11 @@ Route::prefix('v1')->middleware('throttle:api')->group(function () {
         Route::get('orders', [Seller\OrderController::class, 'index']);
         Route::get('orders/{uuid}', [Seller\OrderController::class, 'show']);
         Route::patch('orders/{uuid}/status', [Seller\OrderController::class, 'updateStatus']);
+
+        Route::get('domain', [Seller\DomainController::class, 'show']);
+        Route::patch('domain', [Seller\DomainController::class, 'update']);
+        Route::post('domain/verify', [Seller\DomainController::class, 'verify']);
+        Route::delete('domain', [Seller\DomainController::class, 'destroy']);
 
         Route::get('coupons', [Seller\CouponController::class, 'index']);
         Route::post('coupons', [Seller\CouponController::class, 'store']);

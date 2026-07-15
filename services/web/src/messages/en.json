@@ -411,6 +411,16 @@
       "captcha": "Captcha",
       "refresh": "Refresh",
       "enterSum": "Enter the sum"
+    },
+    "wishlist": {
+      "title": "Wishlist",
+      "saved": "Saved to your wishlist",
+      "removed": "Removed from your wishlist",
+      "signInToSave": "Sign in to save products",
+      "failed": "Could not update your wishlist",
+      "empty": "Nothing saved yet",
+      "emptyHint": "Tap the heart on any product to save it here.",
+      "remove": "Remove"
     }
   },
   "blog": {

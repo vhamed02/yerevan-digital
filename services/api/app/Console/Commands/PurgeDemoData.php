@@ -73,6 +73,7 @@ class PurgeDemoData extends Command
 
         DB::transaction(function () use ($emails, $userIds, $storeIds, $productIds, $orderIds): void {
             DB::table('order_items')->whereIn('order_id', $orderIds)->delete();
+            DB::table('wishlist_items')->whereIn('product_id', $productIds)->delete();
             DB::table('commissions')->whereIn('store_id', $storeIds)->delete();
             DB::table('shipping_zones')->whereIn('store_id', $storeIds)->delete();
             DB::table('transactions')->whereIn('store_id', $storeIds)->delete();
@@ -136,6 +137,7 @@ class PurgeDemoData extends Command
     ): array {
         return [
             'order_items'            => DB::table('order_items')->whereIn('order_id', $orderIds)->count(),
+            'wishlist_items'         => DB::table('wishlist_items')->whereIn('product_id', $productIds)->count(),
             'commissions'            => DB::table('commissions')->whereIn('store_id', $storeIds)->count(),
             'coupons'                => DB::table('coupons')->whereIn('store_id', $storeIds)->count(),
             'shipping_zones'         => DB::table('shipping_zones')->whereIn('store_id', $storeIds)->count(),

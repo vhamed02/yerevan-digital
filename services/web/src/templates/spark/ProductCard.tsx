@@ -1,10 +1,13 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 import { Link } from '@/i18n/navigation'
 import Image from 'next/image'
 import { ShoppingBag, Check, Heart, Eye } from 'lucide-react'
 import { useStoreCart } from '@/stores/cart.store'
+import { useWishlist } from '@/hooks/useWishlist'
 import { formatViewCount } from '@/lib/formatViewCount'
 import { useLocale, useTranslations } from 'next-intl'
 import { pickLang } from '@/lib/i18n'
@@ -12,10 +15,13 @@ import type { ProductCardProps } from '../types'
 
 export function ProductCard({ product, storeSlug, isPreview }: ProductCardProps) {
   const [added, setAdded] = useState(false)
-  const [wishlisted, setWishlisted] = useState(false)
   const { addItem } = useStoreCart(storeSlug)
+  const { isSaved, toggle } = useWishlist()
+  const router = useRouter()
   const locale = useLocale()
   const t = useTranslations('storefront')
+
+  const wishlisted = isSaved(product.uuid)
 
   const name = pickLang(product.name, locale)
   const image = product.images?.[0]
@@ -34,9 +40,24 @@ export function ProductCard({ product, storeSlug, isPreview }: ProductCardProps)
     setTimeout(() => setAdded(false), 1800)
   }
 
-  function handleWishlist(e: React.MouseEvent) {
+  async function handleWishlist(e: React.MouseEvent) {
     e.preventDefault()
-    setWishlisted((v) => !v)
+    if (isPreview) return
+
+    const result = await toggle(product.uuid)
+
+    if (result.needsAuth) {
+      toast.info(t('wishlist.signInToSave'))
+      router.push('/auth/login')
+      return
+    }
+
+    if ('failed' in result && result.failed) {
+      toast.error(t('wishlist.failed'))
+      return
+    }
+
+    toast.success(result.saved ? t('wishlist.saved') : t('wishlist.removed'))
   }
 
   return (

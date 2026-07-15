@@ -18,6 +18,7 @@ import {
   User,
   Ticket,
   Truck,
+  Globe,
 } from 'lucide-react'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import { useLocale } from 'next-intl'
@@ -31,6 +32,7 @@ const navItems = [
   { href: '/seller/coupons', label: 'Coupons', icon: Ticket },
   { href: '/seller/shipping', label: 'Shipping', icon: Truck },
   { href: '/seller/payments', label: 'Payments', icon: CreditCard },
+  { href: '/seller/domain', label: 'Domain', icon: Globe },
   { href: '/seller/store/design', label: 'Design', icon: Palette },
   { href: '/seller/store', label: 'Settings', icon: Settings },
 ]

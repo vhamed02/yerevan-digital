@@ -69,7 +69,8 @@ took $T
 # ── start ─────────────────────────────────────────────────────────────────────
 section "Starting services"
 T=$(date +%s)
-$COMPOSE up -d --no-deps web api queue scheduler admin-reports
+# meilisearch is a pulled image, not built, so it only appears here.
+$COMPOSE up -d --no-deps meilisearch web api queue scheduler admin-reports
 ok "Containers up"
 took $T
 
@@ -98,6 +99,16 @@ section "Running migrations"
 T=$(date +%s)
 $COMPOSE exec -T api php artisan migrate --force
 ok "Migrations done"
+took $T
+
+# ── search index ──────────────────────────────────────────────────────────────
+# Idempotent. Meilisearch rejects a filter on an attribute it wasn't told is
+# filterable, so settings drifting from config/scout.php breaks storefront
+# search. Never fail the deploy over it — search degrades to a SQL LIKE.
+section "Syncing search index settings"
+T=$(date +%s)
+$COMPOSE exec -T api php artisan scout:sync-index-settings || \
+  printf '\033[1;33m  ⚠  Could not sync index settings — search falls back to SQL.\033[0m\n'
 took $T
 
 # ── nginx ─────────────────────────────────────────────────────────────────────

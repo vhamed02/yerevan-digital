@@ -204,6 +204,13 @@ Both are applied in `CreateOrderAction`, inside the order transaction. Order mat
 - **Storefront:** `useCheckoutTotals` + `CouponField` are shared by both checkout templates (`_shared` and `spark` — spark does *not* re-export `_shared`, so changes must land in both). Cart-side coupon/shipping figures are advisory; checkout re-resolves both server-side and that's what's charged.
 - **Public `coupons/preview` is throttled** (`throttle:coupon`) — an unauthenticated code lookup is a code-enumeration target.
 
+## Custom domains & search (added 2026-07-15)
+
+- **Custom domains:** full design in [`docs/custom-domains.md`](docs/custom-domains.md). Short version: `proxy.ts` resolves the Host via `GET /domains/resolve` and rewrites `/` → `/store/{slug}`; a domain only routes once its TXT record is verified **and** the store is active. **TLS is the seller's own Cloudflare** — this box has no certs and no certbot, and nginx listens on :80 only. The host nginx catch-all that makes this work lives in `/etc/nginx/sites-available/vendora`, which is **not in this repo and not restored by a deploy** (backup: `/root/vendora.bak.*`).
+- **Search:** Laravel Scout + Meilisearch (`meilisearch` container, `SCOUT_DRIVER=meilisearch`, `SCOUT_QUEUE=true` so indexing rides the existing `queue` worker). `Product::toSearchableArray()` indexes `name_hy/name_en/name_ru` + `sku` — **the old SQL `LIKE` search only looked at `name->en` and `name->hy`, so Russian was unfindable**. `ProductRepository::searchProductIds()` returns ids and lets SQL apply every other filter and the sort; it returns `null` (→ SQL `LIKE` fallback) when the driver isn't meilisearch *or* Meilisearch is unreachable, so a search outage degrades instead of 500ing. Filterable attributes are declared in `config/scout.php` and applied by `scout:sync-index-settings` (runs on deploy) — Meilisearch **rejects** a filter on an undeclared attribute. Tests force `SCOUT_DRIVER=null`.
+- **Backfilling the index:** `php artisan scout:import "App\Models\Product"`. Not in the deploy — it's a one-off after enabling search or restoring the Meilisearch volume.
+- **Wishlist:** `wishlist_items`, per-account and login-gated (`/customer/wishlist`). Before this the spark `ProductCard` heart was `useState` only and saved nothing.
+
 ## Seller analytics
 
 `Order::scopeRevenueCounted()` defines revenue once: **paid, and not cancelled or refunded** — the same set commission accrues/reverses over. Use it for anything money-shaped; before 2026-07-15 the dashboard summed *all* orders, counting pending and cancelled ones as revenue.

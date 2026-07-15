@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import SettingsAdminClient from '@/components/admin/SettingsAdminClient'
 import { serverAuthGet } from '@/lib/server-api'
-import type { AdminSettings } from '@/types'
 
 export const dynamic = 'force-dynamic'
 
@@ -10,6 +9,7 @@ export const metadata: Metadata = {
 }
 
 export default async function AdminSettingsPage() {
-  const data = await serverAuthGet<AdminSettings>('/admin/settings')
+  // store_settings is a string-valued key/value table; the client parses it.
+  const data = await serverAuthGet<Record<string, string>>('/admin/settings')
   return <SettingsAdminClient initialSettings={data ?? null} />
 }

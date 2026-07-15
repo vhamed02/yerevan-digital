@@ -38,6 +38,8 @@ class Store extends Model implements AuditableContract
         'email',
         'social_links',
         'custom_domain',
+        'custom_domain_token',
+        'custom_domain_verified_at',
         'meta_title',
         'meta_description',
         'is_featured',
@@ -47,11 +49,18 @@ class Store extends Model implements AuditableContract
     protected function casts(): array
     {
         return [
-            'social_links'    => 'array',
-            'status'          => StoreStatus::class,
-            'is_featured'     => 'boolean',
-            'commission_rate' => 'decimal:4',
+            'social_links'              => 'array',
+            'status'                    => StoreStatus::class,
+            'is_featured'               => 'boolean',
+            'commission_rate'           => 'decimal:4',
+            'custom_domain_verified_at' => 'datetime',
         ];
+    }
+
+    /** A domain only routes once ownership has been proven. */
+    public function hasVerifiedDomain(): bool
+    {
+        return $this->custom_domain !== null && $this->custom_domain_verified_at !== null;
     }
 
     protected static function boot(): void

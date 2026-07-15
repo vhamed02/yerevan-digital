@@ -10,7 +10,8 @@ import api from '@/lib/api'
 import type { AdminSettings } from '@/types'
 
 interface SettingsAdminClientProps {
-  initialSettings: AdminSettings | null
+  /** Raw API payload: store_settings is a string-valued key/value table. */
+  initialSettings: Record<string, string> | null
 }
 
 const defaultSettings: AdminSettings = {
@@ -27,13 +28,33 @@ const defaultSettings: AdminSettings = {
   meta_keywords: '',
 }
 
+function toBool(value: string | undefined, fallback: boolean): boolean {
+  if (value === undefined || value === '') return fallback
+  return value === '1' || value === 'true'
+}
+
+/** Settings come back as strings; the form needs real booleans and numbers. */
+function parseSettings(raw: Record<string, string> | null): AdminSettings {
+  if (!raw) return defaultSettings
+
+  return {
+    ...defaultSettings,
+    ...raw,
+    registration_enabled: toBool(raw.registration_enabled, defaultSettings.registration_enabled),
+    registration_require_approval: toBool(
+      raw.registration_require_approval,
+      defaultSettings.registration_require_approval,
+    ),
+    smtp_port: raw.smtp_port ? Number(raw.smtp_port) : defaultSettings.smtp_port,
+  }
+}
+
 export default function SettingsAdminClient({ initialSettings }: SettingsAdminClientProps) {
-  const [settings, setSettings] = useState<AdminSettings>(
-    initialSettings ?? defaultSettings
-  )
+  const [settings, setSettings] = useState<AdminSettings>(() => parseSettings(initialSettings))
 
   const saveMutation = useMutation({
-    mutationFn: (data: Partial<AdminSettings>) => api.patch('/admin/settings', data),
+    // The API takes a `settings` map — sending bare fields 422s.
+    mutationFn: (data: Partial<AdminSettings>) => api.patch('/admin/settings', { settings: data }),
     onSuccess: () => toast.success('Settings saved'),
     onError: () => toast.error('Failed to save settings'),
   })
