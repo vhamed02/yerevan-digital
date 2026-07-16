@@ -24,10 +24,7 @@ class BrevoTransport extends AbstractTransport
                 'name'  => $email->getFrom()[0]->getName() ?: $email->getFrom()[0]->getAddress(),
                 'email' => $email->getFrom()[0]->getAddress(),
             ],
-            'to' => array_map(
-                fn($addr) => ['name' => $addr->getName(), 'email' => $addr->getAddress()],
-                $email->getTo()
-            ),
+            'to'      => $this->addresses($email->getTo()),
             'subject' => $email->getSubject(),
         ];
 
@@ -40,17 +37,11 @@ class BrevoTransport extends AbstractTransport
         }
 
         if ($email->getCc()) {
-            $payload['cc'] = array_map(
-                fn($addr) => ['name' => $addr->getName(), 'email' => $addr->getAddress()],
-                $email->getCc()
-            );
+            $payload['cc'] = $this->addresses($email->getCc());
         }
 
         if ($email->getBcc()) {
-            $payload['bcc'] = array_map(
-                fn($addr) => ['name' => $addr->getName(), 'email' => $addr->getAddress()],
-                $email->getBcc()
-            );
+            $payload['bcc'] = $this->addresses($email->getBcc());
         }
 
         $this->client->request('POST', 'https://api.brevo.com/v3/smtp/email', [
@@ -61,6 +52,30 @@ class BrevoTransport extends AbstractTransport
             ],
             'json' => $payload,
         ]);
+    }
+
+    /**
+     * Map Symfony addresses to Brevo's shape.
+     *
+     * Brevo rejects `{"name": "", "email": ...}` with `name is missing in to` —
+     * an empty name is worse than no name at all. Laravel's notification channel
+     * routes by bare email address (no display name), so every notification hit
+     * this until the key was omitted when there is nothing to put in it.
+     *
+     * @param  \Symfony\Component\Mime\Address[]  $addresses
+     * @return array<int, array{email: string, name?: string}>
+     */
+    private function addresses(array $addresses): array
+    {
+        return array_map(function ($addr) {
+            $entry = ['email' => $addr->getAddress()];
+
+            if ($addr->getName() !== '') {
+                $entry['name'] = $addr->getName();
+            }
+
+            return $entry;
+        }, $addresses);
     }
 
     public function __toString(): string
