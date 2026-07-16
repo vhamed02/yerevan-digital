@@ -204,6 +204,30 @@ Both are applied in `CreateOrderAction`, inside the order transaction. Order mat
 - **Storefront:** `useCheckoutTotals` + `CouponField` are shared by both checkout templates (`_shared` and `spark` — spark does *not* re-export `_shared`, so changes must land in both). Cart-side coupon/shipping figures are advisory; checkout re-resolves both server-side and that's what's charged.
 - **Public `coupons/preview` is throttled** (`throttle:coupon`) — an unauthenticated code lookup is a code-enumeration target.
 
+## Backups (added 2026-07-16)
+
+`scripts/backup.sh`, run nightly at 03:20 by the `vendora-backup.timer` systemd timer
+(install/reinstall with `scripts/install-backup-timer.sh`; the unit files are **not** in this
+repo). Logs to `/var/log/vendora/backup.log`, writes to `/var/backups/vendora`, keeps 7 days.
+
+Backs up only what can't be rebuilt: **MySQL** (`--single-transaction`, gzipped) and the
+**storage volume** (uploaded images). Meilisearch is a derived index — rebuild it with
+`scout:import` rather than restoring it. Redis is cache/queue. The script verifies the gzip and
+greps for mysqldump's `Dump completed` marker, because a truncated dump that looks like a
+backup is worse than none; it also refuses to run below 2 GB free (the box sits at ~80% full).
+
+**Restore:**
+```bash
+zcat /var/backups/vendora/mysql-YYYYmmdd-HHMMSS.sql.gz | \
+  docker compose -f docker-compose.yml -f docker-compose.prod.yml exec -T mysql \
+  sh -c 'mysql -u root -p"$MYSQL_ROOT_PASSWORD" "$MYSQL_DATABASE"'
+# then rebuild the search index:
+docker compose ... exec -T api php artisan scout:import "App\Models\Product"
+```
+Verified end-to-end on 2026-07-16 by restoring into a scratch database (37 tables, 38
+migrations). **Backups are local only** — a disk failure loses them with the site. Offsite copy
+is still an open decision.
+
 ## Custom domains & search (added 2026-07-15)
 
 - **Custom domains:** full design in [`docs/custom-domains.md`](docs/custom-domains.md). Short version: `proxy.ts` resolves the Host via `GET /domains/resolve` and rewrites `/` → `/store/{slug}`; a domain only routes once its TXT record is verified **and** the store is active. **TLS is the seller's own Cloudflare** — this box has no certs and no certbot, and nginx listens on :80 only. The host nginx catch-all that makes this work lives in `/etc/nginx/sites-available/vendora`, which is **not in this repo and not restored by a deploy** (backup: `/root/vendora.bak.*`).
