@@ -1,6 +1,6 @@
 # Yerevan Digital — Roadmap & Status
 
-**Last updated:** 2026-07-15 · **HEAD when written:** `1105a75`
+**Last updated:** 2026-07-16 · **HEAD when written:** `fc8d4d6`
 
 Companion to `CLAUDE.md` (which holds the how: deploy, architecture, pitfalls).
 This file holds the **what**: what is done, what is not, and what to pick up next.
@@ -13,7 +13,7 @@ Read `CLAUDE.md` first — it is loaded automatically and is not repeated here.
 | Fact | Value | How to re-check |
 |------|-------|-----------------|
 | Stores / products / orders | **0 / 0 / 0** — pre-launch, never had real traffic | `curl -s https://api.yerevan.digital/api/v1/stats` |
-| API tests | 384 passing | see `CLAUDE.md` → "Running tests" |
+| API tests | 429 passing | see `CLAUDE.md` → "Running tests" |
 | Web tests | 66 passing | `npm test` in a node container |
 | Business model | Free to launch, **per-sale commission** (default 5%) | `services/web/src/messages/en.json` → `pricing` |
 | Market | Armenia · AMD · trilingual hy/en/ru | — |
@@ -29,8 +29,8 @@ That window closes the moment real orders land.
 |-------|-------|--------|
 | **P0** | Scheduler + commission engine | ✅ **DONE** (2026-07-15) |
 | **P1** | Coupons + shipping zones + seller analytics | ✅ **DONE** (2026-07-15) |
-| **P2** | Cart recovery + self-serve upgrade + Telegram | ❌ **NOT STARTED** |
-| **P3** | Custom domains + CSV import + wallets + search | ❌ **NOT STARTED** |
+| **P2** | Cart recovery + self-serve upgrade + Telegram | ❌ **NOT STARTED** (deliberately skipped for now) |
+| **P3** | Custom domains + search + wishlist | ✅ **DONE** (2026-07-16) — except wallets (blocked) and CSV import (dropped) |
 
 ---
 
@@ -95,15 +95,23 @@ work, not the email.
 
 ---
 
-## ❌ P3 — Scale (NOT STARTED)
+## ✅ P3 — Scale (DONE, with two exclusions)
 
-| # | Feature | Current state | Impact | Effort |
-|---|---------|---------------|--------|--------|
-| 1 | **Custom domain mapping** | `stores.custom_domain` column **exists and is exposed in API resources**, but there is **no routing/middleware** — setting it does nothing. Strongest Business-tier justification. | Medium | L |
-| 2 | **CSV bulk product import** | Nothing exists. Removes onboarding friction for catalog migration. | Medium | M |
-| 3 | **Telcell / EasyPay wallets** | Only Idram + ConverseBank + Innecobank (`app/Services/PaymentGateway/Gateways/`). | Medium | M |
-| 4 | **Meilisearch product search** | No Scout/Meilisearch in `composer.json`. SQL `LIKE` handles Armenian text poorly. | Low-Med | M |
-| 5 | **Wishlist** | ⚠️ **Fake today** — `templates/spark/ProductCard.tsx` has a heart button wired to local `useState` only. It persists nothing. Either build it or remove the button. | Low | S |
+| Delivered | Where |
+|-----------|-------|
+| Custom domains (TXT verification, Host→store routing, seller UI) | `app/Services/DomainService.php`, `proxy.ts`, `/seller/domain` |
+| Meilisearch product search (hy/en/ru + SKU, SQL fallback) | `config/scout.php`, `ProductRepository::searchProductIds()` |
+| Real wishlist (per-account, login-gated) | `app/Models/WishlistItem.php`, `hooks/useWishlist.ts`, `/account/wishlist` |
+| Admin settings 422 fix | `UpdateSettingsRequest`, `SettingsAdminClient.tsx` |
+
+Design notes in `CLAUDE.md` → "Custom domains & search", and [`docs/custom-domains.md`](custom-domains.md).
+
+### Excluded from P3
+
+| # | Feature | Why not |
+|---|---------|---------|
+| 1 | **Telcell / EasyPay wallets** | 🔴 **Blocked — needs the client's merchant API docs.** No official public documentation exists for either (searches return unrelated companies: EasyPay Direct is US, easypay.ua is Ukrainian). A guessed protocol would look finished, pass self-written tests, and then fail or mis-verify real payments. The credential-collection plumbing already exists (`getRequiredFields()` + `Seller\PaymentController::configure`), so once the docs arrive this is a `PaymentGatewayInterface` implementation per gateway plus tests. Owner decision on 2026-07-15 was to defer. |
+| 2 | **CSV bulk product import** | Dropped by owner. |
 
 ---
 
@@ -111,9 +119,8 @@ work, not the email.
 
 | Issue | Severity | Detail |
 |-------|----------|--------|
-| **Admin settings page is broken** | 🟠 Real | `SettingsAdminClient.tsx` sends `api.patch('/admin/settings', fields)` but the API requires `{ settings: {...} }` → every save 422s. No test covered it. **A correct fix must decide how booleans (`registration_enabled`) and numbers (`smtp_port`) serialize**, since the API validates `settings.*` as `string`. Commission's rate editor sends the right shape and is unaffected. |
-| Spark wishlist does nothing | 🟡 Cosmetic | See P3 #5 — a control that lies to customers. |
 | Unauth API returns 500 without `Accept` | 🟢 Cosmetic | With `Accept: application/json` it correctly returns 401. Bare requests hit a missing `login` named route. Affects every admin endpoint equally; no real client sends no Accept. |
+| **Memory pressure** | 🟠 Watch | 3.8 GB box with **swap already ~1.5/2 GB used** before Meilisearch was added. `web` runs at ~114/128 MB. Meilisearch is capped at 192 MB with a 96 MB indexing budget. If things get unstable, this is the first place to look. |
 | Admin sidebar says "VENDORA" | 🟢 Cosmetic | `components/admin/AdminSidebar.tsx`. The 2026-07-14 rebrand was Vendorex → Yerevan Digital; unclear if this internal label was intentional. |
 | Seller payments page fetches `/seller/payment-gateways` | 🟡 Unverified | Routes define `/seller/payments/{available,configured}`. Possible pre-existing 404 — **not investigated**. |
 
@@ -151,7 +158,9 @@ Match it. Both phases shipped with:
 - Live smoke test after deploy (`scheduler` up, tables created, endpoints answering)
 
 ### Traps that already bit once
-- `scripts/deploy.sh` **enumerates services** to build/start. Add any new container to **both** lines or it silently never runs.
+- `scripts/deploy.sh` **enumerates services** to build/start. Add any new container to **both** lines or it silently never runs. (Cost the scheduler once; nearly cost Meilisearch too.)
+- **Never write a payment gateway without the provider's real API docs.** A guessed protocol looks complete and passes self-written tests.
+- `/etc/nginx/sites-enabled/` is `include`d wholesale — never leave a `.bak` there or nginx loads it as a duplicate config.
 - `Store` route key is **slug**, not id.
 - Both checkout templates (`_shared` and `spark`) need storefront changes — spark does not re-export `_shared`.
 - Laravel factory `create()` overrides beat state closures.
