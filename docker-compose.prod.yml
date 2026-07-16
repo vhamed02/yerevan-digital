@@ -87,6 +87,9 @@ services:
       --slow-query-log-file=/var/log/mysql/slow.log
       --long-query-time=1
       --max-connections=60
+      --performance-schema=OFF
+      --innodb-buffer-pool-size=64M
+      --innodb-buffer-pool-instances=1
     volumes:
       - mysql_data:/var/lib/mysql
     networks:
