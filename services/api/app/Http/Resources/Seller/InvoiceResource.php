@@ -12,6 +12,7 @@ class InvoiceResource extends JsonResource
     {
         return [
             'uuid'         => $this->uuid,
+            'number'       => 'INV-' . strtoupper(substr($this->uuid, 0, 8)),
             'status'       => $this->status->value,
             'amount'       => $this->amount,
             'currency'     => $this->currency,

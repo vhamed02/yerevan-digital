@@ -234,6 +234,7 @@ export type InvoiceStatus = 'pending' | 'paid' | 'void'
 export interface AdminInvoice {
   id: number
   uuid: string
+  number: string
   status: InvoiceStatus
   amount: string
   currency: string
@@ -449,6 +450,7 @@ export interface SellerCoupon {
 
 export interface SellerInvoice {
   uuid: string
+  number: string
   status: InvoiceStatus
   amount: string
   currency: string

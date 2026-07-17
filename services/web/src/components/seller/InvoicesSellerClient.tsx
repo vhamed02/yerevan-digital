@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
+import Link from 'next/link'
 import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 import { useQuery, useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
@@ -90,6 +91,7 @@ export default function InvoicesSellerClient({ initialInvoices }: InvoicesSeller
           <table className="w-full min-w-[640px] text-sm">
             <thead className="border-b border-border text-left text-content-muted">
               <tr>
+                <th className="px-4 py-3 font-medium">Invoice</th>
                 <th className="px-4 py-3 font-medium">Period</th>
                 <th className="px-4 py-3 font-medium">Amount</th>
                 <th className="px-4 py-3 font-medium">Status</th>
@@ -102,6 +104,11 @@ export default function InvoicesSellerClient({ initialInvoices }: InvoicesSeller
                 const status = statusOf(invoice.status)
                 return (
                   <tr key={invoice.uuid} className="border-b border-border last:border-0">
+                    <td className="px-4 py-3 font-mono font-semibold text-content-primary">
+                      <Link href={`/seller/invoices/${invoice.uuid}`} className="text-brand-500 hover:underline">
+                        {invoice.number}
+                      </Link>
+                    </td>
                     <td className="px-4 py-3 tabular-nums text-content-primary">
                       {invoice.period_start} &ndash; {invoice.period_end}
                     </td>

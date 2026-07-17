@@ -50,9 +50,11 @@ export default function SellerLayoutClient({ children, categories }: SellerLayou
 
   return (
     <>
-      <SellerTopNav onMenuClick={() => setMobileOpen(true)} />
-      <SellerMobileNav open={mobileOpen} onClose={() => setMobileOpen(false)} />
-      <div className="min-h-screen bg-surface-secondary pt-16">
+      <div className="print:hidden">
+        <SellerTopNav onMenuClick={() => setMobileOpen(true)} />
+        <SellerMobileNav open={mobileOpen} onClose={() => setMobileOpen(false)} />
+      </div>
+      <div className="min-h-screen bg-surface-secondary pt-16 print:bg-white print:pt-0">
         {children}
       </div>
     </>
