@@ -4,6 +4,7 @@
 **Owner:** Vendora
 **Last updated:** 2026-06-01
 
+
 A standalone **Go** service that powers the super-admin reporting surface: a fast, drill-down
 view of every store, product, seller, order, and revenue figure on the platform, plus
 large streaming exports and global search.
