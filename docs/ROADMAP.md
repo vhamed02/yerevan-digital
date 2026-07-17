@@ -115,6 +115,23 @@ Design notes in `CLAUDE.md` → "Custom domains & search", and [`docs/custom-dom
 
 ---
 
+## ✅ Weekly commission billing (DONE, 2026-07-17)
+
+Not part of P0–P3 — a follow-up once Telcell shipped. The commission engine (P0) only
+*accrues* a ledger balance; nothing turned it into money the platform actually collects.
+
+| Delivered | Where |
+|-----------|-------|
+| Period-based `commission_invoices` table (ledger stays append-only) | `database/migrations/2026_07_17_000001_*` |
+| Weekly generation command + schedule (Mondays 08:00) | `app/Console/Commands/SendCommissionInvoices.php`, `routes/console.php` |
+| Seller email + Pay button | `CommissionInvoiceNotification`, `/seller/invoices` |
+| Online collection via the **platform's own** Telcell merchant account (reuses `TelcellGateway`) | `config/telcell.php`, `Seller/CommissionInvoiceController::pay`, `InvoicePaymentController::callback` |
+| Admin oversight (list, summary, void) | `/admin/invoices` |
+
+Design notes in `CLAUDE.md` → "Commission billing".
+
+---
+
 ## Known open issues (not in any phase)
 
 | Issue | Severity | Detail |

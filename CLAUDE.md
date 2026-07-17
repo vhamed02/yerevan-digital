@@ -235,6 +235,46 @@ is still an open decision.
 - **`required_fields` format:** the seller config UI (`GatewayConfigModal`) and `configure()`'s validation both read the **DB column**, which must be `[{key, label_hy, label_en}]` (Telcell does this). Idram's seeder row uses a flat `['account_id', ...]` array — that's the legacy/broken shape; don't copy it.
 - **Telcell (WEB invoice flow):** live `initiate()` returns `redirectUrl = https://telcellmoney.am/invoices` plus `rawResponse` form fields; the frontend `redirectToGateway()` (`lib/payment.ts`) **POSTs** them (a plain GET redirect won't work — this also fixed Idram live mode). Request sig: `md5(shop_key + issuer + '֏' + price + product + issuer_id + valid_days)`; `product`/`issuer_id` are base64. Callback sig: `md5(shop_key + invoice + issuer_id + payment_id + currency + sum + time + status)`; `status` is `PAID`/`REJECTED`. Amounts are **whole AMD** (no minor unit). Callback acks with plain-text `OK` 200; a bad signature → 400, a correctly-signed `REJECTED` → 200 (don't make Telcell retry a real rejection). Credentials: `issuer` (shop email), `shop_key` (secret), `valid_days`. **Callback URL is configured in the Telcell merchant panel**, not passed per-invoice.
 
+## Commission billing (added 2026-07-17)
+
+Telcell payments land directly in each seller's own wallet, so the platform never withholds
+its cut at sale time — `commissions` only *accrues* a signed ledger row. This feature turns
+that ledger balance into money the platform actually collects, weekly.
+
+- **Why a separate table:** the `commissions` ledger is append-only and has no
+  paid/settled column (see "Commission engine" above) — billing state lives on a new
+  **period-based** `commission_invoices` table instead of a flag on the ledger.
+  `unique(store_id, period_start)` is the idempotency guard: re-running a period for a store
+  that already has an invoice creates nothing and sends nothing.
+- **Generation:** `CommissionInvoiceService::generateForPeriod()` sums each store's signed
+  `commissions.amount` over `[period_start, period_end)` via `Money` (never SQL `SUM` — see
+  "Money maths" above) and snapshots the net as a `commission_invoices` row when it's `> 0`.
+  A net `<= 0` (e.g. reversals outweigh accruals) creates nothing.
+- **Schedule:** `invoices:commission` runs Mondays 08:00 (`routes/console.php`, picked up by
+  the `scheduler` container automatically) and bills the **previous complete ISO week**.
+  `--period-start=YYYY-MM-DD` overrides the window for backfill; `--store=<slug>` limits
+  generation/mail to one store; `--dry-run` computes and prints without persisting or
+  emailing (it runs the real path inside a transaction and rolls it back).
+- **Email:** `CommissionInvoiceNotification` (queued on `emails`) links to `/seller/invoices`
+  — no PDF, matching the rest of the notification system.
+- **Collection is online, via the platform's own Telcell merchant account** — money flows
+  seller → platform, the reverse direction from checkout. Credentials come from
+  `config/telcell.php` (`TELCELL_PLATFORM_ISSUER` / `_SHOP_KEY` / `_VALID_DAYS`), **not** from
+  a store's `store_payment_gateways` row. Empty credentials fall back to the shared internal
+  sandbox flow automatically (same `TelcellGateway` behavior as checkout).
+- **Seller pay flow:** `Seller\CommissionInvoiceController::pay()` builds a `PaymentRequest`
+  from the invoice and calls the existing `TelcellGateway` — reused as-is, no new gateway
+  code. Only a `pending` invoice is payable (`InvoiceStatus::allowedTransitions()`:
+  `pending → [paid, void]`).
+- **Callback:** `POST /api/v1/invoices/callback/telcell` (public, outside any auth group) →
+  `InvoicePaymentController::callback`, structured exactly like `Store\PaymentController`'s
+  Telcell branch — plain-text `OK` 200 on success or idempotent replay, `Invalid checksum` 400
+  on a bad signature, `OK` 200 on a correctly-signed rejection.
+- **Admin oversight:** `GET /admin/invoices`, `GET /admin/invoices/summary`,
+  `POST /admin/invoices/{uuid}/void` (guards `pending` only).
+- **Purge ordering:** `PurgeDemoData` deletes `commission_invoices` before `stores` — the FK
+  is `restrictOnDelete`, same reason `commissions` is deleted before `orders`.
+
 ## Custom domains & search (added 2026-07-15)
 
 - **Custom domains:** full design in [`docs/custom-domains.md`](docs/custom-domains.md). Short version: `proxy.ts` resolves the Host via `GET /domains/resolve` and rewrites `/` → `/store/{slug}`; a domain only routes once its TXT record is verified **and** the store is active. **TLS is the seller's own Cloudflare** — this box has no certs and no certbot, and nginx listens on :80 only. The host nginx catch-all that makes this work lives in `/etc/nginx/sites-available/vendora`, which is **not in this repo and not restored by a deploy** (backup: `/root/vendora.bak.*`).

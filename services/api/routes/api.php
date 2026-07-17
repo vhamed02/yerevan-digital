@@ -8,6 +8,7 @@ use App\Http\Controllers\Store;
 use App\Http\Controllers\Customer;
 use App\Http\Controllers\OrderTrackingController;
 use App\Http\Controllers\HealthController;
+use App\Http\Controllers\InvoicePaymentController;
 use App\Http\Controllers\CaptchaController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DomainController;
@@ -89,6 +90,10 @@ Route::prefix('v1')->middleware('throttle:api')->group(function () {
 
         Route::get('commissions', [Admin\CommissionController::class, 'index']);
         Route::get('commissions/summary', [Admin\CommissionController::class, 'summary']);
+
+        Route::get('invoices', [Admin\CommissionInvoiceController::class, 'index']);
+        Route::get('invoices/summary', [Admin\CommissionInvoiceController::class, 'summary']);
+        Route::post('invoices/{uuid}/void', [Admin\CommissionInvoiceController::class, 'void']);
 
         Route::get('stores', [Admin\StoreController::class, 'index']);
         Route::post('stores', [Admin\StoreController::class, 'store']);
@@ -205,9 +210,14 @@ Route::prefix('v1')->middleware('throttle:api')->group(function () {
         Route::get('payments/configured', [Seller\PaymentController::class, 'configured']);
         Route::post('payments/configure', [Seller\PaymentController::class, 'configure']);
         Route::patch('payments/{gatewayId}/toggle', [Seller\PaymentController::class, 'toggle']);
+
+        Route::get('invoices', [Seller\CommissionInvoiceController::class, 'index']);
+        Route::get('invoices/{uuid}', [Seller\CommissionInvoiceController::class, 'show']);
+        Route::post('invoices/{uuid}/pay', [Seller\CommissionInvoiceController::class, 'pay']);
     });
 
     Route::post('store/payments/sandbox/complete', [Store\PaymentController::class, 'sandboxComplete']);
+    Route::post('invoices/callback/telcell', [InvoicePaymentController::class, 'callback']);
 
     Route::prefix('store')->middleware(ResolveStore::class)->group(function () {
         Route::get('{slug}/info', [Store\StoreController::class, 'info']);

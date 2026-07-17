@@ -20,6 +20,7 @@ import {
   Newspaper,
   MessageCircle,
   Coins,
+  Receipt,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import useAuthStore from '@/stores/auth.store'
@@ -35,6 +36,7 @@ const navItems = [
   { href: '/admin/templates', label: 'Templates', icon: Palette },
   { href: '/admin/payments', label: 'Payments', icon: CreditCard },
   { href: '/admin/commissions', label: 'Commissions', icon: Coins },
+  { href: '/admin/invoices', label: 'Invoices', icon: Receipt },
   { href: '/admin/pages', label: 'Pages', icon: FileText },
   { href: '/admin/blog', label: 'Blog', icon: Newspaper },
   { href: '/admin/reviews', label: 'Reviews', icon: MessageSquare },

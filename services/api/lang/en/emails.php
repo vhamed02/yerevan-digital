@@ -89,4 +89,13 @@ return [
         'subject' => 'Orders Export — :store',
         'line'    => 'Please find your orders export attached as a CSV file.',
     ],
+
+    'commission_invoice' => [
+        'subject'      => 'Your weekly commission invoice',
+        'heading'      => 'You have a new commission invoice',
+        'line'         => 'Here is a summary of the platform commission owed for last week\'s sales. Please pay online to settle your balance.',
+        'amount_label' => 'Amount due',
+        'period_label' => 'Billing period',
+        'pay_button'   => 'Pay Now',
+    ],
 ];

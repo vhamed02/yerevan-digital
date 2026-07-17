@@ -229,6 +229,28 @@ export interface AdminCommissionSummary {
   default_rate: string
 }
 
+export type InvoiceStatus = 'pending' | 'paid' | 'void'
+
+export interface AdminInvoice {
+  id: number
+  uuid: string
+  status: InvoiceStatus
+  amount: string
+  currency: string
+  period_start: string
+  period_end: string
+  paid_at?: string | null
+  payment_reference?: string | null
+  created_at: string
+  store?: { id: number; name: MultiLang; slug: string }
+}
+
+export interface AdminInvoiceSummary {
+  outstanding: string
+  paid: string
+  currency: string
+}
+
 export interface AdminStore {
   id: number
   name: MultiLang
@@ -422,6 +444,18 @@ export interface SellerCoupon {
   is_active: boolean
   is_expired: boolean
   is_exhausted: boolean
+  created_at: string
+}
+
+export interface SellerInvoice {
+  uuid: string
+  status: InvoiceStatus
+  amount: string
+  currency: string
+  period_start: string
+  period_end: string
+  paid_at?: string | null
+  is_payable: boolean
   created_at: string
 }
 
