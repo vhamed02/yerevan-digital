@@ -68,9 +68,10 @@ export default function InvoiceDetailClient({ invoice, store }: InvoiceDetailCli
 
       {/* On screen this matches the rest of the seller dashboard (rounded card,
           theme colors, Badge). On print it becomes a plain black-on-white paper
-          document with 1px borders — colors and backgrounds aren't reliable once
-          printed, borders and text are. */}
-      <div className="rounded-xl border border-border bg-surface p-6 text-content-primary sm:p-8 print:rounded-none print:border-black print:bg-white print:p-0 print:text-black">
+          document — no outer border (only the line-item table is bordered) — and
+          everything is scaled down 30% via zoom, since @page margins alone leave
+          the content too large on the printed page. */}
+      <div className="rounded-xl border border-border bg-surface p-6 text-content-primary sm:p-8 print:rounded-none print:border-0 print:bg-white print:p-0 print:text-black print:[zoom:70%]">
         <div className="flex items-start justify-between gap-6 border-b border-border pb-6 print:border-black">
           <div>
             <p className="font-heading text-xl font-bold text-content-primary print:text-black">Yerevan Digital</p>
