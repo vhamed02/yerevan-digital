@@ -98,7 +98,7 @@ export default function InvoiceDetailClient({ invoice, store }: InvoiceDetailCli
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-8 py-6 print:gap-4 print:py-4">
+        <div className="grid grid-cols-2 gap-8 py-6 print:grid-cols-1 print:gap-2 print:py-4">
           <div>
             <p className="text-xs font-semibold uppercase tracking-wider text-content-muted print:text-[8px] print:text-black">
               Bill To
@@ -116,25 +116,25 @@ export default function InvoiceDetailClient({ invoice, store }: InvoiceDetailCli
               <p className="text-sm text-content-secondary print:text-[10px] print:text-black">{store.address}</p>
             )}
           </div>
-          <table className="ml-auto w-fit text-sm text-content-primary print:text-[10px] print:text-black">
+          <table className="ml-auto w-fit text-sm text-content-primary print:ml-0 print:w-full print:text-[10px] print:text-black">
             <tbody>
               <tr>
-                <td className="py-0.5 pr-6 align-top text-xs font-semibold uppercase tracking-wider text-content-muted print:py-0 print:pr-4 print:text-[8px] print:text-black">
+                <td className="py-0.5 pr-6 align-top text-xs font-semibold uppercase tracking-wider text-content-muted print:whitespace-nowrap print:py-0 print:pr-4 print:text-[8px] print:text-black">
                   Invoice date
                 </td>
                 <td className="py-0.5 print:py-0">{formatDate(invoice.created_at)}</td>
               </tr>
               <tr>
-                <td className="py-0.5 pr-6 align-top text-xs font-semibold uppercase tracking-wider text-content-muted print:py-0 print:pr-4 print:text-[8px] print:text-black">
+                <td className="py-0.5 pr-6 align-top text-xs font-semibold uppercase tracking-wider text-content-muted print:whitespace-nowrap print:py-0 print:pr-4 print:text-[8px] print:text-black">
                   Billing period
                 </td>
-                <td className="py-0.5 print:py-0">
+                <td className="py-0.5 print:whitespace-nowrap print:py-0">
                   {invoice.period_start} &ndash; {invoice.period_end}
                 </td>
               </tr>
               {invoice.paid_at && (
                 <tr>
-                  <td className="py-0.5 pr-6 align-top text-xs font-semibold uppercase tracking-wider text-content-muted print:py-0 print:pr-4 print:text-[8px] print:text-black">
+                  <td className="py-0.5 pr-6 align-top text-xs font-semibold uppercase tracking-wider text-content-muted print:whitespace-nowrap print:py-0 print:pr-4 print:text-[8px] print:text-black">
                     Paid on
                   </td>
                   <td className="py-0.5 print:py-0">{formatDate(invoice.paid_at)}</td>
@@ -166,7 +166,7 @@ export default function InvoiceDetailClient({ invoice, store }: InvoiceDetailCli
               <td className="px-3 py-3 align-top text-content-primary print:border print:border-black print:px-2 print:py-2 print:text-black">
                 {invoice.period_start} &ndash; {invoice.period_end}
               </td>
-              <td className="px-3 py-3 text-right align-top print:border print:border-black print:px-2 print:py-2">
+              <td className="px-3 py-3 text-right align-top print:whitespace-nowrap print:border print:border-black print:px-2 print:py-2">
                 <CurrencyDisplay amount={Number(invoice.amount)} className="text-content-primary print:text-black" />
               </td>
             </tr>
@@ -174,12 +174,12 @@ export default function InvoiceDetailClient({ invoice, store }: InvoiceDetailCli
           <tfoot>
             <tr className="border-t border-border font-semibold print:border-black">
               <td
-                className="px-3 py-3 text-right text-content-primary print:border print:border-black print:px-2 print:py-2 print:text-black"
+                className="px-3 py-3 text-right text-content-primary print:whitespace-nowrap print:border print:border-black print:px-2 print:py-2 print:text-black"
                 colSpan={2}
               >
                 Total due
               </td>
-              <td className="px-3 py-3 text-right print:border print:border-black print:px-2 print:py-2">
+              <td className="px-3 py-3 text-right print:whitespace-nowrap print:border print:border-black print:px-2 print:py-2">
                 <CurrencyDisplay
                   amount={Number(invoice.amount)}
                   className="text-base font-bold text-content-primary print:text-[11px] print:text-black"
