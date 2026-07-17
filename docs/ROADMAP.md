@@ -110,7 +110,7 @@ Design notes in `CLAUDE.md` → "Custom domains & search", and [`docs/custom-dom
 
 | # | Feature | Why not |
 |---|---------|---------|
-| 1 | **Telcell / EasyPay wallets** | 🔴 **Blocked — needs the client's merchant API docs.** No official public documentation exists for either (searches return unrelated companies: EasyPay Direct is US, easypay.ua is Ukrainian). A guessed protocol would look finished, pass self-written tests, and then fail or mis-verify real payments. The credential-collection plumbing already exists (`getRequiredFields()` + `Seller\PaymentController::configure`), so once the docs arrive this is a `PaymentGatewayInterface` implementation per gateway plus tests. Owner decision on 2026-07-15 was to defer. |
+| 1 | **Telcell wallet** | ✅ **DONE (2026-07-17)** — docs arrived at `developer.telcell.am`. Implemented as `TelcellGateway` (WEB invoice flow: browser POSTs to `telcellmoney.am/invoices`, Telcell POSTs a signed PAID/REJECTED callback). Registered + seeded active, storefront + checkout wired, 26 tests. See the Telcell section in `CLAUDE.md`. **EasyPay is still blocked** — no public docs for it. |
 | 2 | **CSV bulk product import** | Dropped by owner. |
 
 ---

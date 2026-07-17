@@ -12,6 +12,7 @@ import { useStoreCart } from '@/stores/cart.store'
 import { useCheckoutTotals } from '@/hooks/useCheckoutTotals'
 import { CouponField } from '@/components/store/CouponField'
 import api from '@/lib/api'
+import { redirectToGateway } from '@/lib/payment'
 import { pickLang } from '@/lib/i18n'
 import type { CheckoutFormProps } from '../types'
 
@@ -122,10 +123,10 @@ export function CheckoutForm({ storeSlug, store }: CheckoutFormProps) {
         items: items.map((i) => ({ product_id: i.productId, variant_id: i.variantId ?? null, quantity: i.quantity })),
       })
       const uuid = orderRes.data.uuid
-      const payRes = await api.post<{ redirect_url: string }>(`/store/${storeSlug}/payments/initiate`, {
+      const payRes = await api.post<{ redirect_url: string; form_params?: Record<string, string> | null }>(`/store/${storeSlug}/payments/initiate`, {
         order_uuid: uuid, payment_method: data.payment_method,
       })
-      window.location.href = payRes.data.redirect_url
+      redirectToGateway(payRes.data.redirect_url, payRes.data.form_params)
     } catch (err: unknown) {
       const axiosErr = err as { response?: { data?: { message?: string; errors?: Record<string, string[]> } } }
       const fieldErrors = axiosErr.response?.data?.errors

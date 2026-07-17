@@ -103,6 +103,11 @@ class IdramGateway implements PaymentGatewayInterface
         );
     }
 
+    public function extractOrderReference(array $callbackData): ?string
+    {
+        return $callbackData['EDP_BILL_NO'] ?? null;
+    }
+
     public function refund(string $transactionId, float $amount): PaymentRefundResponse
     {
         return new PaymentRefundResponse(

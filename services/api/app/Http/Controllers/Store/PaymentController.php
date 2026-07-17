@@ -109,7 +109,8 @@ class PaymentController extends Controller
             return $this->error('Unknown payment gateway.', 404);
         }
 
-        $orderUuid = $callbackData['EDP_BILL_NO'] ?? null;
+        $gatewayInstance = $this->registry->get($gateway);
+        $orderUuid       = $gatewayInstance->extractOrderReference($callbackData);
 
         if (!$orderUuid) {
             return $this->error('Missing order reference.', 422);
@@ -126,7 +127,7 @@ class PaymentController extends Controller
                 ->exists();
 
             if ($alreadyPaid) {
-                if ($gateway === 'idram') {
+                if (in_array($gateway, ['idram', 'telcell'], true)) {
                     return response('OK', 200)->header('Content-Type', 'text/plain');
                 }
                 return $this->success(null, 'Payment already processed.');
@@ -141,8 +142,7 @@ class PaymentController extends Controller
 
         $credentials = $storeGateway?->credentials ?? [];
 
-        $gatewayInstance = $this->registry->get($gateway);
-        $verifyResponse  = $gatewayInstance->verify($callbackData, $credentials);
+        $verifyResponse = $gatewayInstance->verify($callbackData, $credentials);
 
         $transaction->update([
             'status'                  => $verifyResponse->success ? TransactionStatus::Success : TransactionStatus::Failed,
@@ -158,6 +158,16 @@ class PaymentController extends Controller
         if ($gateway === 'idram') {
             if (!$verifyResponse->success) {
                 return response('FAIL', 400)->header('Content-Type', 'text/plain');
+            }
+            return response('OK', 200)->header('Content-Type', 'text/plain');
+        }
+
+        if ($gateway === 'telcell') {
+            // Only an untrusted request (bad signature) is rejected. A correctly
+            // signed REJECTED is a legitimate notification — acknowledge it so
+            // Telcell does not keep retrying.
+            if (!$verifyResponse->success && $verifyResponse->status === 'failed') {
+                return response('Invalid checksum', 400)->header('Content-Type', 'text/plain');
             }
             return response('OK', 200)->header('Content-Type', 'text/plain');
         }

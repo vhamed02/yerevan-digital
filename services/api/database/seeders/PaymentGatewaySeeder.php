@@ -21,6 +21,20 @@ class PaymentGatewaySeeder extends Seeder
                 'sort_order'           => 1,
             ],
             [
+                'name'                 => 'telcell',
+                'display_name'         => ['hy' => 'Telcell', 'en' => 'Telcell', 'ru' => 'Telcell'],
+                'description'          => ['hy' => 'Վճարում Telcell Wallet-ով', 'en' => 'Pay with Telcell Wallet', 'ru' => 'Оплата через Telcell Wallet'],
+                'instructions'         => ['hy' => 'Կհղվեք Telcell-ի վճարային էջ:', 'en' => 'You will be redirected to Telcell to complete payment.', 'ru' => 'Вы будете перенаправлены на страницу оплаты Telcell.'],
+                'is_active'            => true,
+                'is_sandbox_available' => true,
+                'required_fields'      => [
+                    ['key' => 'issuer',     'label_hy' => 'Խանութի էլ. հասցե',        'label_en' => 'Shop email (issuer)'],
+                    ['key' => 'shop_key',   'label_hy' => 'Գաղտնի բանալի (shop key)', 'label_en' => 'Shop key'],
+                    ['key' => 'valid_days', 'label_hy' => 'Վավերականությունը (օր)',    'label_en' => 'Invoice validity (days)'],
+                ],
+                'sort_order'           => 2,
+            ],
+            [
                 'name'                 => 'ineco',
                 'display_name'         => ['hy' => 'Ինեկոբանկ', 'en' => 'Inecobank'],
                 'description'          => ['hy' => 'Վճարում Ինեկոբանկի քարտով', 'en' => 'Pay with Inecobank card'],
@@ -28,7 +42,7 @@ class PaymentGatewaySeeder extends Seeder
                 'is_active'            => false,
                 'is_sandbox_available' => true,
                 'required_fields'      => ['merchant_id', 'merchant_password', 'merchant_name'],
-                'sort_order'           => 2,
+                'sort_order'           => 3,
             ],
             [
                 'name'                 => 'converse',
@@ -38,7 +52,7 @@ class PaymentGatewaySeeder extends Seeder
                 'is_active'            => false,
                 'is_sandbox_available' => true,
                 'required_fields'      => ['username', 'password'],
-                'sort_order'           => 3,
+                'sort_order'           => 4,
             ],
         ];
 

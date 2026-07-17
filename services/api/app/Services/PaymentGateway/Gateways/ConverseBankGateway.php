@@ -37,6 +37,11 @@ class ConverseBankGateway implements PaymentGatewayInterface
         );
     }
 
+    public function extractOrderReference(array $callbackData): ?string
+    {
+        return null;
+    }
+
     public function refund(string $transactionId, float $amount): PaymentRefundResponse
     {
         throw new RuntimeException('Not implemented');
