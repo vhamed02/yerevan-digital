@@ -6,8 +6,8 @@ import (
 
 	"golang.org/x/sync/errgroup"
 
-	"github.com/vendorex/admin-reports/internal/multilang"
-	"github.com/vendorex/admin-reports/internal/store"
+	"github.com/yerevan-digital/admin-reports/internal/multilang"
+	"github.com/yerevan-digital/admin-reports/internal/store"
 )
 
 type Service struct {

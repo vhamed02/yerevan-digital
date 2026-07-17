@@ -1,6 +1,6 @@
 # admin-reports
 
-A standalone, **read-only** Go service that powers the Vendora super-admin reporting surface
+A standalone, **read-only** Go service that powers the Yerevan Digital super-admin reporting surface
 (stores, products, sellers, orders, revenue, search, exports). It is the **query side** of a
 CQRS split — the Laravel monolith keeps all writes.
 

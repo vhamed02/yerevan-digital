@@ -98,7 +98,7 @@ function buildCartStore(storeSlug: string) {
           get().items.reduce((sum, i) => sum + i.quantity, 0),
       }),
       {
-        name: `vendora_cart_${storeSlug}`,
+        name: `yerevan_digital_cart_${storeSlug}`,
         storage: createJSONStorage(() => safeStorage),
       }
     )

@@ -57,7 +57,7 @@ return [
     'frontend_url' => env('FRONTEND_URL', env('APP_URL', 'http://localhost')),
 
     'sandbox_mode'  => env('SANDBOX_MODE', false),
-    'contact_email' => env('CONTACT_EMAIL', 'support@vendora.am'),
+    'contact_email' => env('CONTACT_EMAIL', 'support@yerevan.digital'),
 
     /*
     |--------------------------------------------------------------------------

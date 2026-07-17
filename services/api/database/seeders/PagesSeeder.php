@@ -27,8 +27,8 @@ class PagesSeeder extends Seeder
                 'slug'    => 'contact',
                 'title'   => ['hy' => 'Կապ', 'en' => 'Contact Us'],
                 'content' => [
-                    'hy' => "Կապ մեզ հետ:\n\nԷլ. փոստ: support@vendora.am\n\nԱշխատանքային ժամեր: Երկուշաբթի — Ուրբաթ, 10:00 — 18:00 (UTC+4)\n\nՄենք պատրաստ ենք օգնել Ձեզ Ձեր առցանց խանութի ցանկացած հարցով: Ուղարկեք նամակ և մենք կպատասխանենք 24 ժամվա ընթացքում:",
-                    'en' => "Get in touch with us:\n\nEmail: support@vendora.am\n\nWorking hours: Monday — Friday, 10:00 — 18:00 (UTC+4)\n\nWe are ready to help you with any questions about your online store. Send us an email and we will respond within 24 hours.",
+                    'hy' => "Կապ մեզ հետ:\n\nԷլ. փոստ: support@yerevan.digital\n\nԱշխատանքային ժամեր: Երկուշաբթի — Ուրբաթ, 10:00 — 18:00 (UTC+4)\n\nՄենք պատրաստ ենք օգնել Ձեզ Ձեր առցանց խանութի ցանկացած հարցով: Ուղարկեք նամակ և մենք կպատասխանենք 24 ժամվա ընթացքում:",
+                    'en' => "Get in touch with us:\n\nEmail: support@yerevan.digital\n\nWorking hours: Monday — Friday, 10:00 — 18:00 (UTC+4)\n\nWe are ready to help you with any questions about your online store. Send us an email and we will respond within 24 hours.",
                 ],
                 'meta_title'       => ['hy' => 'Կապ — Yerevan Digital', 'en' => 'Contact Us — Yerevan Digital'],
                 'meta_description' => [
@@ -53,8 +53,8 @@ class PagesSeeder extends Seeder
                 'slug'    => 'privacy',
                 'title'   => ['hy' => 'Գաղտնիության Քաղաքականություն', 'en' => 'Privacy Policy'],
                 'content' => [
-                    'hy' => "Գաղտնիության Քաղաքականություն\n\nYerevan Digital-ն պատասխանատու կերպով վերաբերվում է Ձեր անձնական տվյալներին:\n\n1. Հավաքվող Տվյալներ\nՄենք հավաքում ենք անուն, էլ. փոստ, հեռախոս և վճարման տեղեկություններ:\n\n2. Տվյալների Օգտագործում\nՏվյալները օգտագործվում են ծառայությունների բարելավման, վճարումների մշակման և աջակցության համար:\n\n3. Տվյալների Անվտանգություն\nՄենք օգտագործում ենք SSL գաղտնագրում բոլոր հաղորդակցությունների համար:\n\n4. Կապ\nԳաղտնիության հարցերով դիմեք՝ privacy@vendora.am:",
-                    'en' => "Privacy Policy\n\nYerevan Digital handles your personal data responsibly.\n\n1. Data We Collect\nWe collect name, email, phone number, and payment information.\n\n2. How We Use Data\nData is used to improve services, process payments, and provide support.\n\n3. Data Security\nWe use SSL encryption for all communications.\n\n4. Contact\nFor privacy questions, contact: privacy@vendora.am",
+                    'hy' => "Գաղտնիության Քաղաքականություն\n\nYerevan Digital-ն պատասխանատու կերպով վերաբերվում է Ձեր անձնական տվյալներին:\n\n1. Հավաքվող Տվյալներ\nՄենք հավաքում ենք անուն, էլ. փոստ, հեռախոս և վճարման տեղեկություններ:\n\n2. Տվյալների Օգտագործում\nՏվյալները օգտագործվում են ծառայությունների բարելավման, վճարումների մշակման և աջակցության համար:\n\n3. Տվյալների Անվտանգություն\nՄենք օգտագործում ենք SSL գաղտնագրում բոլոր հաղորդակցությունների համար:\n\n4. Կապ\nԳաղտնիության հարցերով դիմեք՝ privacy@yerevan.digital:",
+                    'en' => "Privacy Policy\n\nYerevan Digital handles your personal data responsibly.\n\n1. Data We Collect\nWe collect name, email, phone number, and payment information.\n\n2. How We Use Data\nData is used to improve services, process payments, and provide support.\n\n3. Data Security\nWe use SSL encryption for all communications.\n\n4. Contact\nFor privacy questions, contact: privacy@yerevan.digital",
                 ],
                 'meta_title'       => ['hy' => 'Գաղտնիության Քաղաքականություն — Yerevan Digital', 'en' => 'Privacy Policy — Yerevan Digital'],
                 'meta_description' => [

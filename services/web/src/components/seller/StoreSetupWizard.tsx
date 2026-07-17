@@ -180,7 +180,7 @@ export default function StoreSetupWizard({ categories }: StoreSetupWizardProps) 
               <div>
                 <Input
                   label="Store URL"
-                  prefix={<span className="text-xs">vendora.am/store/</span>}
+                  prefix={<span className="text-xs">yerevan.digital/store/</span>}
                   {...register('slug')}
                   error={errors.slug?.message}
                   helperText={

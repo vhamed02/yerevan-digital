@@ -51,7 +51,7 @@ export default function Footer() {
             <p className="text-xs font-semibold uppercase tracking-wider text-content-muted">{t('social_label')}</p>
             <div className="flex flex-col gap-2">
               <a
-                href="https://instagram.com/vendora.am"
+                href="https://instagram.com/yerevan.digital"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 text-sm text-content-secondary hover:text-content-primary transition-colors"
@@ -60,7 +60,7 @@ export default function Footer() {
                 Instagram
               </a>
               <a
-                href="https://facebook.com/vendora.am"
+                href="https://facebook.com/yerevan.digital"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 text-sm text-content-secondary hover:text-content-primary transition-colors"

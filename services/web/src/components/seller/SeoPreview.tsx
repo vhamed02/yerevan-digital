@@ -6,7 +6,7 @@ interface SeoPreviewProps {
 }
 
 export default function SeoPreview({ slug, storeSlug, title, description }: SeoPreviewProps) {
-  const url = `vendora.am › store › ${storeSlug ?? 'your-store'} › products › ${slug ?? 'product-slug'}`
+  const url = `yerevan.digital › store › ${storeSlug ?? 'your-store'} › products › ${slug ?? 'product-slug'}`
   const displayTitle = title || 'Product Title'
   const displayDesc = description
     ? description.slice(0, 160)

@@ -8,8 +8,8 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
-	"github.com/vendorex/admin-reports/internal/report"
-	"github.com/vendorex/admin-reports/internal/store"
+	"github.com/yerevan-digital/admin-reports/internal/report"
+	"github.com/yerevan-digital/admin-reports/internal/store"
 )
 
 func NewRouter(s *store.Store, logger *slog.Logger) http.Handler {

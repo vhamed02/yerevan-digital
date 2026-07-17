@@ -30,14 +30,14 @@ const useAuthStore = create<AuthState>()(
       setHasHydrated: (v) => set({ _hasHydrated: v }),
 
       login: ({ user, token, store }) => {
-        Cookies.set('vendora_token', token, { expires: 30 })
-        Cookies.set('vendora_role', user.role, { expires: 30 })
+        Cookies.set('yerevan_digital_token', token, { expires: 30 })
+        Cookies.set('yerevan_digital_role', user.role, { expires: 30 })
         set({ user, token, sellerStore: store ?? null, isAuthenticated: true })
       },
 
       logout: () => {
-        Cookies.remove('vendora_token')
-        Cookies.remove('vendora_role')
+        Cookies.remove('yerevan_digital_token')
+        Cookies.remove('yerevan_digital_role')
         set({ user: null, token: null, sellerStore: null, isAuthenticated: false })
       },
 
@@ -50,7 +50,7 @@ const useAuthStore = create<AuthState>()(
         })),
     }),
     {
-      name: 'vendora-auth',
+      name: 'yerevan-digital-auth',
       partialize: (state) => ({ user: state.user, token: state.token, sellerStore: state.sellerStore, isAuthenticated: state.isAuthenticated }),
       onRehydrateStorage: () => (state) => {
         state?.setHasHydrated(true)

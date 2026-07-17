@@ -281,7 +281,7 @@ export default function CreateStoreClient() {
                 errors.slug ? 'border-status-error' : 'border-border focus-within:border-brand-500'
               )}>
                 <span className="border-r border-border bg-surface-secondary px-3 py-2.5 text-xs text-content-muted shrink-0">
-                  vendora.am/store/
+                  yerevan.digital/store/
                 </span>
                 <input
                   type="text"

@@ -24,7 +24,7 @@ services:
       web:
         condition: service_started
     networks:
-      - vendora-frontend
+      - yerevan-digital-frontend
     restart: unless-stopped
     mem_limit: 96m
     mem_reservation: 24m
@@ -39,8 +39,8 @@ services:
     mem_reservation: 96m
     memswap_limit: 256m
     networks:
-      - vendora-backend
-      - vendora-frontend
+      - yerevan-digital-backend
+      - yerevan-digital-frontend
     depends_on:
       mysql:
         condition: service_healthy
@@ -67,7 +67,7 @@ services:
       SERVER_API_URL: http://nginx:8080
     command: ["node", "server.js"]
     networks:
-      - vendora-frontend
+      - yerevan-digital-frontend
     restart: unless-stopped
     mem_limit: 192m
     mem_reservation: 144m
@@ -93,7 +93,7 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
     networks:
-      - vendora-backend
+      - yerevan-digital-backend
     restart: unless-stopped
     mem_limit: 512m
     mem_reservation: 256m
@@ -113,7 +113,7 @@ services:
     volumes:
       - mongodb_data:/data/db
     networks:
-      - vendora-backend
+      - yerevan-digital-backend
     restart: unless-stopped
     mem_limit: 192m
     mem_reservation: 48m
@@ -125,7 +125,7 @@ services:
     volumes:
       - redis_data:/data
     networks:
-      - vendora-backend
+      - yerevan-digital-backend
     restart: unless-stopped
     mem_limit: 64m
     mem_reservation: 24m
@@ -140,7 +140,7 @@ services:
     <<: *api-common
     command: php artisan queue:work --queue=default,emails,notifications --sleep=3 --tries=3 --timeout=90
     networks:
-      - vendora-backend
+      - yerevan-digital-backend
     depends_on:
       mysql:
         condition: service_healthy
@@ -169,7 +169,7 @@ services:
     <<: *api-common
     command: php artisan schedule:work
     networks:
-      - vendora-backend
+      - yerevan-digital-backend
     depends_on:
       mysql:
         condition: service_healthy
@@ -190,9 +190,9 @@ services:
     memswap_limit: 128m
 
 networks:
-  vendora-backend:
+  yerevan-digital-backend:
     driver: bridge
-  vendora-frontend:
+  yerevan-digital-frontend:
     driver: bridge
 
 volumes:

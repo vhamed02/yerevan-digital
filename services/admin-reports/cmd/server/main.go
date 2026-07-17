@@ -10,9 +10,9 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/vendorex/admin-reports/internal/config"
-	"github.com/vendorex/admin-reports/internal/httpapi"
-	"github.com/vendorex/admin-reports/internal/store"
+	"github.com/yerevan-digital/admin-reports/internal/config"
+	"github.com/yerevan-digital/admin-reports/internal/httpapi"
+	"github.com/yerevan-digital/admin-reports/internal/store"
 )
 
 func main() {

@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/vendorex/admin-reports/internal/store"
+	"github.com/yerevan-digital/admin-reports/internal/store"
 )
 
 func healthHandler(s *store.Store) http.HandlerFunc {

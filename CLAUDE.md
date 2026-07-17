@@ -1,4 +1,4 @@
-# Vendora — Claude Code Project Memory
+# Yerevan Digital — Claude Code Project Memory
 
 **Roadmap & phase status: [`docs/ROADMAP.md`](docs/ROADMAP.md)** — what's done (P0, P1), what's
 next (P2, P3), known open bugs, and decisions not to re-litigate. Read it before starting
@@ -22,7 +22,7 @@ The GitHub webhook triggers `scripts/deploy.sh` automatically, which:
 - Runs `optimize:clear`, `cache:clear`, `migrate --force`
 - Reloads nginx
 
-**Never wait for the deploy to finish.** After pushing, only confirm the webhook triggered — the new commit hash appears in `/var/log/vendora/deploy.log` — then move on. Do not poll the live site or watch the build.
+**Never wait for the deploy to finish.** After pushing, only confirm the webhook triggered — the new commit hash appears in `/var/log/yerevan-digital/deploy.log` — then move on. Do not poll the live site or watch the build.
 
 Webhook plumbing: GitHub (`vhamed02/yerevan-digital`) → `webhook.service` (adnanh/webhook) on port 9001, hooks loaded from **`/etc/webhook.conf`** (NOT the repo's `scripts/hooks.json`, which is only a template and is kept `--assume-unchanged`). Verify deliveries with `journalctl -u webhook -n 20`.
 
@@ -40,7 +40,7 @@ Git identity: `user.name="vhamed02"`, `user.email=vhamed02@gmail.com`
 - **Server:** Ubuntu 24, hostname `yerevan.digital`, repo at `/home/yerevan-digital` (the old `/home/deploy/vendora` and `/home/vendorex` paths are gone; `/home/vendorex` still holds an unused `docker/`+`services/` fragment from the rename)
 - **Domains:** `yerevan.digital` (frontend) / `api.yerevan.digital` (API), both Cloudflare-proxied; TLS terminates at Cloudflare (nginx listens on 80 only). The old `radif.org` zone is stale (522) — don't use it. `/etc/hosts` maps `yerevan.digital` to 127.0.1.1, so server-local curl tests need `--resolve` or `http://localhost` + Host header.
 - **Stack:** Laravel 13 / PHP 8.5 API + Next.js 16.2.6 frontend, MySQL 8, Redis 7, Docker Compose
-- **Networks:** `vendora-backend` (api, mysql, mongodb, redis), `vendora-frontend` (nginx, web, api)
+- **Networks:** `yerevan-digital-backend` (api, mysql, mongodb, redis), `yerevan-digital-frontend` (nginx, web, api)
 - **Workers:** `queue` runs `queue:work` (emails/notifications) and `scheduler` runs `schedule:work`. `QUEUE_CONNECTION=redis`, so if `queue` is down, mail silently never sends; anything registered in `routes/console.php` needs `scheduler` up.
 - **SSR API path:** Next.js server-side calls `http://nginx:8080/api/v1/...` — nginx listens on 8080 and proxies to PHP-FPM at `api:9000`
 - **Client-side API path:** `https://api.yerevan.digital/api/v1/...`
@@ -206,9 +206,9 @@ Both are applied in `CreateOrderAction`, inside the order transaction. Order mat
 
 ## Backups (added 2026-07-16)
 
-`scripts/backup.sh`, run nightly at 03:20 by the `vendora-backup.timer` systemd timer
+`scripts/backup.sh`, run nightly at 03:20 by the `yerevan-digital-backup.timer` systemd timer
 (install/reinstall with `scripts/install-backup-timer.sh`; the unit files are **not** in this
-repo). Logs to `/var/log/vendora/backup.log`, writes to `/var/backups/vendora`, keeps 7 days.
+repo). Logs to `/var/log/yerevan-digital/backup.log`, writes to `/var/backups/yerevan-digital`, keeps 7 days.
 
 Backs up only what can't be rebuilt: **MySQL** (`--single-transaction`, gzipped) and the
 **storage volume** (uploaded images). Meilisearch is a derived index — rebuild it with
@@ -218,7 +218,7 @@ backup is worse than none; it also refuses to run below 2 GB free (the box sits 
 
 **Restore:**
 ```bash
-zcat /var/backups/vendora/mysql-YYYYmmdd-HHMMSS.sql.gz | \
+zcat /var/backups/yerevan-digital/mysql-YYYYmmdd-HHMMSS.sql.gz | \
   docker compose -f docker-compose.yml -f docker-compose.prod.yml exec -T mysql \
   sh -c 'mysql -u root -p"$MYSQL_ROOT_PASSWORD" "$MYSQL_DATABASE"'
 # then rebuild the search index:

@@ -61,7 +61,7 @@ class ContactMessageTest extends TestCase
         Notification::assertNothingSent();
     }
 
-    public function test_contact_email_renders_through_mailer_with_vendorex_branding(): void
+    public function test_contact_email_renders_through_mailer_with_yerevan_digital_branding(): void
     {
         $email = $this->sendAndCapture(
             name: 'Hamed Najari',

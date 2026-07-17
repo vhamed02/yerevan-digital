@@ -11,5 +11,5 @@
 </div>
 @endif
 <p>{{ __('emails.store_suspended.body', [], $locale) }}</p>
-<a href="mailto:support@vendora.am" class="btn">{{ __('emails.store_suspended.contact', [], $locale) }}</a>
+<a href="mailto:support@yerevan.digital" class="btn">{{ __('emails.store_suspended.contact', [], $locale) }}</a>
 @endsection

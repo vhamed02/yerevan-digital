@@ -66,7 +66,7 @@ export default function SellerTopNav({ onMenuClick }: SellerTopNavProps) {
       <div className="flex items-center gap-4 lg:gap-6">
         <Link href="/seller" className="flex items-center gap-2 font-heading text-base font-bold text-content-primary">
           <StoreIcon className="h-5 w-5 text-brand-500" />
-          <span className="hidden sm:inline">VENDORA</span>
+          <span className="hidden sm:inline">Yerevan Digital</span>
         </Link>
 
         {sellerStore && (
@@ -184,7 +184,7 @@ export function SellerMobileNav({ open, onClose }: SellerMobileNavProps) {
         <div className="flex items-center justify-between border-b border-border px-5 py-4">
           <div className="flex items-center gap-2">
             <StoreIcon className="h-5 w-5 text-brand-500" />
-            <span className="font-heading font-bold text-content-primary">VENDORA</span>
+            <span className="font-heading font-bold text-content-primary">Yerevan Digital</span>
           </div>
           <button
             className="rounded p-1 text-content-muted hover:text-content-primary"

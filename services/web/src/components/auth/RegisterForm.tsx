@@ -241,7 +241,7 @@ function Step2Form({
         <label className="text-sm font-medium text-content-primary">Store URL</label>
         <div className="flex items-center gap-0">
           <span className="flex h-10 items-center rounded-l border border-r-0 border-border bg-surface-secondary px-3 text-sm text-content-muted">
-            vendora.am/store/
+            yerevan.digital/store/
           </span>
           <div className="relative flex-1">
             <input

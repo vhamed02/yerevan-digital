@@ -70,7 +70,7 @@ export default function AdminSidebar({ mobileOpen, onMobileClose }: AdminSidebar
         <div className="flex items-center gap-2">
           <StoreIcon className="h-5 w-5 text-brand-500" />
           <div>
-            <p className="font-heading text-sm font-bold leading-tight">VENDORA</p>
+            <p className="font-heading text-sm font-bold leading-tight">Yerevan Digital</p>
             <p className="text-[11px] text-white/50">Admin</p>
           </div>
         </div>

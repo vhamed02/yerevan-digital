@@ -1,12 +1,12 @@
-# Vendora — Armenian Store Builder Platform
+# Yerevan Digital — Armenian Store Builder Platform
 
-Vendora is a multi-tenant e-commerce platform built for Armenian businesses. Sellers register, create a branded online store, manage products and orders, and accept payments via Armenian payment gateways (Idram, with Inecobank and Converse Bank stubs ready to activate).
+Yerevan Digital is a multi-tenant e-commerce platform built for Armenian businesses. Sellers register, create a branded online store, manage products and orders, and accept payments via Armenian payment gateways (Idram, with Inecobank and Converse Bank stubs ready to activate).
 
 ```
                        ┌──────────────────────────────────────────────┐
                        │                 NGINX 1.25                    │
-                       │  vendora.am       → Next.js 16                │
-                       │  api.vendora.am   → Laravel 13                │
+                       │  yerevan.digital       → Next.js 16                │
+                       │  api.yerevan.digital   → Laravel 13                │
                        └─────────┬───────────────────┬────────────────┘
                                  │                   │
                      ┌───────────▼────┐   ┌──────────▼──────────┐
@@ -62,7 +62,7 @@ Vendora is a multi-tenant e-commerce platform built for Armenian businesses. Sel
 ## Local Setup
 
 ```bash
-git clone https://github.com/vhamed02/vendora vendora
+git clone https://github.com/vhamed02/yerevan-digital vendora
 cd vendora
 cp .env.example .env        # edit with your values
 docker compose up -d
@@ -89,10 +89,10 @@ docker compose exec api php artisan migrate --seed
 
 | Role | Email | Password |
 |------|-------|----------|
-| Super Admin | admin@vendora.am | password |
-| Demo Seller 1 (Artisan) | demo1@vendora.am | password |
-| Demo Seller 2 (Fashion) | demo2@vendora.am | password |
-| Demo Seller 3 (Tech) | demo3@vendora.am | password |
+| Super Admin | admin@yerevan.digital | password |
+| Demo Seller 1 (Artisan) | demo1@yerevan.digital | password |
+| Demo Seller 2 (Fashion) | demo2@yerevan.digital | password |
+| Demo Seller 3 (Tech) | demo3@yerevan.digital | password |
 
 Load demo data:
 ```bash
@@ -139,7 +139,7 @@ docker compose exec api php artisan storage:link
 | Variable | Description | Example |
 |----------|-------------|---------|
 | `APP_KEY` | Laravel app key | `base64:...` |
-| `APP_URL` | API base URL | `http://api.vendora.am` |
+| `APP_URL` | API base URL | `http://api.yerevan.digital` |
 | `DB_HOST` | MySQL host | `mysql` |
 | `DB_DATABASE` | MySQL database name | `vendora` |
 | `DB_USERNAME` | MySQL user | `vendora` |
@@ -148,8 +148,8 @@ docker compose exec api php artisan storage:link
 | `MONGODB_DATABASE` | MongoDB database | `vendora_docs` |
 | `REDIS_HOST` | Redis host | `redis` |
 | `BREVO_API_KEY` | Brevo transactional email key | `xkeysib-...` |
-| `MAIL_FROM_ADDRESS` | Default sender email | `hello@vendora.am` |
-| `FRONTEND_URL` | Next.js public URL | `https://vendora.am` |
+| `MAIL_FROM_ADDRESS` | Default sender email | `hello@yerevan.digital` |
+| `FRONTEND_URL` | Next.js public URL | `https://yerevan.digital` |
 
 ## Useful Commands
 

@@ -1,4 +1,4 @@
-# 🛍️ Vendora — Armenian Store Builder Platform
+# 🛍️ Yerevan Digital — Armenian Store Builder Platform
 ## Full-Stack E-Commerce Platform | Claude Code Prompt Set
 ### Version 2.0 — Final
 
@@ -69,7 +69,7 @@
 # PHASE 1 — Project Structure & Docker Infrastructure
 
 ```
-You are building a multi-tenant e-commerce platform called "Vendora" — a store builder for Armenian businesses. The platform allows sellers to register, create their own online store, manage products, receive orders, and accept payments via Armenian payment gateways (Idram, and extensible for future gateways).
+You are building a multi-tenant e-commerce platform called "Yerevan Digital" — a store builder for Armenian businesses. The platform allows sellers to register, create their own online store, manage products, receive orders, and accept payments via Armenian payment gateways (Idram, and extensible for future gateways).
 
 The platform has four distinct interfaces:
 1. Main public website — landing page, store discovery, SEO
@@ -97,8 +97,8 @@ vendora/
     ├── nginx/
     │   ├── nginx.conf
     │   └── conf.d/
-    │       ├── api.conf               # api.vendora.am
-    │       └── app.conf               # vendora.am + *.vendora.am
+    │       ├── api.conf               # api.yerevan.digital
+    │       └── app.conf               # yerevan.digital + *.yerevan.digital
     ├── mysql/
     │   └── init.sql
     ├── php/
@@ -121,8 +121,8 @@ vendora/
 - **mailpit** — local email testing UI at port 8025 (DEV ONLY — replaced by Brevo in production)
 
 Networks:
-- `vendora-backend` — api, mysql, mongodb, redis, queue, scheduler
-- `vendora-frontend` — nginx, web, api
+- `yerevan-digital-backend` — api, mysql, mongodb, redis, queue, scheduler
+- `yerevan-digital-frontend` — nginx, web, api
 
 Volumes: mysql_data, mongodb_data, redis_data, storage_data
 
@@ -136,9 +136,9 @@ Development (localhost-based):
 - `http://localhost/store/{slug}` → Store storefront
 
 Production (DNS-based):
-- `vendora.am` → Next.js
-- `api.vendora.am` → Laravel
-- `*.vendora.am` → Next.js (store subdomains)
+- `yerevan.digital` → Next.js
+- `api.yerevan.digital` → Laravel
+- `*.yerevan.digital` → Next.js (store subdomains)
 
 ## PHP Dockerfile (docker/php/Dockerfile):
 
@@ -165,7 +165,7 @@ Set working dir: /app
 
 ```env
 # App
-APP_NAME=Vendora
+APP_NAME=Yerevan Digital
 APP_ENV=local
 APP_URL=http://localhost
 API_URL=http://api.localhost
@@ -193,8 +193,8 @@ REDIS_PORT=6379
 # Mail — Brevo (Sendinblue)
 MAIL_MAILER=brevo
 BREVO_API_KEY=your-brevo-api-key
-MAIL_FROM_ADDRESS=noreply@vendora.am
-MAIL_FROM_NAME=Vendora
+MAIL_FROM_ADDRESS=noreply@yerevan.digital
+MAIL_FROM_NAME=Yerevan Digital
 
 # Mailpit (local dev only)
 MAILPIT_HOST=mailpit
@@ -233,7 +233,7 @@ Running `docker compose up -d` must start all services successfully.
 # PHASE 2 — Laravel 13 API Foundation
 
 ```
-Set up Laravel 13 (PHP 8.5) as the backend API for Vendora inside services/api/.
+Set up Laravel 13 (PHP 8.5) as the backend API for Yerevan Digital inside services/api/.
 
 ## Bootstrap:
 ```bash
@@ -402,7 +402,7 @@ enum PaymentStatus: string { case Pending = 'pending'; case Paid = 'paid'; case 
 ```
 
 ### Config adjustments:
-- config/cors.php — allow Next.js origins (localhost:3000, vendora.am)
+- config/cors.php — allow Next.js origins (localhost:3000, yerevan.digital)
 - config/sanctum.php — SPA + API token mode
 - config/queue.php — Redis driver, queues: default, emails, notifications
 - config/cache.php — Redis driver
@@ -426,7 +426,7 @@ enum PaymentStatus: string { case Pending = 'pending'; case Paid = 'paid'; case 
 # PHASE 3 — MySQL Database Schema & Migrations
 
 ```
-Create all MySQL migrations for Vendora. Run in order. Use bigint auto-increment PKs + separate uuid fields. Apply softDeletes where noted. All bilingual text fields stored as JSON: {"hy": "...", "en": "..."}.
+Create all MySQL migrations for Yerevan Digital. Run in order. Use bigint auto-increment PKs + separate uuid fields. Apply softDeletes where noted. All bilingual text fields stored as JSON: {"hy": "...", "en": "..."}.
 
 ## Migrations (in this exact order):
 
@@ -671,7 +671,7 @@ timestamps
 ## Seeders:
 
 ### SuperAdminSeeder
-- Email: admin@vendora.am
+- Email: admin@yerevan.digital
 - Password: password
 - Role: super_admin
 - Status: active
@@ -729,7 +729,7 @@ Spatie roles: super-admin, seller, customer
 # PHASE 4 — Authentication System & Roles
 
 ```
-Implement the full authentication system for Vendora using Laravel Sanctum + Spatie Permissions.
+Implement the full authentication system for Yerevan Digital using Laravel Sanctum + Spatie Permissions.
 
 ## Three Roles: super-admin, seller, customer
 
@@ -817,14 +817,14 @@ All notifications use Mail channel → Brevo transport → professional HTML tem
 
 ### WelcomeSellerNotification
 - Queue: emails
-- Subject EN: "Welcome to Vendora!"
-- Subject HY: "Բարի գալուստ Vendora!"
+- Subject EN: "Welcome to Yerevan Digital!"
+- Subject HY: "Բարի գալուստ Yerevan Digital!"
 - Content: welcome message, "What's next" steps, link to seller panel
 
 ### StoreApprovedNotification
 - Queue: emails
 - Channel: mail + database
-- Subject: "Your store is now live on Vendora!"
+- Subject: "Your store is now live on Yerevan Digital!"
 - Include: store URL, dashboard link
 
 ### StoreSuspendedNotification
@@ -851,7 +851,7 @@ All notifications use Mail channel → Brevo transport → professional HTML tem
 - All 3 policies
 - All 5 notification classes
 - Brevo transport configured and working (tested via Mailpit in dev)
-- Blade email templates (clean, minimal HTML, Vendora brand colors)
+- Blade email templates (clean, minimal HTML, Yerevan Digital brand colors)
 - Feature test: AuthTest.php (register, login, logout, me, role routing)
 ```
 
@@ -1527,7 +1527,7 @@ location /storage/ {
 # PHASE 9 — Next.js 16.2.6 Setup & Design System
 
 ```
-Set up the Next.js 16.2.6 frontend for Vendora inside services/web/. One Next.js app serves: main website, admin panel, seller panel, and all storefronts via route groups.
+Set up the Next.js 16.2.6 frontend for Yerevan Digital inside services/web/. One Next.js app serves: main website, admin panel, seller panel, and all storefronts via route groups.
 
 ## Bootstrap:
 ```bash
@@ -1766,7 +1766,7 @@ Radix Dialog wrapper
 sizes: sm (400px), md (600px), lg (800px), full
 ConfirmModal variant: title, message, confirm/cancel buttons, destructive mode
 
-**Toast** — use Sonner, wrapper with Vendora styling:
+**Toast** — use Sonner, wrapper with Yerevan Digital styling:
 ```tsx
 toast.success('Product saved!')
 toast.error('Something went wrong')
@@ -1938,7 +1938,7 @@ const api = axios.create({
 
 // Request interceptor
 api.interceptors.request.use((config) => {
-  const token = Cookies.get('vendora_token')
+  const token = Cookies.get('yerevan_digital_token')
   if (token) config.headers.Authorization = `Bearer ${token}`
 
   const locale = Cookies.get('NEXT_LOCALE') || 'hy'
@@ -1952,7 +1952,7 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      Cookies.remove('vendora_token')
+      Cookies.remove('yerevan_digital_token')
       window.location.href = '/auth/login'
     }
     return Promise.reject(error)
@@ -2013,8 +2013,8 @@ const queryClient = new QueryClient({
 // Protect /admin/* → require super-admin role
 // Protect /seller/* → require seller role
 // Redirect logged-in users away from /auth/*
-// Read token from cookie: vendora_token
-// Read role from cookie: vendora_role
+// Read token from cookie: yerevan_digital_token
+// Read role from cookie: yerevan_digital_role
 // For unauthenticated access to protected routes → redirect to /auth/login
 ```
 
@@ -2026,7 +2026,7 @@ const queryClient = new QueryClient({
 - Zustand stores (auth + cart)
 - React Query client
 - Middleware for route protection
-- Tailwind configured with Vendora design tokens
+- Tailwind configured with Yerevan Digital design tokens
 - Fonts loaded and Armenian characters display correctly
 - ESLint + Prettier configured
 ```
@@ -2038,7 +2038,7 @@ const queryClient = new QueryClient({
 # PHASE 10 — Main Public Website (Next.js)
 
 ```
-Build the main public website for Vendora. This is what visitors see at vendora.am — landing page, store directory, and auth pages.
+Build the main public website for Yerevan Digital. This is what visitors see at yerevan.digital — landing page, store directory, and auth pages.
 
 ## 1. Landing Page — (website)/page.tsx
 
@@ -2048,7 +2048,7 @@ Build the main public website for Vendora. This is what visitors see at vendora.
 - Large headline:
   - HY: "Ստեղծեք Ձեր Առցանց Խանութը Հիմա"
   - EN: "Launch Your Online Store Today"
-- Subheadline: "Join hundreds of Armenian businesses selling online with Vendora"
+- Subheadline: "Join hundreds of Armenian businesses selling online with Yerevan Digital"
 - Two CTAs:
   - "Start for Free" → /auth/register (white button)
   - "Browse Stores" → /stores (ghost white button)
@@ -2083,14 +2083,14 @@ Grid of 3 step cards with numbered circles:
 
 ### Footer:
 ```
-[Vendora Logo]          Links column:       Social:
+[Yerevan Digital Logo]          Links column:       Social:
 Your Armenian           About               Instagram
 Store Builder           Contact             Facebook
                         Terms of Use
                         Privacy Policy
                         Language: [🇦🇲 hy | 🇬🇧 en]
 
-© 2026 Vendora. All rights reserved.
+© 2026 Yerevan Digital. All rights reserved.
 ```
 
 ## 2. Store Directory — (website)/stores/page.tsx
@@ -2148,7 +2148,7 @@ Store Builder           Contact             Facebook
 
 **Step 2 — Your Store**
 - Store Name (two inputs side by side with 🇦🇲 and 🇬🇧 labels)
-- Store URL: vendora.am/store/
+- Store URL: yerevan.digital/store/
   - Input: slug (auto-fill from EN name → Str.slug)
   - Real-time availability check (debounced 500ms → GET /api/v1/stores/check-slug?slug=...)
   - ✓ Available / ✗ Taken indicator
@@ -2169,7 +2169,7 @@ Email input → submit → "Reset link sent to your inbox" success state
 ## SEO:
 ```tsx
 export const metadata: Metadata = {
-  title: 'Vendora — Armenian Online Store Builder',
+  title: 'Yerevan Digital — Armenian Online Store Builder',
   description: 'Create your Armenian online store in minutes. Accept Idram payments, manage products, and grow your business.',
   openGraph: { ... }
 }
@@ -2197,7 +2197,7 @@ export const metadata: Metadata = {
 # PHASE 11 — Admin Panel (Next.js)
 
 ```
-Build the Admin Panel for Vendora. Super admin manages the entire platform. Layout: right-positioned sidebar (WordPress-style).
+Build the Admin Panel for Yerevan Digital. Super admin manages the entire platform. Layout: right-positioned sidebar (WordPress-style).
 
 ## Layout — (admin)/layout.tsx
 
@@ -2207,7 +2207,7 @@ Background: surface-dark (#0F172A)
 Text: white
 
 ┌────────────────────────┐
-│  VENDORA               │
+│  Yerevan Digital               │
 │  Admin                 │
 │  ─────────────────     │
 │  [🙂] Super Admin       │
@@ -2369,14 +2369,14 @@ src/components/admin/
 # PHASE 12 — Seller Panel (Next.js)
 
 ```
-Build the Seller Panel for Vendora. Top navigation layout. Sellers manage their entire store from here.
+Build the Seller Panel for Yerevan Digital. Top navigation layout. Sellers manage their entire store from here.
 
 ## Layout — (seller)/layout.tsx
 
 ### Top Navigation Bar (height: 64px):
 ```
 ┌──────────────────────────────────────────────────────────────────┐
-│ [VENDORA]  [Anna's Store ▾]  Overview  Products  Orders  Payments  Design  Settings  [🔔] [Avatar▾] │
+│ [Yerevan Digital]  [Anna's Store ▾]  Overview  Products  Orders  Payments  Design  Settings  [🔔] [Avatar▾] │
 └──────────────────────────────────────────────────────────────────┘
 ```
 - Active tab: brand-500 bottom border (3px)
@@ -2394,7 +2394,7 @@ Full-screen wizard overlay (can't be dismissed):
 
 **Step 1 — Store Info**
 - Store name: two inputs [🇦🇲 Armenian Name] [🇬🇧 English Name]
-- Store URL: vendora.am/store/ + [slug input with live check]
+- Store URL: yerevan.digital/store/ + [slug input with live check]
 - Category: select
 - Description (optional, hy + en tabs)
 
@@ -2415,7 +2415,7 @@ Full-screen wizard overlay (can't be dismissed):
 
 **Store Status Banner** (shown when not active):
 - Pending: amber background "Your store is awaiting approval. You can add products while waiting."
-- Suspended: red background "Your store has been suspended. Contact support@vendora.am"
+- Suspended: red background "Your store has been suspended. Contact support@yerevan.digital"
 
 **Stats Row:**
 - Total Products / Active Products
@@ -2502,7 +2502,7 @@ If enabled:
 - Meta Description (hy + en tabs, max 160 chars with counter)
 - Google preview component:
 ```
-vendora.am › store › annas-store › products › red-rose
+yerevan.digital › store › annas-store › products › red-rose
 Meta Title Here
 Meta description preview — first 160 chars shown here...
 ```
@@ -2631,7 +2631,7 @@ Show categories bar: [Toggle]
 ```
 ┌─────────────────────────────────────────────┐
 │  [↺ Refresh]  [📱 Mobile] [💻 Desktop]      │
-│  Preview: vendora.am/store/annas-store       │
+│  Preview: yerevan.digital/store/annas-store       │
 │ ─────────────────────────────────────────── │
 │                                             │
 │    [Live Store Preview in iframe]           │
@@ -2786,7 +2786,7 @@ Hover: subtle shadow elevation + "Quick Add" overlay on image.
 **StoreFooter (Minimal):**
 - Store name + tagline
 - Social links
-- "Powered by Vendora" (small, gray)
+- "Powered by Yerevan Digital" (small, gray)
 
 ## Template 2: "Bold" (src/templates/bold/)
 
@@ -2926,7 +2926,7 @@ When ?preview=true in URL:
 - Used by seller's design panel iframe
 
 ## Cart State — Zustand with localStorage:
-Key in localStorage: `vendora_cart_{storeSlug}`
+Key in localStorage: `yerevan_digital_cart_{storeSlug}`
 Cross-tab sync via storage events.
 
 ## SEO for Storefronts:
@@ -2935,7 +2935,7 @@ export async function generateMetadata({ params }): Promise<Metadata> {
   const store = await fetchStoreInfo(params.slug)
   const locale = /* from cookie or default */ 'hy'
   return {
-    title: store.meta_title?.[locale] ?? store.name[locale] + ' | Vendora',
+    title: store.meta_title?.[locale] ?? store.name[locale] + ' | Yerevan Digital',
     description: store.meta_description?.[locale] ?? store.description?.[locale],
     openGraph: {
       title: store.name[locale],
@@ -2981,8 +2981,8 @@ Response:
     "slug": "annas-store",
     "name": {"hy": "Աննայի Խանութ", "en": "Anna's Store"},
     "description": {"hy": "...", "en": "..."},
-    "logo": "https://vendora.am/storage/images/stores/1/uuid/thumbnail.webp",
-    "banner": "https://vendora.am/storage/images/stores/1/uuid/large.webp",
+    "logo": "https://yerevan.digital/storage/images/stores/1/uuid/thumbnail.webp",
+    "banner": "https://yerevan.digital/storage/images/stores/1/uuid/large.webp",
     "active_template_key": "minimal",
     "template_config": {
       "primary_color": "#6366F1",
@@ -3208,7 +3208,7 @@ RateLimiter::for('checkout', fn($request) => Limit::perMinute(10)->by($request->
 # PHASE 15 — Integration, Testing & Production Readiness
 
 ```
-Finalize Vendora: end-to-end testing, performance optimization, and production configuration.
+Finalize Yerevan Digital: end-to-end testing, performance optimization, and production configuration.
 
 ## 1. End-to-End Integration Flows to Verify:
 
@@ -3224,7 +3224,7 @@ Finalize Vendora: end-to-end testing, performance optimization, and production c
 9. GET /store/{slug}/products → product NOT visible yet (store still pending)
 
 ### Flow B: Admin Approves Store
-1. Login as admin@vendora.am / password
+1. Login as admin@yerevan.digital / password
 2. GET /admin/stores?status=pending → see the store
 3. PATCH /admin/stores/{slug}/approve → status = active
 4. Verify StoreApprovedNotification queued
@@ -3337,11 +3337,11 @@ public function definition(): array {
 ## 4. Demo Seeder — DemoSeeder.php:
 
 Creates realistic demo data:
-- 1 super admin: admin@vendora.am / password
+- 1 super admin: admin@yerevan.digital / password
 - 3 demo sellers (all active):
-  - demo1@vendora.am / password → store: "demo-artisan" (active, template: elegant)
-  - demo2@vendora.am / password → store: "demo-fashion" (active, template: bold)
-  - demo3@vendora.am / password → store: "demo-tech" (active, template: minimal)
+  - demo1@yerevan.digital / password → store: "demo-artisan" (active, template: elegant)
+  - demo2@yerevan.digital / password → store: "demo-fashion" (active, template: bold)
+  - demo3@yerevan.digital / password → store: "demo-tech" (active, template: minimal)
 - 15 products per store (realistic names in hy + en, prices in AMD 1000-50000)
 - 2 images per product (placeholder images from picsum.photos)
 - 5 delivered orders per store
@@ -3438,7 +3438,7 @@ Include:
 - Prerequisites: Docker, Docker Compose, Git
 - Local setup (5 commands):
   ```bash
-  git clone https://github.com/yourname/vendora
+  git clone https://github.com/yourname/yerevan-digital
   cd vendora
   cp .env.example .env        # edit with your values
   docker compose up -d
@@ -3512,9 +3512,9 @@ Include:
 ```
                          ┌─────────────────────────────────────────┐
                          │               NGINX 1.25                │
-                         │  vendora.am → Next.js 16               │
-                         │  api.vendora.am → Laravel 13            │
-                         │  *.vendora.am → Next.js (subdomains)    │
+                         │  yerevan.digital → Next.js 16               │
+                         │  api.yerevan.digital → Laravel 13            │
+                         │  *.yerevan.digital → Next.js (subdomains)    │
                          └──────┬──────────────────┬───────────────┘
                                 │                  │
                     ┌───────────▼───┐      ┌───────▼───────────┐
@@ -3548,5 +3548,5 @@ Include:
 
 ---
 
-*Vendora — Armenian E-Commerce Store Builder*
+*Yerevan Digital — Armenian E-Commerce Store Builder*
 *15 Phases | Laravel 13 + PHP 8.5 + Next.js 16.2.6 | Brevo Email | No Go*

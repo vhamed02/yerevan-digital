@@ -114,8 +114,8 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  const token = request.cookies.get('vendora_token')?.value
-  const role = request.cookies.get('vendora_role')?.value
+  const token = request.cookies.get('yerevan_digital_token')?.value
+  const role = request.cookies.get('yerevan_digital_role')?.value
 
   if (ADMIN_PATHS.some((p) => bare.startsWith(p)) && (!token || role !== 'super_admin')) {
     const url = request.nextUrl.clone()

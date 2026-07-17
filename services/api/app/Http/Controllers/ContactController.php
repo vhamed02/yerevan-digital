@@ -19,7 +19,7 @@ class ContactController extends Controller
             'message' => ['required', 'string', 'min:10', 'max:3000'],
         ]);
 
-        $to = config('app.contact_email', 'support@vendora.am');
+        $to = config('app.contact_email', 'support@yerevan.digital');
 
         Notification::route('mail', $to)
             ->notify(new ContactMessageNotification(

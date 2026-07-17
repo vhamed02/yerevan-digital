@@ -6,8 +6,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/vendorex/admin-reports/internal/multilang"
-	"github.com/vendorex/admin-reports/internal/store"
+	"github.com/yerevan-digital/admin-reports/internal/multilang"
+	"github.com/yerevan-digital/admin-reports/internal/store"
 )
 
 type RecordWriter func(record []string) error

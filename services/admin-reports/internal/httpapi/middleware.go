@@ -13,8 +13,8 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 
-	"github.com/vendorex/admin-reports/internal/auth"
-	"github.com/vendorex/admin-reports/internal/store"
+	"github.com/yerevan-digital/admin-reports/internal/auth"
+	"github.com/yerevan-digital/admin-reports/internal/store"
 )
 
 type userCtxKey struct{}

@@ -49,7 +49,7 @@ class CommissionInvoiceController extends Controller
             orderNumber: $invoice->uuid,
             amount: (float) $invoice->amount,
             currency: $invoice->currency,
-            description: "Vendora commission {$invoice->period_start->toDateString()}",
+            description: "Yerevan Digital commission {$invoice->period_start->toDateString()}",
             callbackUrl: url('/api/v1/invoices/callback/telcell'),
             successUrl: rtrim(config('app.frontend_url'), '/') . "/seller/invoices?paid={$invoice->uuid}",
             failureUrl: rtrim(config('app.frontend_url'), '/') . "/seller/invoices?failed={$invoice->uuid}",

@@ -24,8 +24,8 @@ export default function StoreStatusBanner({ status }: StoreStatusBannerProps) {
         <XCircle className="mt-0.5 h-4 w-4 shrink-0 text-status-error" />
         <p className="text-sm text-status-error">
           Your store has been suspended. Contact{' '}
-          <a href="mailto:support@vendora.am" className="font-medium underline">
-            support@vendora.am
+          <a href="mailto:support@yerevan.digital" className="font-medium underline">
+            support@yerevan.digital
           </a>
         </p>
       </div>

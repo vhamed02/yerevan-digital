@@ -8,8 +8,8 @@ import (
 
 	"github.com/go-chi/chi/v5"
 
-	"github.com/vendorex/admin-reports/internal/report"
-	"github.com/vendorex/admin-reports/internal/store"
+	"github.com/yerevan-digital/admin-reports/internal/report"
+	"github.com/yerevan-digital/admin-reports/internal/store"
 )
 
 func exportHandler(rep *report.Service) http.HandlerFunc {

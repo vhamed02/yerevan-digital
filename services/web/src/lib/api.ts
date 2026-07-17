@@ -7,7 +7,7 @@ const api = axios.create({
 })
 
 api.interceptors.request.use((config) => {
-  const token = Cookies.get('vendora_token')
+  const token = Cookies.get('yerevan_digital_token')
   if (token) config.headers.Authorization = `Bearer ${token}`
 
   const locale = Cookies.get('NEXT_LOCALE') || 'hy'
@@ -30,8 +30,8 @@ api.interceptors.response.use(
   },
   (error) => {
     if (error.response?.status === 401) {
-      Cookies.remove('vendora_token')
-      Cookies.remove('vendora_role')
+      Cookies.remove('yerevan_digital_token')
+      Cookies.remove('yerevan_digital_role')
       window.location.href = '/auth/login'
     }
     return Promise.reject(error)

@@ -1,4 +1,4 @@
-module github.com/vendorex/admin-reports
+module github.com/yerevan-digital/admin-reports
 
 go 1.23
 

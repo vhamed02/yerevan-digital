@@ -1,6 +1,6 @@
-# Vendora — Engineering Improvements Log
+# Yerevan Digital — Engineering Improvements Log
 
-> This file tracks architectural and correctness improvements made to the Vendora platform.
+> This file tracks architectural and correctness improvements made to the Yerevan Digital platform.
 > Each entry includes CV-ready bullet points with real technical context.
 
 ---

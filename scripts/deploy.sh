@@ -11,9 +11,9 @@ if [ -z "${_DEPLOY_PULLED:-}" ]; then
   exec bash "$REPO_DIR/scripts/deploy.sh"
 fi
 
-LOG_DIR="/var/log/vendora"
+LOG_DIR="/var/log/yerevan-digital"
 LOG_FILE="$LOG_DIR/deploy.log"
-LOCK_FILE="/tmp/vendora-deploy.lock"
+LOCK_FILE="/tmp/yerevan-digital-deploy.lock"
 COMPOSE="docker compose -f docker-compose.yml -f docker-compose.prod.yml"
 
 mkdir -p "$LOG_DIR"
@@ -54,7 +54,7 @@ took()    { printf '\033[2;37m     (took %ds)\033[0m\n' "$(( $(date +%s) - $1 ))
 
 # ── header ───────────────────────────────────────────────────────────────────
 printf '\n%b\n' "$HR"
-printf '\033[1;97m  🚀  VENDORA DEPLOY\033[0m\n'
+printf '\033[1;97m  🚀  Yerevan Digital DEPLOY\033[0m\n'
 printf '\033[2;37m  %s  ·  %s  ·  %s\033[0m\n' "$DEPLOY_TIME" "$NEW_SHORT" "$COMMIT_AUTHOR"
 printf '\033[2;37m  "%s"\033[0m\n' "$COMMIT_MSG"
 printf '%b\n' "$HR"

@@ -15,8 +15,8 @@
 set -euo pipefail
 
 REPO_DIR="$(cd "$(dirname "$0")/.." && pwd)"
-BACKUP_DIR="/var/backups/vendora"
-LOG_FILE="/var/log/vendora/backup.log"
+BACKUP_DIR="/var/backups/yerevan-digital"
+LOG_FILE="/var/log/yerevan-digital/backup.log"
 RETAIN_DAYS=7
 COMPOSE="docker compose -f $REPO_DIR/docker-compose.yml -f $REPO_DIR/docker-compose.prod.yml"
 

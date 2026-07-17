@@ -33,7 +33,7 @@ class PurgeDemoDataTest extends TestCase
         $this->seed(PermissionSeeder::class);
 
         $this->admin = User::factory()->create([
-            'email' => 'admin@vendora.am',
+            'email' => 'admin@yerevan.digital',
             'role'  => UserRole::SuperAdmin,
         ]);
         $this->admin->assignRole('super-admin');
@@ -161,7 +161,7 @@ class PurgeDemoDataTest extends TestCase
 
     public function test_purges_soft_deleted_demo_data(): void
     {
-        [$seller, $store] = $this->createSellerWithFullGraph('demo1@vendora.am');
+        [$seller, $store] = $this->createSellerWithFullGraph('demo1@yerevan.digital');
         $store->delete();
         $seller->delete();
 
@@ -185,7 +185,7 @@ class PurgeDemoDataTest extends TestCase
 
     public function test_never_purges_super_admins(): void
     {
-        $this->artisan('demo:purge', ['--force' => true, '--user' => ['admin@vendora.am']])
+        $this->artisan('demo:purge', ['--force' => true, '--user' => ['admin@yerevan.digital']])
             ->assertSuccessful();
 
         $this->assertDatabaseHas('users', ['id' => $this->admin->id]);

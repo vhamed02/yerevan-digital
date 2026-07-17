@@ -1,4 +1,4 @@
-# Vendora — Multilingual System (HY · EN · RU)
+# Yerevan Digital — Multilingual System (HY · EN · RU)
 
 > **Living document.** Kept up to date as work progresses. Each phase updates the
 > status table, the progress log, and any decisions that change.

@@ -8,7 +8,7 @@ set -euo pipefail
 
 REPO_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 
-cat > /etc/systemd/system/vendora-backup.service <<EOF
+cat > /etc/systemd/system/yerevan-digital-backup.service <<EOF
 [Unit]
 Description=Nightly backup of the yerevan.digital database and uploads
 After=docker.service
@@ -22,7 +22,7 @@ Nice=10
 IOSchedulingClass=idle
 EOF
 
-cat > /etc/systemd/system/vendora-backup.timer <<'EOF'
+cat > /etc/systemd/system/yerevan-digital-backup.timer <<'EOF'
 [Unit]
 Description=Run the yerevan.digital backup nightly
 
@@ -38,7 +38,7 @@ EOF
 
 chmod +x "$REPO_DIR/scripts/backup.sh"
 systemctl daemon-reload
-systemctl enable --now vendora-backup.timer
+systemctl enable --now yerevan-digital-backup.timer
 
 echo "Installed. Next run:"
-systemctl list-timers vendora-backup.timer --no-pager
+systemctl list-timers yerevan-digital-backup.timer --no-pager

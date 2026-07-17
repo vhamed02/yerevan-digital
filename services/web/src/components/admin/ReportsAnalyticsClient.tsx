@@ -87,7 +87,7 @@ export default function ReportsAnalyticsClient() {
   }
 
   async function exportCsv(entity: string) {
-    const token = Cookies.get('vendora_token')
+    const token = Cookies.get('yerevan_digital_token')
     const res = await fetch(`/api/admin-reports/exports/${entity}`, {
       headers: { Authorization: `Bearer ${token ?? ''}` },
     })

@@ -20,9 +20,9 @@ class PurgeDemoData extends Command
     protected $description = 'Permanently delete demo sellers, their stores, and every related row';
 
     private const DEMO_EMAILS = [
-        'demo1@vendora.am',
-        'demo2@vendora.am',
-        'demo3@vendora.am',
+        'demo1@yerevan.digital',
+        'demo2@yerevan.digital',
+        'demo3@yerevan.digital',
         'hayk@yerevan-tech.am',
         'nune@armfashion.am',
         'gor@ararat-foods.am',

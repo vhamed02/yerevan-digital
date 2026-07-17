@@ -138,7 +138,7 @@ Design notes in `CLAUDE.md` → "Commission billing".
 |-------|----------|--------|
 | Unauth API returns 500 without `Accept` | 🟢 Cosmetic | With `Accept: application/json` it correctly returns 401. Bare requests hit a missing `login` named route. Affects every admin endpoint equally; no real client sends no Accept. |
 | **Memory pressure** | 🟠 Watch | 3.8 GB box with **swap already ~1.5/2 GB used** before Meilisearch was added. `web` runs at ~114/128 MB. Meilisearch is capped at 192 MB with a 96 MB indexing budget. If things get unstable, this is the first place to look. |
-| Admin sidebar says "VENDORA" | 🟢 Cosmetic | `components/admin/AdminSidebar.tsx`. The 2026-07-14 rebrand was Vendorex → Yerevan Digital; unclear if this internal label was intentional. |
+| Admin sidebar says "Yerevan Digital" | 🟢 Cosmetic | `components/admin/AdminSidebar.tsx`. The 2026-07-14 rebrand was Yerevan Digital → Yerevan Digital; unclear if this internal label was intentional. |
 | Seller payments page fetches `/seller/payment-gateways` | 🟡 Unverified | Routes define `/seller/payments/{available,configured}`. Possible pre-existing 404 — **not investigated**. |
 
 ---

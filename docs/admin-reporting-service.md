@@ -1,7 +1,7 @@
 # Admin Reporting Service — Design Document
 
 **Status:** Proposal (planning only — no implementation until approved)
-**Owner:** Vendora
+**Owner:** Yerevan Digital
 **Last updated:** 2026-06-01
 
 
@@ -205,14 +205,14 @@ retention). *Kafka/NATS JetStream noted as scale-up options — not now.*
   the user holds the **admin** role (Spatie tables). Read-only DB credentials.
 - All endpoints require admin; **audit who exported what** (export is sensitive — it's the
   whole platform's data).
-- Network: internal service on the `vendora-backend` Docker network; exposed only via nginx on
+- Network: internal service on the `yerevan-digital-backend` Docker network; exposed only via nginx on
   an admin path / subdomain; rate-limited.
 
 ---
 
 ## 10. Integration & deployment
 
-- New container in `docker-compose` on `vendora-backend` (+ `vendora-frontend` for nginx).
+- New container in `docker-compose` on `yerevan-digital-backend` (+ `yerevan-digital-frontend` for nginx).
 - nginx route (e.g. `/api/admin-reports/*` or `admin-api.yerevan.digital`) → Go service.
 - Next.js admin panel calls it (SSR via nginx internal name, client via the public path).
 - Fits the existing deploy flow (webhook → `deploy.sh` builds/recreates containers).
@@ -314,7 +314,7 @@ event-driven CQRS showcase.
 | Metrics/health | `prometheus/client_golang` + `/health` | cheap, good signal |
 | Lifecycle | graceful shutdown, env config | |
 | Tests | stdlib `testing` + **`testcontainers-go`** | unit (pure builders) + integration |
-| Deploy | Dockerfile, compose service on `vendora-backend`, nginx route | fits `deploy.sh` |
+| Deploy | Dockerfile, compose service on `yerevan-digital-backend`, nginx route | fits `deploy.sh` |
 
 **Deferred to Phase 2 (not now):** transactional outbox, Redis Streams bus, Go event
 consumer, projection tables, replay/rebuild tooling. **Deferred indefinitely unless needed:**

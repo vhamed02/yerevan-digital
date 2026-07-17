@@ -18,7 +18,7 @@ RUN install-php-extensions \
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-COPY docker/php/php.ini /usr/local/etc/php/conf.d/vendora.ini
+COPY docker/php/php.ini /usr/local/etc/php/conf.d/yerevan-digital.ini
 COPY docker/php/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh

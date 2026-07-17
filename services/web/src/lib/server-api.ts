@@ -38,7 +38,7 @@ export async function serverGet<T>(path: string, init?: RequestInit): Promise<T 
 export async function serverAuthGet<T>(path: string, init?: RequestInit): Promise<T | null> {
   try {
     const cookieStore = await cookies()
-    const token = cookieStore.get('vendora_token')?.value
+    const token = cookieStore.get('yerevan_digital_token')?.value
     const res = await fetch(`${baseUrl()}${path}`, {
       ...init,
       headers: {

@@ -19,7 +19,7 @@ export default function StorePreviewFrame({ storeSlug, previewParams }: StorePre
   return (
     <div className="flex h-full flex-col">
       <div className="flex items-center justify-between border-b border-border bg-surface px-4 py-2">
-        <p className="text-xs text-content-muted truncate">vendora.am/store/{storeSlug}</p>
+        <p className="text-xs text-content-muted truncate">yerevan.digital/store/{storeSlug}</p>
         <div className="flex items-center gap-1">
           <button
             onClick={() => setKey((k) => k + 1)}
