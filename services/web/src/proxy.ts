@@ -30,6 +30,19 @@ function normaliseHost(host: string): string {
 }
 
 /**
+ * The single label of a direct platform subdomain (`<label>.<PLATFORM_HOST>`),
+ * or null for the apex, a deeper name, or a non-platform host. The apex and
+ * www/api are already excluded by PLATFORM_HOSTS before this is used.
+ */
+function platformSubdomainLabel(host: string): string | null {
+  const suffix = `.${PLATFORM_HOST}`
+  if (!host.endsWith(suffix)) return null
+  const label = host.slice(0, -suffix.length)
+  if (label === '' || label.includes('.')) return null
+  return label
+}
+
+/**
  * Host -> store slug, cached in memory.
  *
  * The proxy runs on every storefront request, so this must not hit the API each
@@ -121,6 +134,21 @@ export async function proxy(request: NextRequest) {
           sameSite: 'lax',
         })
         return response
+      }
+    } else if (!pathname.startsWith('/store/')) {
+      // A `<slug>.yerevan.digital` address with no active store: rewrite into
+      // the storefront route so its /info lookup 404s and the not-found
+      // boundary renders the "store unavailable" page. The attempted host is
+      // forwarded so that page can show it.
+      const label = platformSubdomainLabel(host)
+      if (label) {
+        const url = request.nextUrl.clone()
+        url.pathname = `/store/${label}`
+
+        const headers = new Headers(request.headers)
+        headers.set('x-store-host', host)
+
+        return NextResponse.rewrite(url, { request: { headers } })
       }
     }
   }
