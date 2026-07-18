@@ -1,4 +1,5 @@
 'use client'
+import { useStoreBase, storeHref } from '@/components/store/StoreBaseProvider'
 
 import { useState } from 'react'
 import Image from 'next/image'
@@ -11,6 +12,7 @@ import { pickLang } from '@/lib/i18n'
 import type { ProductDetailProps, StorefrontVariant } from '../types'
 
 export function ProductDetail({ product, storeSlug, isPreview }: ProductDetailProps) {
+  const base = useStoreBase()
   const activeVariants = product.variants?.filter((v) => v.is_active) ?? []
   const [selectedVariant, setSelectedVariant] = useState<StorefrontVariant | null>(
     activeVariants[0] ?? null
@@ -45,9 +47,9 @@ export function ProductDetail({ product, storeSlug, isPreview }: ProductDetailPr
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
       <nav className="mb-6 flex items-center gap-1.5 text-sm text-gray-500">
-        <Link href={`/store/${storeSlug}`} className="hover:text-gray-700">{t('breadcrumbHome')}</Link>
+        <Link href={storeHref(base)} className="hover:text-gray-700">{t('breadcrumbHome')}</Link>
         <ChevronRight className="h-3.5 w-3.5" />
-        <Link href={`/store/${storeSlug}/products`} className="hover:text-gray-700">{t('home.products')}</Link>
+        <Link href={storeHref(base, `/products`)} className="hover:text-gray-700">{t('home.products')}</Link>
         <ChevronRight className="h-3.5 w-3.5" />
         <span className="text-gray-900">{name}</span>
       </nav>

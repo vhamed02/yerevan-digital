@@ -1,4 +1,5 @@
 'use client'
+import { useStoreBase, storeHref } from '@/components/store/StoreBaseProvider'
 
 import { useState, useEffect } from 'react'
 import { X, Minus, Plus, ShoppingBag } from 'lucide-react'
@@ -9,6 +10,7 @@ import { useStoreCart } from '@/stores/cart.store'
 import type { CartDrawerProps } from '../types'
 
 export function CartDrawer({ open, onClose, storeSlug }: CartDrawerProps) {
+  const base = useStoreBase()
   const [mounted, setMounted] = useState(false)
   const t = useTranslations('storefront')
   useEffect(() => { setMounted(true) }, [])
@@ -118,14 +120,14 @@ export function CartDrawer({ open, onClose, storeSlug }: CartDrawerProps) {
               </div>
               <div className="flex flex-col gap-2">
                 <Link
-                  href={`/store/${storeSlug}/checkout`}
+                  href={storeHref(base, `/checkout`)}
                   onClick={onClose}
                   className="flex items-center justify-center rounded-lg bg-gray-900 px-4 py-3 text-sm font-semibold text-white hover:bg-gray-800 transition-colors"
                 >
                   {t('cart.checkout')} →
                 </Link>
                 <Link
-                  href={`/store/${storeSlug}/cart`}
+                  href={storeHref(base, `/cart`)}
                   onClick={onClose}
                   className="flex items-center justify-center rounded-lg border border-gray-200 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                 >

@@ -1,7 +1,9 @@
 import type { Metadata } from 'next'
+import { headers } from 'next/headers'
 import { Link } from '@/i18n/navigation'
 import { XCircle } from 'lucide-react'
 import { getTranslations } from 'next-intl/server'
+import { storeHref } from '@/lib/storeHref'
 
 export const dynamic = 'force-dynamic'
 
@@ -15,6 +17,7 @@ export default async function CheckoutFailedPage({
   params: Promise<{ slug: string }>
 }) {
   const { slug } = await params
+  const base = (await headers()).get('x-store-domain') ? '' : `/store/${slug}`
   const t = await getTranslations('storefront')
 
   return (
@@ -32,13 +35,13 @@ export default async function CheckoutFailedPage({
 
       <div className="flex flex-wrap justify-center gap-3">
         <Link
-          href={`/store/${slug}/cart`}
+          href={storeHref(base, `/cart`)}
           className="rounded-xl bg-gray-900 px-6 py-3 text-sm font-semibold text-white hover:bg-gray-800 transition-colors"
         >
           {t('payFailed.returnToCart')}
         </Link>
         <Link
-          href={`/store/${slug}`}
+          href={storeHref(base)}
           className="rounded-xl border border-gray-200 px-6 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
         >
           {t('cart.continueShopping')}

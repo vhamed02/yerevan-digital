@@ -1,4 +1,5 @@
 'use client'
+import { useStoreBase, storeHref } from '@/components/store/StoreBaseProvider'
 
 import { useEffect, useState } from 'react'
 import { Link } from '@/i18n/navigation'
@@ -159,6 +160,7 @@ const STATUS_COLORS: Record<string, string> = {
 // ── Main component ────────────────────────────────────────────────────────────
 
 export function OrderConfirmationClient({ order, storeSlug, isNew = false }: Props) {
+  const base = useStoreBase()
   const locale = useLocale()
   const t = useTranslations('storefront')
   const formattedDate = order?.created_at
@@ -250,7 +252,7 @@ export function OrderConfirmationClient({ order, storeSlug, isNew = false }: Pro
 
         <div className="flex justify-center">
           <Link
-            href={`/store/${storeSlug}`}
+            href={storeHref(base)}
             className="rounded-xl bg-gray-900 px-8 py-3 text-sm font-semibold text-white hover:bg-gray-800 transition-colors"
           >
             {t('cart.continueShopping')}

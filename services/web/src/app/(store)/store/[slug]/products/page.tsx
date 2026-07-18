@@ -1,8 +1,10 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
+import { headers } from 'next/headers'
 import { Link } from '@/i18n/navigation'
 import { getLocale, getTranslations } from 'next-intl/server'
 import { serverGet } from '@/lib/server-api'
+import { storeHref } from '@/lib/storeHref'
 import { loadTemplate } from '@/lib/templates'
 import { SortSelect } from '@/components/store/SortSelect'
 import { PriceRangeFilter } from '@/components/store/PriceRangeFilter'
@@ -37,6 +39,7 @@ export default async function StoreProductsPage({
   searchParams: Promise<Record<string, string>>
 }) {
   const { slug } = await params
+  const base = (await headers()).get('x-store-domain') ? '' : `/store/${slug}`
   const locale = await getLocale()
   const t = await getTranslations('storefront')
   const sp = await searchParams
@@ -71,7 +74,7 @@ export default async function StoreProductsPage({
     if (p.has(key)) p.delete(key)
     else p.set(key, '1')
     const str = p.toString()
-    return `/store/${slug}/products${str ? `?${str}` : ''}`
+    return storeHref(base, `/products${str ? `?${str}` : ''}`)
   }
 
   const hasActiveFilters = !!(minPrice || maxPrice || inStock || onSale || featured)
@@ -105,7 +108,7 @@ export default async function StoreProductsPage({
       <div className="mb-6 flex flex-wrap items-center gap-3">
         <div className="flex flex-1 flex-wrap gap-2">
           <Link
-            href={`/store/${slug}/products`}
+            href={storeHref(base, '/products')}
             className={`rounded-full border px-4 py-1.5 text-sm transition-colors ${
               !category
                 ? 'border-gray-900 bg-gray-900 text-white'
@@ -117,7 +120,7 @@ export default async function StoreProductsPage({
           {categories.map((cat) => (
             <Link
               key={cat.id}
-              href={`/store/${slug}/products?category=${cat.slug}${sort !== 'newest' ? `&sort=${sort}` : ''}`}
+              href={storeHref(base, `/products?category=${cat.slug}${sort !== 'newest' ? `&sort=${sort}` : ''}`)}
               className={`rounded-full border px-4 py-1.5 text-sm whitespace-nowrap transition-colors ${
                 category === cat.slug
                   ? 'border-gray-900 bg-gray-900 text-white'
@@ -159,7 +162,7 @@ export default async function StoreProductsPage({
         ))}
         {hasActiveFilters && (
           <Link
-            href={`/store/${slug}/products${sort !== 'newest' ? `?sort=${sort}` : ''}${category ? `${sort !== 'newest' ? '&' : '?'}category=${category}` : ''}`}
+            href={storeHref(base, `/products${sort !== 'newest' ? `?sort=${sort}` : ''}${category ? `${sort !== 'newest' ? '&' : '?'}category=${category}` : ''}`)}
             className="ml-auto rounded-full border border-gray-200 px-3.5 py-1.5 text-xs font-medium text-gray-500 transition-colors hover:border-gray-400 hover:text-gray-700"
           >
             {t('filters.clear')} ×
@@ -179,7 +182,7 @@ export default async function StoreProductsPage({
         <div className="mt-10 flex items-center justify-center gap-2">
           {page > 1 && (
             <Link
-              href={`/store/${slug}/products?${new URLSearchParams({ ...sp, page: String(page - 1) })}`}
+              href={storeHref(base, `/products?${new URLSearchParams({ ...sp, page: String(page - 1) })}`)}
               className="rounded-lg border border-gray-200 px-4 py-2 text-sm hover:bg-gray-50"
             >
               ← {t('filters.prev')}
@@ -190,7 +193,7 @@ export default async function StoreProductsPage({
           </span>
           {page < meta.last_page && (
             <Link
-              href={`/store/${slug}/products?${new URLSearchParams({ ...sp, page: String(page + 1) })}`}
+              href={storeHref(base, `/products?${new URLSearchParams({ ...sp, page: String(page + 1) })}`)}
               className="rounded-lg border border-gray-200 px-4 py-2 text-sm hover:bg-gray-50"
             >
               {t('filters.next')} →

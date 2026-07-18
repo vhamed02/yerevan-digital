@@ -1,4 +1,5 @@
 'use client'
+import { useStoreBase, storeHref } from '@/components/store/StoreBaseProvider'
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
@@ -14,6 +15,7 @@ import { pickLang } from '@/lib/i18n'
 import type { ProductCardProps } from '../types'
 
 export function ProductCard({ product, storeSlug, isPreview }: ProductCardProps) {
+  const base = useStoreBase()
   const [added, setAdded] = useState(false)
   const { addItem } = useStoreCart(storeSlug)
   const { isSaved, toggle } = useWishlist()
@@ -61,7 +63,7 @@ export function ProductCard({ product, storeSlug, isPreview }: ProductCardProps)
   }
 
   return (
-    <Link href={`/store/${storeSlug}/products/${product.slug}`} className="group flex h-full flex-col">
+    <Link href={storeHref(base, `/products/${product.slug}`)} className="group flex h-full flex-col">
       <div className="flex flex-1 flex-col overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-black/[0.04] transition-all duration-300 group-hover:shadow-lg group-hover:ring-black/[0.08]">
 
         {/* Image container */}

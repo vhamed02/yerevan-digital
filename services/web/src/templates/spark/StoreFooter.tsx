@@ -1,4 +1,5 @@
 'use client'
+import { useStoreBase, storeHref } from '@/components/store/StoreBaseProvider'
 
 import { Link } from '@/i18n/navigation'
 import { Camera, Globe, Mail, Phone, MapPin, ShieldCheck } from 'lucide-react'
@@ -7,6 +8,7 @@ import { pickLang } from '@/lib/i18n'
 import type { StoreFooterProps } from '../types'
 
 export function StoreFooter({ store }: StoreFooterProps) {
+  const base = useStoreBase()
   const locale = useLocale()
   const t = useTranslations('storefront')
   const name = pickLang(store.name, locale)
@@ -29,7 +31,7 @@ export function StoreFooter({ store }: StoreFooterProps) {
             <p className="relative mt-3 text-sm text-white/70">{description}</p>
           )}
           <Link
-            href={`/store/${store.slug}/products`}
+            href={storeHref(base, `/products`)}
             className="relative mt-6 inline-flex items-center gap-2 rounded-full bg-white px-6 py-2.5 text-sm font-bold shadow-lg transition-all hover:scale-105"
             style={{ color: 'var(--accent)' }}
           >
@@ -80,10 +82,10 @@ export function StoreFooter({ store }: StoreFooterProps) {
             <div>
               <p className="mb-4 text-[10px] font-semibold uppercase tracking-widest text-gray-500">{t('sections')}</p>
               <nav className="flex flex-col gap-2.5">
-                <Link href={`/store/${store.slug}/products`} className="text-sm text-gray-400 transition-colors hover:text-white">
+                <Link href={storeHref(base, `/products`)} className="text-sm text-gray-400 transition-colors hover:text-white">
                   {t('allProducts')}
                 </Link>
-                <Link href={`/store/${store.slug}/products?featured=1`} className="text-sm text-gray-400 transition-colors hover:text-white">
+                <Link href={storeHref(base, `/products?featured=1`)} className="text-sm text-gray-400 transition-colors hover:text-white">
                   {t('featuredProducts')}
                 </Link>
               </nav>

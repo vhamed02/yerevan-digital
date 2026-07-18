@@ -1,4 +1,5 @@
 'use client'
+import { useStoreBase, storeHref } from '@/components/store/StoreBaseProvider'
 
 import { useState, useEffect } from 'react'
 import { Link } from '@/i18n/navigation'
@@ -11,6 +12,7 @@ import { CartDrawer } from './CartDrawer'
 import type { StoreHeaderProps } from '../types'
 
 export function StoreHeader({ store, categories, slug, isPreview }: StoreHeaderProps) {
+  const base = useStoreBase()
   const [cartOpen, setCartOpen] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
@@ -30,7 +32,7 @@ export function StoreHeader({ store, categories, slug, isPreview }: StoreHeaderP
           </div>
         )}
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
-          <Link href={`/store/${slug}`} className="flex items-center gap-3">
+          <Link href={storeHref(base)} className="flex items-center gap-3">
             {store.logo_url ? (
               <Image
                 src={store.logo_url}
@@ -49,7 +51,7 @@ export function StoreHeader({ store, categories, slug, isPreview }: StoreHeaderP
 
           <nav className="hidden items-center gap-1 overflow-x-auto md:flex">
             <Link
-              href={`/store/${slug}/products`}
+              href={storeHref(base, `/products`)}
               className="rounded-md px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900"
             >
               {t('allProducts')}
@@ -57,7 +59,7 @@ export function StoreHeader({ store, categories, slug, isPreview }: StoreHeaderP
             {categories.slice(0, 5).map((cat) => (
               <Link
                 key={cat.id}
-                href={`/store/${slug}/products?category=${cat.slug}`}
+                href={storeHref(base, `/products?category=${cat.slug}`)}
                 className="rounded-md px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 whitespace-nowrap"
               >
                 {pickLang(cat.name, locale)}
@@ -67,7 +69,7 @@ export function StoreHeader({ store, categories, slug, isPreview }: StoreHeaderP
 
           <div className="flex items-center gap-1">
             <Link
-              href={`/store/${slug}/products?search=1`}
+              href={storeHref(base, `/products?search=1`)}
               className="rounded-md p-2 text-gray-500 hover:bg-gray-50 hover:text-gray-700"
               aria-label="Search"
             >
@@ -99,7 +101,7 @@ export function StoreHeader({ store, categories, slug, isPreview }: StoreHeaderP
           <div className="border-t border-gray-100 bg-white px-4 pb-4 pt-2 md:hidden">
             <nav className="flex flex-col gap-1">
               <Link
-                href={`/store/${slug}/products`}
+                href={storeHref(base, `/products`)}
                 onClick={() => setMobileMenuOpen(false)}
                 className="rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
               >
@@ -108,7 +110,7 @@ export function StoreHeader({ store, categories, slug, isPreview }: StoreHeaderP
               {categories.map((cat) => (
                 <Link
                   key={cat.id}
-                  href={`/store/${slug}/products?category=${cat.slug}`}
+                  href={storeHref(base, `/products?category=${cat.slug}`)}
                   onClick={() => setMobileMenuOpen(false)}
                   className="rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
                 >

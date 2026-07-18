@@ -1,4 +1,5 @@
 'use client'
+import { useStoreBase, storeHref } from '@/components/store/StoreBaseProvider'
 
 import { useState, useEffect } from 'react'
 import { Link } from '@/i18n/navigation'
@@ -8,6 +9,7 @@ import { useParams } from 'next/navigation'
 import { useStoreCart } from '@/stores/cart.store'
 
 export default function CartPage() {
+  const base = useStoreBase()
   const [mounted, setMounted] = useState(false)
   useEffect(() => { setMounted(true) }, [])
   const { slug } = useParams<{ slug: string }>()
@@ -22,7 +24,7 @@ export default function CartPage() {
         <h1 className="mb-2 text-xl font-bold text-gray-900">Ձեր զամբյուղը դատարկ է</h1>
         <p className="mb-6 text-gray-500">Ավելացրեք ապրանքներ սկսելու համար։</p>
         <Link
-          href={`/store/${slug}/products`}
+          href={storeHref(base, `/products`)}
           className="rounded-lg bg-gray-900 px-6 py-3 text-sm font-semibold text-white hover:bg-gray-800 transition-colors"
         >
           Դիտել ապրանքները
@@ -43,7 +45,7 @@ export default function CartPage() {
                 key={`${item.productId}:${item.variantId ?? ''}`}
                 className="flex gap-4 py-5"
               >
-                <Link href={`/store/${slug}/products/${item.productSlug}`}>
+                <Link href={storeHref(base, `/products/${item.productSlug}`)}>
                   {item.image ? (
                     <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-xl border border-gray-100">
                       <Image src={item.image} alt={item.productName} fill className="object-cover" />
@@ -57,7 +59,7 @@ export default function CartPage() {
                   <div className="flex items-start justify-between gap-2">
                     <div>
                       <Link
-                        href={`/store/${slug}/products/${item.productSlug}`}
+                        href={storeHref(base, `/products/${item.productSlug}`)}
                         className="font-medium text-gray-900 hover:underline"
                       >
                         {item.productName}
@@ -119,13 +121,13 @@ export default function CartPage() {
               <span>{total.toLocaleString()} ֏</span>
             </div>
             <Link
-              href={`/store/${slug}/checkout`}
+              href={storeHref(base, `/checkout`)}
               className="flex w-full items-center justify-center rounded-xl bg-gray-900 px-4 py-3.5 text-sm font-semibold text-white hover:bg-gray-800 transition-colors"
             >
               Անցնել վճարման →
             </Link>
             <Link
-              href={`/store/${slug}/products`}
+              href={storeHref(base, `/products`)}
               className="mt-3 flex w-full items-center justify-center text-sm text-gray-500 hover:text-gray-700"
             >
               Շարունակել գնումները

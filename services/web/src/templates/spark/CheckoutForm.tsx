@@ -1,4 +1,5 @@
 'use client'
+import { useStoreBase, storeHref } from '@/components/store/StoreBaseProvider'
 
 import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -57,6 +58,7 @@ const inputCls =
   'h-11 w-full rounded-xl border border-gray-200 bg-white px-4 text-sm text-gray-900 placeholder:text-gray-300 transition-all focus:border-[var(--accent)] focus:outline-none focus:ring-2 focus:ring-[color-mix(in_srgb,var(--accent)_20%,white)]'
 
 export function CheckoutForm({ storeSlug, store }: CheckoutFormProps) {
+  const base = useStoreBase()
   const [mounted, setMounted] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [step, setStep] = useState<1 | 2>(1)
@@ -141,7 +143,7 @@ export function CheckoutForm({ storeSlug, store }: CheckoutFormProps) {
       {/* Top bar */}
       <div className="border-b border-gray-100 bg-white px-4 py-4">
         <div className="mx-auto flex max-w-5xl items-center justify-between">
-          <Link href={`/store/${storeSlug}`} className="font-bold tracking-tight text-gray-900">
+          <Link href={storeHref(base)} className="font-bold tracking-tight text-gray-900">
             {storeName}
           </Link>
           <div className="flex items-center gap-1.5 text-xs text-gray-400">

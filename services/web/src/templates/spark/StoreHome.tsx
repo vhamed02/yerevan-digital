@@ -1,4 +1,5 @@
 'use client'
+import { useStoreBase, storeHref } from '@/components/store/StoreBaseProvider'
 
 import { useRef } from 'react'
 import { Link } from '@/i18n/navigation'
@@ -85,6 +86,7 @@ function FeaturedSlider({ products, storeSlug, isPreview }: { products: Storefro
 }
 
 function CategoryCards({ categories, slug }: { categories: PublicCategory[]; slug: string }) {
+  const base = useStoreBase()
   const locale = useLocale()
   const t = useTranslations('storefront')
   const PALETTES = [
@@ -98,7 +100,7 @@ function CategoryCards({ categories, slug }: { categories: PublicCategory[]; slu
   return (
     <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
       <Link
-        href={`/store/${slug}/products`}
+        href={storeHref(base, `/products`)}
         className="group relative flex h-24 items-end overflow-hidden rounded-2xl p-4 ring-1 ring-black/[0.04] transition-all hover:-translate-y-0.5 hover:shadow-lg"
         style={{ background: 'linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 70%, black))' }}
       >
@@ -109,7 +111,7 @@ function CategoryCards({ categories, slug }: { categories: PublicCategory[]; slu
       {categories.slice(0, 7).map((cat, i) => (
         <Link
           key={cat.id}
-          href={`/store/${slug}/products?category=${cat.slug}`}
+          href={storeHref(base, `/products?category=${cat.slug}`)}
           className={`group relative flex h-24 items-end overflow-hidden rounded-2xl bg-gradient-to-br p-4 ring-1 ring-black/[0.04] transition-all hover:-translate-y-0.5 hover:shadow-lg ${PALETTES[i % PALETTES.length]}`}
         >
           <div className="pointer-events-none absolute inset-0 bg-black/10 opacity-0 transition-opacity group-hover:opacity-100" />
@@ -123,6 +125,7 @@ function CategoryCards({ categories, slug }: { categories: PublicCategory[]; slu
 }
 
 function FeaturedSpotlight({ product, storeSlug, isPreview }: { product: StorefrontProduct; storeSlug: string; isPreview?: boolean }) {
+  const base = useStoreBase()
   const locale = useLocale()
   const t = useTranslations('storefront')
   const name = pickLang(product.name, locale)
@@ -131,7 +134,7 @@ function FeaturedSpotlight({ product, storeSlug, isPreview }: { product: Storefr
   const savingsPct = isOnSale ? Math.round(((product.compare_price! - product.price) / product.compare_price!) * 100) : 0
 
   return (
-    <Link href={`/store/${storeSlug}/products/${product.slug}`} className="group block">
+    <Link href={storeHref(base, `/products/${product.slug}`)} className="group block">
       <div className="grid grid-cols-1 overflow-hidden rounded-3xl ring-1 ring-black/[0.06] transition-all duration-300 group-hover:shadow-xl sm:grid-cols-2">
         <div className="relative aspect-[4/3] overflow-hidden bg-gray-50 sm:aspect-auto sm:min-h-[360px]">
           {image ? (
@@ -205,6 +208,7 @@ function SectionHeading({ eyebrow, title, href }: { eyebrow?: string; title: str
 }
 
 export function StoreHome({ store, featuredProducts, products, categories, slug, isPreview }: StoreHomeProps) {
+  const base = useStoreBase()
   const locale = useLocale()
   const t = useTranslations('storefront')
   const name = pickLang(store.name, locale)
@@ -235,7 +239,7 @@ export function StoreHome({ store, featuredProducts, products, categories, slug,
               )}
               <div className="mt-8 flex flex-wrap gap-3">
                 <Link
-                  href={`/store/${slug}/products`}
+                  href={storeHref(base, `/products`)}
                   className="inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-sm font-bold text-white shadow-xl shadow-black/20 transition-all hover:scale-105 hover:shadow-2xl"
                   style={{ backgroundColor: 'var(--accent)' }}
                 >
@@ -243,7 +247,7 @@ export function StoreHome({ store, featuredProducts, products, categories, slug,
                 </Link>
                 {featuredProducts.length > 0 && (
                   <Link
-                    href={`/store/${slug}/products?featured=1`}
+                    href={storeHref(base, `/products?featured=1`)}
                     className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-7 py-3.5 text-sm font-semibold text-white backdrop-blur-sm transition-all hover:bg-white/20"
                   >
                     {t('home.featured')} ↗
@@ -265,7 +269,7 @@ export function StoreHome({ store, featuredProducts, products, categories, slug,
             <h1 className="text-6xl font-black leading-[1.02] text-white sm:text-8xl">{name}</h1>
             {description && <p className="mt-5 text-lg text-white/70">{description}</p>}
             <Link
-              href={`/store/${slug}/products`}
+              href={storeHref(base, `/products`)}
               className="mt-10 inline-flex items-center gap-2.5 rounded-full bg-white px-8 py-4 text-sm font-bold shadow-2xl shadow-black/20 transition-all hover:scale-105"
               style={{ color: 'var(--accent)' }}
             >
@@ -299,7 +303,7 @@ export function StoreHome({ store, featuredProducts, products, categories, slug,
         {/* ─── Categories ─── */}
         {showCategoryBar && categories.length > 0 && (
           <section>
-            <SectionHeading eyebrow={t('sections')} title={t('home.whatLookingFor')} href={`/store/${slug}/products`} />
+            <SectionHeading eyebrow={t('sections')} title={t('home.whatLookingFor')} href={storeHref(base, `/products`)} />
             <CategoryCards categories={categories} slug={slug} />
           </section>
         )}
@@ -318,7 +322,7 @@ export function StoreHome({ store, featuredProducts, products, categories, slug,
             <SectionHeading
               eyebrow={t('home.collection')}
               title={t('home.mostLoved')}
-              href={`/store/${slug}/products?featured=1`}
+              href={storeHref(base, `/products?featured=1`)}
             />
             <FeaturedSlider products={sliderProducts} storeSlug={slug} isPreview={isPreview} />
           </section>
@@ -329,7 +333,7 @@ export function StoreHome({ store, featuredProducts, products, categories, slug,
           <SectionHeading
             eyebrow={featuredProducts.length > 0 ? t('home.fullCollection') : undefined}
             title={t('allProducts')}
-            href={`/store/${slug}/products`}
+            href={storeHref(base, `/products`)}
           />
           <ProductGrid products={products} storeSlug={slug} isPreview={isPreview} />
         </section>

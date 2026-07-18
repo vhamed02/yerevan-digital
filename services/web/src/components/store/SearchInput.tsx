@@ -1,4 +1,5 @@
 'use client'
+import { useStoreBase, storeHref } from '@/components/store/StoreBaseProvider'
 
 import { useState, useRef } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -6,6 +7,7 @@ import { useTranslations } from 'next-intl'
 import { Search, X } from 'lucide-react'
 
 export function SearchInput({ storeSlug, initialValue }: { storeSlug: string; initialValue: string }) {
+  const base = useStoreBase()
   const router = useRouter()
   const sp = useSearchParams()
   const t = useTranslations('storefront')
@@ -17,7 +19,7 @@ export function SearchInput({ storeSlug, initialValue }: { storeSlug: string; in
     if (q) params.set('search', q)
     else params.delete('search')
     params.delete('page')
-    router.push(`/store/${storeSlug}/products?${params.toString()}`)
+    router.push(storeHref(base, `/products?${params.toString()}`))
   }
 
   function onChange(e: React.ChangeEvent<HTMLInputElement>) {

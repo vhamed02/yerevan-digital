@@ -1,4 +1,5 @@
 'use client'
+import { useStoreBase, storeHref } from '@/components/store/StoreBaseProvider'
 
 import { useState, useEffect } from 'react'
 import { Link } from '@/i18n/navigation'
@@ -11,6 +12,7 @@ import { CartDrawer } from './CartDrawer'
 import type { StoreHeaderProps } from '../types'
 
 export function StoreHeader({ store, categories, slug, isPreview }: StoreHeaderProps) {
+  const base = useStoreBase()
   const [cartOpen, setCartOpen] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
@@ -56,7 +58,7 @@ export function StoreHeader({ store, categories, slug, isPreview }: StoreHeaderP
           }`}
         >
           <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3.5">
-            <Link href={`/store/${slug}`} className="flex flex-shrink-0 items-center gap-3 group">
+            <Link href={storeHref(base)} className="flex flex-shrink-0 items-center gap-3 group">
               {store.logo_url ? (
                 <Image
                   src={store.logo_url}
@@ -78,7 +80,7 @@ export function StoreHeader({ store, categories, slug, isPreview }: StoreHeaderP
 
             <nav className="hidden items-center md:flex">
               <Link
-                href={`/store/${slug}/products`}
+                href={storeHref(base, `/products`)}
                 className="relative px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:text-gray-900 after:absolute after:bottom-0 after:left-3 after:right-3 after:h-px after:bg-[var(--accent)] after:scale-x-0 after:transition-transform hover:after:scale-x-100"
               >
                 {t('allProducts')}
@@ -86,7 +88,7 @@ export function StoreHeader({ store, categories, slug, isPreview }: StoreHeaderP
               {categories.slice(0, 5).map((cat) => (
                 <Link
                   key={cat.id}
-                  href={`/store/${slug}/products?category=${cat.slug}`}
+                  href={storeHref(base, `/products?category=${cat.slug}`)}
                   className="relative whitespace-nowrap px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:text-gray-900 after:absolute after:bottom-0 after:left-3 after:right-3 after:h-px after:bg-[var(--accent)] after:scale-x-0 after:transition-transform hover:after:scale-x-100"
                 >
                   {pickLang(cat.name, locale)}
@@ -101,7 +103,7 @@ export function StoreHeader({ store, categories, slug, isPreview }: StoreHeaderP
 
             <div className="flex items-center gap-1">
               <Link
-                href={`/store/${slug}/products?search=1`}
+                href={storeHref(base, `/products?search=1`)}
                 className="rounded-xl p-2.5 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700"
                 aria-label="Search"
               >
@@ -159,7 +161,7 @@ export function StoreHeader({ store, categories, slug, isPreview }: StoreHeaderP
           </div>
           <nav className="flex flex-col px-3 py-3">
             <Link
-              href={`/store/${slug}/products`}
+              href={storeHref(base, `/products`)}
               onClick={() => setMobileMenuOpen(false)}
               className="flex items-center rounded-xl px-3 py-3 text-sm font-semibold text-gray-800 transition-colors hover:bg-gray-50"
             >
@@ -168,7 +170,7 @@ export function StoreHeader({ store, categories, slug, isPreview }: StoreHeaderP
             {categories.map((cat) => (
               <Link
                 key={cat.id}
-                href={`/store/${slug}/products?category=${cat.slug}`}
+                href={storeHref(base, `/products?category=${cat.slug}`)}
                 onClick={() => setMobileMenuOpen(false)}
                 className="flex items-center rounded-xl px-3 py-3 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50"
               >

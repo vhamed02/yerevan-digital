@@ -1,4 +1,5 @@
 'use client'
+import { useStoreBase, storeHref } from '@/components/store/StoreBaseProvider'
 
 import { useState, useEffect } from 'react'
 import { X, Minus, Plus, ShoppingBag, ArrowRight, Gift } from 'lucide-react'
@@ -11,6 +12,7 @@ import type { CartDrawerProps } from '../types'
 const FREE_SHIPPING_THRESHOLD = 10000
 
 export function CartDrawer({ open, onClose, storeSlug }: CartDrawerProps) {
+  const base = useStoreBase()
   const [mounted, setMounted] = useState(false)
   const t = useTranslations('storefront')
   useEffect(() => { setMounted(true) }, [])
@@ -165,7 +167,7 @@ export function CartDrawer({ open, onClose, storeSlug }: CartDrawerProps) {
                 <span className="text-xl font-black text-gray-900">{total.toLocaleString()} ֏</span>
               </div>
               <Link
-                href={`/store/${storeSlug}/checkout`}
+                href={storeHref(base, `/checkout`)}
                 onClick={onClose}
                 className="flex w-full items-center justify-center gap-2 rounded-2xl py-3.5 text-sm font-bold text-white shadow-lg shadow-black/10 transition-all hover:opacity-90 hover:shadow-xl"
                 style={{ backgroundColor: 'var(--accent)' }}
@@ -173,7 +175,7 @@ export function CartDrawer({ open, onClose, storeSlug }: CartDrawerProps) {
                 {t('cart.checkout')} <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
-                href={`/store/${storeSlug}/cart`}
+                href={storeHref(base, `/cart`)}
                 onClick={onClose}
                 className="mt-2.5 flex w-full items-center justify-center rounded-2xl border border-gray-200 py-3 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50"
               >

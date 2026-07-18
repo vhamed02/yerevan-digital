@@ -1,4 +1,5 @@
 'use client'
+import { useStoreBase, storeHref } from '@/components/store/StoreBaseProvider'
 
 import { useState, useRef, useCallback } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -14,6 +15,7 @@ interface Props {
 }
 
 export function PriceRangeFilter({ storeSlug, initialMin, initialMax, rangeMax }: Props) {
+  const base = useStoreBase()
   const RANGE_MAX = rangeMax > 0 ? Math.ceil(rangeMax / STEP) * STEP : STEP
   const router = useRouter()
   const sp = useSearchParams()
@@ -31,7 +33,7 @@ export function PriceRangeFilter({ storeSlug, initialMin, initialMax, rangeMax }
     if (hi < RANGE_MAX) params.set('max_price', String(hi))
     else params.delete('max_price')
     params.delete('page')
-    router.push(`/store/${storeSlug}/products?${params.toString()}`)
+    router.push(storeHref(base, `/products?${params.toString()}`))
   }, [router, sp, storeSlug])
 
   function schedule(lo: number, hi: number) {

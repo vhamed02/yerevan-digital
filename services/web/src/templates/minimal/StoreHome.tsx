@@ -1,4 +1,5 @@
 'use client'
+import { useStoreBase, storeHref } from '@/components/store/StoreBaseProvider'
 
 import { Link } from '@/i18n/navigation'
 import Image from 'next/image'
@@ -15,6 +16,7 @@ export function StoreHome({
   slug,
   isPreview,
 }: StoreHomeProps) {
+  const base = useStoreBase()
   const locale = useLocale()
   const t = useTranslations('storefront')
   const name = pickLang(store.name, locale)
@@ -58,7 +60,7 @@ export function StoreHome({
         {store.template_config.show_categories_bar !== false && categories.length > 0 && (
           <div className="mb-8 flex items-center gap-2 overflow-x-auto pb-2">
             <Link
-              href={`/store/${slug}/products`}
+              href={storeHref(base, `/products`)}
               className="flex-shrink-0 rounded-full border border-gray-200 px-4 py-1.5 text-sm font-medium text-gray-700 hover:border-gray-900 hover:text-gray-900 transition-colors"
             >
               All
@@ -66,7 +68,7 @@ export function StoreHome({
             {categories.map((cat) => (
               <Link
                 key={cat.id}
-                href={`/store/${slug}/products?category=${cat.slug}`}
+                href={storeHref(base, `/products?category=${cat.slug}`)}
                 className="flex-shrink-0 rounded-full border border-gray-200 px-4 py-1.5 text-sm font-medium text-gray-700 hover:border-gray-900 hover:text-gray-900 transition-colors whitespace-nowrap"
               >
                 {pickLang(cat.name, locale)}
@@ -80,7 +82,7 @@ export function StoreHome({
             <div className="mb-5 flex items-center justify-between">
               <h2 className="text-lg font-bold text-gray-900">{t('featuredProducts')}</h2>
               <Link
-                href={`/store/${slug}/products?featured=1`}
+                href={storeHref(base, `/products?featured=1`)}
                 className="text-sm text-gray-500 hover:text-gray-700"
               >
                 {t('home.seeAll')} →
@@ -96,7 +98,7 @@ export function StoreHome({
               {featuredProducts.length > 0 ? t('allProducts') : t('home.products')}
             </h2>
             <Link
-              href={`/store/${slug}/products`}
+              href={storeHref(base, `/products`)}
               className="text-sm text-gray-500 hover:text-gray-700"
             >
               {t('home.seeAll')} →

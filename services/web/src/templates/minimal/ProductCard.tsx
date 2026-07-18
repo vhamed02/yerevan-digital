@@ -1,4 +1,5 @@
 'use client'
+import { useStoreBase, storeHref } from '@/components/store/StoreBaseProvider'
 
 import { useState } from 'react'
 import { Link } from '@/i18n/navigation'
@@ -10,6 +11,7 @@ import { pickLang } from '@/lib/i18n'
 import type { ProductCardProps } from '../types'
 
 export function ProductCard({ product, storeSlug, isPreview }: ProductCardProps) {
+  const base = useStoreBase()
   const [added, setAdded] = useState(false)
   const { addItem } = useStoreCart(storeSlug)
   const locale = useLocale()
@@ -26,7 +28,7 @@ export function ProductCard({ product, storeSlug, isPreview }: ProductCardProps)
   }
 
   return (
-    <Link href={`/store/${storeSlug}/products/${product.slug}`} className="group block">
+    <Link href={storeHref(base, `/products/${product.slug}`)} className="group block">
       <div className="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm transition-shadow group-hover:shadow-md">
         <div className="relative aspect-square overflow-hidden bg-gray-50">
           {image ? (

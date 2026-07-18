@@ -1,4 +1,5 @@
 'use client'
+import { useStoreBase, storeHref } from '@/components/store/StoreBaseProvider'
 
 import { useState, useRef, useEffect } from 'react'
 import Image from 'next/image'
@@ -75,6 +76,7 @@ function Lightbox({ src, alt, onClose }: { src: string; alt: string; onClose: ()
 }
 
 export function ProductDetail({ product, storeSlug, isPreview }: ProductDetailProps) {
+  const base = useStoreBase()
   const activeVariants = product.variants?.filter((v) => v.is_active) ?? []
   const [selectedVariant, setSelectedVariant] = useState<StorefrontVariant | null>(activeVariants[0] ?? null)
   const [quantity, setQuantity] = useState(1)
@@ -124,9 +126,9 @@ export function ProductDetail({ product, storeSlug, isPreview }: ProductDetailPr
       <div className="mx-auto max-w-5xl px-4 py-8">
         {/* Breadcrumb */}
         <nav className="mb-8 flex items-center gap-1.5 text-sm text-gray-400">
-          <Link href={`/store/${storeSlug}`} className="transition-colors hover:text-gray-700">Գлхавор</Link>
+          <Link href={storeHref(base)} className="transition-colors hover:text-gray-700">Գлхавор</Link>
           <ChevronRight className="h-3.5 w-3.5 flex-shrink-0" />
-          <Link href={`/store/${storeSlug}/products`} className="transition-colors hover:text-gray-700">Апранqner</Link>
+          <Link href={storeHref(base, `/products`)} className="transition-colors hover:text-gray-700">Апранqner</Link>
           <ChevronRight className="h-3.5 w-3.5 flex-shrink-0" />
           <span className="font-medium text-gray-900 line-clamp-1">{name}</span>
         </nav>
