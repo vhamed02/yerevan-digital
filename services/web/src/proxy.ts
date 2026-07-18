@@ -135,21 +135,18 @@ export async function proxy(request: NextRequest) {
         })
         return response
       }
-    } else if (!pathname.startsWith('/store/')) {
-      // A `<slug>.yerevan.digital` address with no active store: rewrite into
-      // the storefront route so its /info lookup 404s and the not-found
-      // boundary renders the "store unavailable" page. The attempted host is
+    } else if (platformSubdomainLabel(host)) {
+      // A `<slug>.yerevan.digital` address with no active store: render the
+      // dedicated "store unavailable" page (a real 404). The attempted host is
       // forwarded so that page can show it.
-      const label = platformSubdomainLabel(host)
-      if (label) {
-        const url = request.nextUrl.clone()
-        url.pathname = `/store/${label}`
+      const url = request.nextUrl.clone()
+      url.pathname = '/store-unavailable'
+      url.search = ''
 
-        const headers = new Headers(request.headers)
-        headers.set('x-store-host', host)
+      const headers = new Headers(request.headers)
+      headers.set('x-store-host', host)
 
-        return NextResponse.rewrite(url, { request: { headers } })
-      }
+      return NextResponse.rewrite(url, { request: { headers } })
     }
   }
 
