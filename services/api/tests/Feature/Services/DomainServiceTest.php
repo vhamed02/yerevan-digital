@@ -103,6 +103,42 @@ class DomainServiceTest extends TestCase
         $this->assertNull($this->service->resolveSlug(''));
     }
 
+    public function test_resolves_a_platform_subdomain_to_an_active_store(): void
+    {
+        Store::factory()->create([
+            'slug'   => 'billing-test-store',
+            'status' => StoreStatus::Active,
+        ]);
+
+        // No custom domain, no verification needed — the platform owns the parent.
+        $this->assertSame('billing-test-store', $this->service->resolveSlug('billing-test-store.yerevan.digital'));
+        // Case/port insensitive, same as any other host.
+        $this->assertSame('billing-test-store', $this->service->resolveSlug('Billing-Test-Store.Yerevan.Digital:443'));
+    }
+
+    public function test_platform_subdomain_of_a_suspended_or_unknown_store_does_not_resolve(): void
+    {
+        Store::factory()->create([
+            'slug'   => 'sleeping-store',
+            'status' => StoreStatus::Suspended,
+        ]);
+
+        $this->assertNull($this->service->resolveSlug('sleeping-store.yerevan.digital'));
+        $this->assertNull($this->service->resolveSlug('no-such-store.yerevan.digital'));
+    }
+
+    public function test_reserved_and_deep_platform_subdomains_never_resolve(): void
+    {
+        // Even if a store somehow had these slugs, the label is reserved.
+        Store::factory()->create(['slug' => 'admin', 'status' => StoreStatus::Active]);
+
+        $this->assertNull($this->service->resolveSlug('admin.yerevan.digital'));
+        $this->assertNull($this->service->resolveSlug('www.yerevan.digital'));
+        $this->assertNull($this->service->resolveSlug('api.yerevan.digital'));
+        // Multi-level names under the platform host are not store subdomains.
+        $this->assertNull($this->service->resolveSlug('a.b.yerevan.digital'));
+    }
+
     public function test_suspending_a_store_busts_the_resolve_cache(): void
     {
         $store = Store::factory()->create([

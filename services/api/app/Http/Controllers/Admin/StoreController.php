@@ -30,7 +30,7 @@ class StoreController extends Controller
             'seller_id'           => ['required', 'integer', 'exists:users,id'],
             'name.hy'             => ['required', 'string', 'max:200'],
             'name.en'             => ['required', 'string', 'max:200'],
-            'slug'                => ['required', 'string', 'max:100', 'unique:stores,slug', 'regex:/^[a-z0-9-]+$/'],
+            'slug'                => ['required', 'string', 'max:100', 'unique:stores,slug', 'regex:/^[a-z0-9-]+$/', \Illuminate\Validation\Rule::notIn(config('domains.reserved_subdomains', []))],
             'status'              => ['sometimes', 'in:pending,active,suspended'],
             'active_template_key' => ['sometimes', 'string', 'max:50'],
             'primary_color'       => ['sometimes', 'string', 'max:20'],

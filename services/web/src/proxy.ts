@@ -22,6 +22,9 @@ const PLATFORM_HOSTS = new Set(
 /** Paths that stay on the platform even when reached via a custom domain. */
 const PLATFORM_ONLY_PREFIXES = ['/admin', '/seller', '/auth', '/api', '/_next']
 
+/** The platform host. Every store's canonical URL is `<slug>.<PLATFORM_HOST>`. */
+const PLATFORM_HOST = process.env.NEXT_PUBLIC_PLATFORM_HOST ?? 'yerevan.digital'
+
 function normaliseHost(host: string): string {
   return host.split(':')[0].trim().toLowerCase().replace(/\.$/, '')
 }
@@ -67,6 +70,26 @@ export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   const host = normaliseHost(request.headers.get('host') ?? '')
+
+  // A store's canonical URL is its subdomain, so a hit on the apex
+  // /store/<slug> is permanently redirected to <slug>.<PLATFORM_HOST>.
+  // The seller store-preview iframe loads /store/<slug>?preview=true on the
+  // apex, so preview requests are left untouched.
+  if (
+    (host === PLATFORM_HOST || host === `www.${PLATFORM_HOST}`) &&
+    request.nextUrl.searchParams.get('preview') !== 'true'
+  ) {
+    const storeMatch = pathname.match(/^(\/(?:en|hy|ru))?\/store\/([^/]+)(\/.*)?$/)
+    if (storeMatch) {
+      const [, localeSeg = '', slug, rest = ''] = storeMatch
+      const target = request.nextUrl.clone()
+      target.protocol = 'https:'
+      target.host = `${slug}.${PLATFORM_HOST}`
+      target.port = ''
+      target.pathname = `${localeSeg}${rest}` || '/'
+      return NextResponse.redirect(target, 301)
+    }
+  }
 
   // Custom storefront domain: serve the store at the domain root, so
   // shop.example.am/products maps to /store/<slug>/products.

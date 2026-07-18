@@ -6,11 +6,10 @@ import { loadTemplate } from '@/lib/templates'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { pickLang } from '@/lib/i18n'
 import { localePath, localizedAlternates, ogLocale } from '@/lib/seo'
+import { storeOrigin } from '@/lib/storeUrl'
 import type { StorefrontStore, StorefrontProduct, PublicCategory } from '@/types'
 
 export const dynamic = 'force-dynamic'
-
-const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://radif.org'
 
 export async function generateMetadata({
   params,
@@ -24,14 +23,19 @@ export async function generateMetadata({
   const name = pickLang(store.name, locale)
   const description = pickLang(store.meta_description, locale) || pickLang(store.description, locale) || undefined
   return {
+    // Canonical/OG/alternate URLs below are relative; metadataBase resolves them
+    // to absolute URLs on the store's subdomain (or its verified custom domain).
+    metadataBase: new URL(storeOrigin(store)),
     title: pickLang(store.meta_title, locale) || `${name} | Yerevan Digital`,
     description,
-    alternates: localizedAlternates(`/store/${slug}`, locale),
+    // The storefront lives at the subdomain root (metadataBase), so the
+    // canonical path is '/', not '/store/<slug>'.
+    alternates: localizedAlternates('/', locale),
     openGraph: {
       type: 'website',
       title: name,
       description,
-      url: localePath(locale, `/store/${slug}`),
+      url: localePath(locale, '/'),
       ...ogLocale(locale),
       ...(store.banner_url ? { images: [{ url: store.banner_url }] } : {}),
     },
@@ -44,14 +48,14 @@ export async function generateMetadata({
   }
 }
 
-function buildStoreJsonLd(store: StorefrontStore, slug: string, locale: string): Record<string, unknown> {
+function buildStoreJsonLd(store: StorefrontStore, locale: string): Record<string, unknown> {
   const name = pickLang(store.name, locale)
   const description = pickLang(store.description, locale)
   return {
     '@context': 'https://schema.org',
     '@type': 'OnlineStore',
     name,
-    url: `${BASE_URL}/store/${slug}`,
+    url: storeOrigin(store),
     ...(description ? { description } : {}),
     ...(store.logo_url ? { logo: store.logo_url } : {}),
     ...(store.banner_url ? { image: store.banner_url } : {}),
@@ -89,7 +93,7 @@ export default async function StorefrontPage({
 
   return (
     <>
-      {!isPreview && <JsonLd data={buildStoreJsonLd(store, slug, locale)} />}
+      {!isPreview && <JsonLd data={buildStoreJsonLd(store, locale)} />}
       <Template.StoreHome
         store={store}
         featuredProducts={featuredData?.data ?? []}

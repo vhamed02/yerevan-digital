@@ -12,6 +12,18 @@ return [
     |
     */
 
+    // The platform's own host. Every store is served for free at
+    // <slug>.<platform_host> (e.g. billing-test-store.yerevan.digital) without
+    // any claim/verification — the platform owns the parent domain.
+    'platform_host' => env('PLATFORM_HOST', 'yerevan.digital'),
+
+    // Subdomain labels that must never be resolved to a store, even if a store
+    // with that slug exists. These are platform-owned or ambiguous hostnames.
+    'reserved_subdomains' => [
+        'www', 'api', 'admin', 'app', 'mail', 'smtp', 'static', 'cdn',
+        'assets', 'storage', 'media', 'files', 'ftp', 'ns', 'ns1', 'ns2',
+    ],
+
     // TXT record checked for the verification token, prefixed to the domain:
     //   _yerevan-verify.shop.example.am  TXT  "<token>"
     'verification_prefix' => env('DOMAIN_VERIFY_PREFIX', '_yerevan-verify'),

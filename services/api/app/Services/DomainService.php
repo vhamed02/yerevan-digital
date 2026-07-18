@@ -108,18 +108,55 @@ class DomainService
             return null;
         }
 
+        // Platform subdomain (<slug>.yerevan.digital): served for free, no claim
+        // or verification — matched by slug on any Active store.
+        $label = $this->platformSubdomainLabel($host);
+
         $cached = Cache::remember(
             $this->cacheKey($host),
             config('domains.resolve_cache_ttl'),
-            fn () => Store::query()
-                ->where('custom_domain', $host)
-                ->whereNotNull('custom_domain_verified_at')
-                ->where('status', StoreStatus::Active)
-                ->value('slug') ?? '',
+            fn () => ($label !== null
+                ? Store::query()
+                    ->where('slug', $label)
+                    ->where('status', StoreStatus::Active)
+                    ->value('slug')
+                : Store::query()
+                    ->where('custom_domain', $host)
+                    ->whereNotNull('custom_domain_verified_at')
+                    ->where('status', StoreStatus::Active)
+                    ->value('slug')
+            ) ?? '',
         );
 
         // '' is the cached "no such domain", so a miss doesn't re-query every hit.
         return $cached === '' ? null : $cached;
+    }
+
+    /**
+     * If $host is a direct `<label>.<platform_host>` subdomain that is eligible
+     * to serve a store, return the label; otherwise null (the apex itself, a
+     * reserved label like www/api, or a deeper name such as a.b.yerevan.digital).
+     */
+    private function platformSubdomainLabel(string $host): ?string
+    {
+        $platform = mb_strtolower(trim((string) config('domains.platform_host')));
+
+        if ($platform === '' || ! str_ends_with($host, '.' . $platform)) {
+            return null;
+        }
+
+        $label = substr($host, 0, -(strlen($platform) + 1));
+
+        // Single label only, and never a reserved/platform-owned subdomain.
+        if ($label === '' || str_contains($label, '.')) {
+            return null;
+        }
+
+        if (in_array($label, config('domains.reserved_subdomains', []), true)) {
+            return null;
+        }
+
+        return $label;
     }
 
     public function forget(?string $host): void

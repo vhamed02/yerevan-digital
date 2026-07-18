@@ -240,14 +240,11 @@ function Step2Form({
       <div className="flex flex-col gap-1.5">
         <label className="text-sm font-medium text-content-primary">Store URL</label>
         <div className="flex items-center gap-0">
-          <span className="flex h-10 items-center rounded-l border border-r-0 border-border bg-surface-secondary px-3 text-sm text-content-muted">
-            yerevan.digital/store/
-          </span>
           <div className="relative flex-1">
             <input
               placeholder="ani-studio"
               className={cn(
-                'h-10 w-full rounded-r border border-border bg-surface px-3 pr-8 text-sm text-content-primary placeholder:text-content-muted',
+                'h-10 w-full rounded-l border border-r-0 border-border bg-surface px-3 pr-8 text-sm text-content-primary placeholder:text-content-muted',
                 'focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500',
                 errors.store_slug && 'border-status-error'
               )}
@@ -259,6 +256,9 @@ function Step2Form({
               {slugStatus === 'taken' && <X className="h-4 w-4 text-status-error" />}
             </span>
           </div>
+          <span className="flex h-10 items-center whitespace-nowrap rounded-r border border-l-0 border-border bg-surface-secondary px-3 text-sm text-content-muted">
+            .yerevan.digital
+          </span>
         </div>
         {slugStatus === 'available' && <p className="text-xs text-status-success">Available ✓</p>}
         {slugStatus === 'taken' && <p className="text-xs text-status-error">This URL is already taken</p>}

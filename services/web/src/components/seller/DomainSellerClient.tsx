@@ -9,6 +9,8 @@ import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Badge } from '@/components/ui/Badge'
 import api from '@/lib/api'
+import useAuthStore from '@/stores/auth.store'
+import { storeOrigin, PLATFORM_HOST } from '@/lib/storeUrl'
 import type { ApiError, SellerDomain } from '@/types'
 
 interface DomainSellerClientProps {
@@ -44,6 +46,7 @@ function CopyRow({ label, value }: { label: string; value: string }) {
 export default function DomainSellerClient({ initialDomain }: DomainSellerClientProps) {
   const queryClient = useQueryClient()
   const [input, setInput] = useState(initialDomain?.custom_domain ?? '')
+  const storeSlug = useAuthStore((s) => s.sellerStore?.slug) ?? null
 
   const { data: domain } = useQuery({
     queryKey: ['seller-domain'],
@@ -94,10 +97,38 @@ export default function DomainSellerClient({ initialDomain }: DomainSellerClient
   return (
     <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 lg:px-8">
       <div className="mb-6">
-        <h1 className="font-heading text-xl font-bold text-content-primary">Custom domain</h1>
+        <h1 className="font-heading text-xl font-bold text-content-primary">Domain</h1>
         <p className="text-sm text-content-muted">
-          Serve your storefront on your own domain instead of a yerevan.digital address.
+          Your store is live on a free {PLATFORM_HOST} address. You can also connect your own
+          domain below.
         </p>
+      </div>
+
+      {storeSlug && (
+        <div className="mb-4 flex flex-col gap-3 rounded-xl border border-border bg-surface p-5">
+          <div className="flex items-center gap-2">
+            <Globe className="h-4 w-4 text-content-muted" />
+            <p className="text-sm font-semibold text-content-primary">Your free store address</p>
+            <Badge variant="success">Active</Badge>
+          </div>
+          <p className="text-xs text-content-muted">
+            Every store gets this address automatically — it&apos;s live now, no setup needed.
+          </p>
+          <CopyRow label="Store URL" value={`${storeSlug}.${PLATFORM_HOST}`} />
+          <a
+            href={storeOrigin({ slug: storeSlug })}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm font-medium text-brand-500 underline"
+          >
+            Open store ↗
+          </a>
+        </div>
+      )}
+
+      <div className="mb-2 flex flex-col gap-1">
+        <p className="text-sm font-semibold text-content-primary">Use your own domain</p>
+        <p className="text-xs text-content-muted">Optional — serve the storefront on a domain you own.</p>
       </div>
 
       <div className="flex flex-col gap-4 rounded-xl border border-border bg-surface p-5">
@@ -134,7 +165,7 @@ export default function DomainSellerClient({ initialDomain }: DomainSellerClient
               size="sm"
               disabled={removeMutation.isPending}
               onClick={() => {
-                if (confirm(`Remove ${current}? Your store stays reachable on yerevan.digital.`)) {
+                if (confirm(`Remove ${current}? Your store stays reachable at ${storeSlug ? `${storeSlug}.${PLATFORM_HOST}` : PLATFORM_HOST}.`)) {
                   removeMutation.mutate()
                 }
               }}

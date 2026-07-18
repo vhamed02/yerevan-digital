@@ -6,6 +6,7 @@ import StoreStatusBanner from '@/components/seller/StoreStatusBanner'
 import { RevenueBarChart, OrderStatusDonut } from '@/components/seller/SellerCharts'
 import { StatusBadge } from '@/components/ui/StatusBadge'
 import { serverAuthGet } from '@/lib/server-api'
+import { storeUrl } from '@/lib/storeUrl'
 import type { SellerDashboardData, Store } from '@/types'
 
 export const dynamic = 'force-dynamic'
@@ -151,7 +152,7 @@ export default async function SellerDashboardPage() {
           </Link>
           {store?.slug && (
             <a
-              href={`/store/${store.slug}`}
+              href={storeUrl(store)}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 rounded-lg border border-border px-4 py-2.5 text-sm font-medium text-content-primary hover:bg-surface-secondary transition-colors"

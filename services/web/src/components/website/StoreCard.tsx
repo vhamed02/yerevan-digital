@@ -1,12 +1,12 @@
 'use client'
 
 import Image from 'next/image'
-import { Link } from '@/i18n/navigation'
 import { useLocale } from 'next-intl'
 import { Avatar } from '@/components/ui/Avatar'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { pickLang } from '@/lib/i18n'
+import { storeUrl } from '@/lib/storeUrl'
 import type { PublicStore } from '@/types'
 
 const DEFAULT_BANNER = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQwIiBoZWlnaHQ9IjI4MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjRThFQUYwIi8+PC9zdmc+'
@@ -43,11 +43,11 @@ export default function StoreCard({ store }: StoreCardProps) {
         <div className="mt-2 flex items-center gap-2">
           <Badge variant="outline">{store.product_count} products</Badge>
         </div>
-        <Link href={`/store/${store.slug}`} className="mt-3 block">
+        <a href={storeUrl({ slug: store.slug })} className="mt-3 block">
           <Button variant="outline" size="sm" className="w-full">
             Visit Store →
           </Button>
-        </Link>
+        </a>
       </div>
     </div>
   )

@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Seller;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class CreateStoreRequest extends FormRequest
 {
@@ -13,7 +14,9 @@ class CreateStoreRequest extends FormRequest
             'name.hy'        => ['required', 'string', 'max:255'],
             'name.en'        => ['required', 'string', 'max:255'],
             'name.ru'        => ['nullable', 'string', 'max:255'],
-            'slug'           => ['required', 'string', 'max:100', 'unique:stores,slug', 'regex:/^[a-z0-9-]+$/'],
+            // A store is served at <slug>.yerevan.digital, so the slug must not
+            // collide with a reserved/platform subdomain (www, api, …).
+            'slug'           => ['required', 'string', 'max:100', 'unique:stores,slug', 'regex:/^[a-z0-9-]+$/', Rule::notIn(config('domains.reserved_subdomains', []))],
             'description'    => ['nullable', 'array'],
             'description.hy' => ['nullable', 'string'],
             'description.en' => ['nullable', 'string'],
