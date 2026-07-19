@@ -38,6 +38,7 @@
   --font-body: var(--font-inter), sans-serif;
   --font-mono: var(--font-jetbrains-mono), monospace;
   --font-sans: var(--font-inter), sans-serif;
+  --font-logo: var(--font-arm-bebas), var(--font-plus-jakarta), sans-serif;
 }
 
 body {

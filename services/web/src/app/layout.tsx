@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Plus_Jakarta_Sans, Inter, JetBrains_Mono } from 'next/font/google'
+import localFont from 'next/font/local'
 import { NextIntlClientProvider } from 'next-intl'
 import { getLocale, getMessages } from 'next-intl/server'
 import './globals.css'
@@ -22,6 +23,13 @@ const jetbrainsMono = JetBrains_Mono({
   display: 'swap',
 })
 
+// Armenian Bebas Neue — the logo wordmark only.
+const armBebas = localFont({
+  src: './fonts/arm-bebas-neue.ttf',
+  variable: '--font-arm-bebas',
+  display: 'swap',
+})
+
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? 'https://radif.org'),
   title: 'Yerevan Digital',
@@ -36,7 +44,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const messages = await getMessages()
 
   return (
-    <html lang={locale} className={`${plusJakarta.variable} ${inter.variable} ${jetbrainsMono.variable}`}>
+    <html lang={locale} className={`${plusJakarta.variable} ${inter.variable} ${jetbrainsMono.variable} ${armBebas.variable}`}>
       <body>
         <NextIntlClientProvider locale={locale} messages={messages}>
           {children}

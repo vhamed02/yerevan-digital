@@ -11,10 +11,10 @@ export default function Footer() {
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-10 sm:grid-cols-3">
           <div className="flex flex-col gap-3">
-            <Link href="/" className="flex items-center gap-2 font-heading text-lg font-bold text-content-primary">
+            <Link href="/" className="flex items-center gap-2 text-content-primary">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/logo.svg" alt="" width={24} height={24} className="h-6 w-6" />
-              Yerevan Digital
+              <span className="font-logo text-xl leading-none tracking-wide">Երևան Դիջիթալ</span>
             </Link>
             <p className="text-sm text-content-muted">{t('tagline')}</p>
           </div>

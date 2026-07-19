@@ -39,7 +39,7 @@ export default function Navbar() {
         <Link href="/" className="flex items-center gap-2.5">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/logo.svg" alt="Yerevan Digital" width={32} height={32} className="h-8 w-8" />
-          <span className="font-heading text-lg font-bold text-content-primary tracking-tight">Yerevan Digital</span>
+          <span className="font-logo text-2xl leading-none text-content-primary tracking-wide">Երևան Դիջիթալ</span>
         </Link>
 
         <nav className="hidden items-center gap-1 md:flex">
