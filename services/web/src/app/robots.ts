@@ -1,7 +1,7 @@
 import type { MetadataRoute } from 'next'
 
 export default function robots(): MetadataRoute.Robots {
-  const siteUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://radif.org'
+  const siteUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://yerevan.digital'
 
   return {
     rules: {
@@ -9,6 +9,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: '/',
       disallow: ['/admin/', '/seller/', '/dev/'],
     },
-    sitemap: `${siteUrl}/sitemap.xml`,
+    sitemap: `${siteUrl}/sitemap_index.xml`,
   }
 }
