@@ -14,6 +14,7 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const t = useTranslations('nav')
   const ta = useTranslations('account')
+  const tb = useTranslations('brand')
   const { isAuthenticated, user, logout } = useAuthStore()
 
   const isCustomer = user?.role === 'customer'
@@ -39,7 +40,12 @@ export default function Navbar() {
         <Link href="/" className="flex items-center gap-2.5">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/logo.svg" alt="Yerevan Digital" width={32} height={32} className="h-8 w-8" />
-          <span className="font-logo text-2xl leading-none text-content-primary tracking-wide">Երևան Դիջիթալ</span>
+          <span
+            className="font-logo leading-none text-content-primary tracking-wide"
+            style={{ fontSize: '22px', position: 'relative', top: '2px', fontWeight: 300 }}
+          >
+            {tb('wordmark')}
+          </span>
         </Link>
 
         <nav className="hidden items-center gap-1 md:flex">

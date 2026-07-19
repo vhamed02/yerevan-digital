@@ -5,6 +5,7 @@ import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher'
 
 export default function Footer() {
   const t = useTranslations('footer')
+  const tb = useTranslations('brand')
 
   return (
     <footer className="border-t border-border bg-surface-secondary">
@@ -14,7 +15,12 @@ export default function Footer() {
             <Link href="/" className="flex items-center gap-2 text-content-primary">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/logo.svg" alt="" width={24} height={24} className="h-6 w-6" />
-              <span className="font-logo text-xl leading-none tracking-wide">Երևան Դիջիթալ</span>
+              <span
+                className="font-logo leading-none tracking-wide"
+                style={{ fontSize: '22px', position: 'relative', top: '2px', fontWeight: 300 }}
+              >
+                {tb('wordmark')}
+              </span>
             </Link>
             <p className="text-sm text-content-muted">{t('tagline')}</p>
           </div>
