@@ -140,13 +140,20 @@ services:
 
 networks:
   yerevan-digital-backend:
+    name: yerevan-digital-backend
     driver: bridge
   yerevan-digital-frontend:
+    name: yerevan-digital-frontend
     driver: bridge
 
 volumes:
   mysql_data:
+    name: yerevan-digital_mysql_data
   mongodb_data:
+    name: yerevan-digital_mongodb_data
   redis_data:
+    name: yerevan-digital_redis_data
   storage_data:
+    name: yerevan-digital_storage_data
   meilisearch_data:
+    name: yerevan-digital_meilisearch_data
