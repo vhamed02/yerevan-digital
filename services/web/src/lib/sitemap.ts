@@ -21,6 +21,12 @@ export const PLATFORM_HOST =
 /** Google caps a single sitemap at 50,000 URLs / 50 MB. */
 export const SITEMAP_LIMIT = 50000
 
+/**
+ * Yoast-style stylesheet reference. Search engines ignore it; browsers render
+ * the XML as a styled, clickable table (see app/sitemap.xsl/route.ts).
+ */
+const STYLESHEET = `<?xml-stylesheet type="text/xsl" href="${SITEMAP_BASE}/sitemap.xsl"?>`
+
 /** A store's public storefront lives on its own subdomain, over HTTPS. */
 export function storeOrigin(slug: string): string {
   return `https://${slug}.${PLATFORM_HOST}`
@@ -107,6 +113,7 @@ export function renderUrlset(entries: SitemapEntry[]): string {
 
   return (
     `<?xml version="1.0" encoding="UTF-8"?>\n` +
+    `${STYLESHEET}\n` +
     `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" ` +
     `xmlns:xhtml="http://www.w3.org/1999/xhtml" ` +
     `xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n` +
@@ -125,6 +132,7 @@ export function renderSitemapIndex(sitemaps: IndexEntry[]): string {
 
   return (
     `<?xml version="1.0" encoding="UTF-8"?>\n` +
+    `${STYLESHEET}\n` +
     `<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
     `${items}\n</sitemapindex>\n`
   )
