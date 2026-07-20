@@ -20,12 +20,8 @@ const XSL = `<?xml version="1.0" encoding="UTF-8"?>
         <meta name="robots" content="noindex,follow"/>
         <title>XML Sitemap &#8212; Yerevan Digital</title>
         <style>
-          :root{--bg:#f8fafc;--card:#ffffff;--fg:#0f172a;--muted:#64748b;
+          :root{color-scheme:light;--bg:#f8fafc;--card:#ffffff;--fg:#0f172a;--muted:#64748b;
                 --border:#e2e8f0;--brand:#6863f5;--brand-soft:#eeecff;--row:#f8fafc;}
-          @media (prefers-color-scheme:dark){
-            :root{--bg:#0b0d12;--card:#12151c;--fg:#e5e7eb;--muted:#94a3b8;
-                  --border:#232833;--brand:#a9a9fc;--brand-soft:#1b1e2b;--row:#0f1319;}
-          }
           *{box-sizing:border-box}
           body{margin:0;background:var(--bg);color:var(--fg);
                font:14px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
