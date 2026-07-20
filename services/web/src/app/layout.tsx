@@ -31,7 +31,7 @@ const armBebas = localFont({
 })
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? 'https://radif.org'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? 'https://yerevan.digital'),
   title: 'Yerevan Digital',
   description: 'Armenian store builder platform',
   verification: {
