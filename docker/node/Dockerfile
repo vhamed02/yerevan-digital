@@ -3,8 +3,15 @@
 # To upgrade: change the digest deliberately, expect one slow rebuild.
 FROM node:22-alpine@sha256:968df39aedcea65eeb078fb336ed7191baf48f972b4479711397108be0966920 AS deps
 WORKDIR /app
-COPY services/web/package.json ./
-RUN npm install
+# Install from the committed lockfile. A bare `npm install` re-resolves the tree
+# on every build, which is how the 2026-07-20 deploys died: it picked
+# @hookform/resolvers 5.4.3, whose optional @typeschema peer chain pins
+# valibot 0.39 against its own valibot ^1 peer — ERESOLVE, and the whole deploy
+# aborts before the api is ever built. `npm ci` installs exactly what the lock
+# says (resolvers 5.2.2, no valibot at all) and fails loudly if the lock and
+# package.json drift apart.
+COPY services/web/package.json services/web/package-lock.json ./
+RUN npm ci
 
 FROM node:22-alpine@sha256:968df39aedcea65eeb078fb336ed7191baf48f972b4479711397108be0966920 AS builder
 WORKDIR /app
