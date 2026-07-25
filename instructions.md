@@ -3,6 +3,13 @@
 ### Version 2.0 — Final
 
 ---
+> **OUTDATED — this is the original build spec, kept for history.** It still describes
+> MongoDB (`store_template_configs`, `MONGODB_*`, the `mongodb` container and PHP
+> extension) and Meilisearch. Both were **removed on 2026-07-26**: template config is a
+> `store_template_configs` table in MySQL and product search is SQL `LIKE`. For the
+> current architecture read `CLAUDE.md` and `README.md`, not this file.
+
+---
 > NOTES:
 > * Imagine you are a senior software engineer. Always consider SOLID principles,
     >   proper design patterns, clean code, and best practices. There is no rush.

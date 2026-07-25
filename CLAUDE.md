@@ -40,7 +40,7 @@ Git identity: `user.name="vhamed02"`, `user.email=vhamed02@gmail.com`
 - **Server:** Ubuntu 24, hostname `yerevan.digital`, repo at `/home/yerevan-digital` (the old `/home/deploy/vendora` and `/home/vendorex` paths are gone; `/home/vendorex` still holds an unused `docker/`+`services/` fragment from the rename)
 - **Domains:** `yerevan.digital` (frontend) / `api.yerevan.digital` (API), both Cloudflare-proxied; TLS terminates at Cloudflare (nginx listens on 80 only). The old `radif.org` zone is stale (522) — don't use it. `/etc/hosts` maps `yerevan.digital` to 127.0.1.1, so server-local curl tests need `--resolve` or `http://localhost` + Host header.
 - **Stack:** Laravel 13 / PHP 8.5 API + Next.js 16.2.6 frontend, MySQL 8, Redis 7, Docker Compose
-- **Networks:** `yerevan-digital-backend` (api, mysql, mongodb, redis), `yerevan-digital-frontend` (nginx, web, api)
+- **Networks:** `yerevan-digital-backend` (api, mysql, redis), `yerevan-digital-frontend` (nginx, web, api)
 - **Workers:** `queue` runs `queue:work` (emails/notifications) and `scheduler` runs `schedule:work`. `QUEUE_CONNECTION=redis`, so if `queue` is down, mail silently never sends; anything registered in `routes/console.php` needs `scheduler` up.
 - **SSR API path:** Next.js server-side calls `http://nginx:8080/api/v1/...` — nginx listens on 8080 and proxies to PHP-FPM at `api:9000`
 - **Client-side API path:** `https://api.yerevan.digital/api/v1/...`
@@ -211,8 +211,7 @@ Both are applied in `CreateOrderAction`, inside the order transaction. Order mat
 repo). Logs to `/var/log/yerevan-digital/backup.log`, writes to `/var/backups/yerevan-digital`, keeps 7 days.
 
 Backs up only what can't be rebuilt: **MySQL** (`--single-transaction`, gzipped) and the
-**storage volume** (uploaded images). Meilisearch is a derived index — rebuild it with
-`scout:import` rather than restoring it. Redis is cache/queue. The script verifies the gzip and
+**storage volume** (uploaded images). Redis is cache/queue. The script verifies the gzip and
 greps for mysqldump's `Dump completed` marker, because a truncated dump that looks like a
 backup is worse than none; it also refuses to run below 2 GB free (the box sits at ~80% full).
 
@@ -221,8 +220,6 @@ backup is worse than none; it also refuses to run below 2 GB free (the box sits 
 zcat /var/backups/yerevan-digital/mysql-YYYYmmdd-HHMMSS.sql.gz | \
   docker compose -f docker-compose.yml -f docker-compose.prod.yml exec -T mysql \
   sh -c 'mysql -u root -p"$MYSQL_ROOT_PASSWORD" "$MYSQL_DATABASE"'
-# then rebuild the search index:
-docker compose ... exec -T api php artisan scout:import "App\Models\Product"
 ```
 Verified end-to-end on 2026-07-16 by restoring into a scratch database (37 tables, 38
 migrations). **Backups are local only** — a disk failure loses them with the site. Offsite copy
@@ -278,8 +275,7 @@ that ledger balance into money the platform actually collects, weekly.
 ## Custom domains & search (added 2026-07-15)
 
 - **Custom domains:** full design in [`docs/custom-domains.md`](docs/custom-domains.md). Short version: `proxy.ts` resolves the Host via `GET /domains/resolve` and rewrites `/` → `/store/{slug}`; a domain only routes once its TXT record is verified **and** the store is active. **TLS is the seller's own Cloudflare** — this box has no certs and no certbot, and nginx listens on :80 only. The host nginx catch-all that makes this work lives in `/etc/nginx/sites-available/vendora`, which is **not in this repo and not restored by a deploy** (backup: `/root/vendora.bak.*`).
-- **Search:** Laravel Scout + Meilisearch (`meilisearch` container, `SCOUT_DRIVER=meilisearch`, `SCOUT_QUEUE=true` so indexing rides the existing `queue` worker). `Product::toSearchableArray()` indexes `name_hy/name_en/name_ru` + `sku` — **the old SQL `LIKE` search only looked at `name->en` and `name->hy`, so Russian was unfindable**. `ProductRepository::searchProductIds()` returns ids and lets SQL apply every other filter and the sort; it returns `null` (→ SQL `LIKE` fallback) when the driver isn't meilisearch *or* Meilisearch is unreachable, so a search outage degrades instead of 500ing. Filterable attributes are declared in `config/scout.php` and applied by `scout:sync-index-settings` (runs on deploy) — Meilisearch **rejects** a filter on an undeclared attribute. Tests force `SCOUT_DRIVER=null`.
-- **Backfilling the index:** `php artisan scout:import "App\Models\Product"`. Not in the deploy — it's a one-off after enabling search or restoring the Meilisearch volume.
+- **Search:** plain SQL `LIKE` in `ProductRepository::paginatePublicByStore()`, matching `name->hy`, `name->en`, `name->ru` and `sku`, composed with every other filter and the sort. **Meilisearch and Scout were removed on 2026-07-26** — with no live sellers, a search container and its index were not worth ~190 MB of a 3.7 GB box. The engine bought typo tolerance and relevance ranking, not extra coverage: all three languages are searched either way. Reintroduce Scout only when catalogue size (or seller complaints about typo matching) justifies the container.
 - **Wishlist:** `wishlist_items`, per-account and login-gated (`/customer/wishlist`). Before this the spark `ProductCard` heart was `useState` only and saved nothing.
 
 ## Seller analytics
@@ -326,6 +322,7 @@ Trilingual (hy/en/ru) blog for SEO. One shared English-canonical slug per post; 
 
 ## Architecture notes
 
+- **Storefront template config lives in MySQL** (`store_template_configs`, one JSON row per store, FK cascade). It was a MongoDB collection until 2026-07-26; the `mongodb` container, connection, PHP extension and `mongodb/laravel-mongodb` are all gone. `StoreTemplateConfigRepository` is the only way in — don't reach for the model directly.
 - **Each seller has exactly one store.** The seller middleware, dashboard, and all seller API routes are scoped to a single store per user. Multi-store would require a significant refactor.
 - **Seller layout:** `SellerLayoutClient` renders `{children}` directly inside `min-h-screen` (no `<main>` wrapper). Each seller page/component owns its own `mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8` container. `StoreDesignClient` goes full-bleed (no container, no negative margins needed).
 - **Product slug check endpoint:** `GET /seller/products/check-slug?slug=x&exclude=uuid` — must come before `products/{uuid}` in routes or Laravel matches it as a UUID.

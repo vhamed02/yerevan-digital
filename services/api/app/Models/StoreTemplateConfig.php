@@ -2,13 +2,11 @@
 
 namespace App\Models;
 
-use MongoDB\Laravel\Eloquent\Model;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class StoreTemplateConfig extends Model
 {
-    protected $connection = 'mongodb';
-    protected $collection = 'store_template_configs';
-
     protected $fillable = ['store_id', 'config'];
 
     protected function casts(): array
@@ -17,5 +15,10 @@ class StoreTemplateConfig extends Model
             'store_id' => 'integer',
             'config'   => 'array',
         ];
+    }
+
+    public function store(): BelongsTo
+    {
+        return $this->belongsTo(Store::class);
     }
 }

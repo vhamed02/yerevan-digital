@@ -14,7 +14,6 @@ class HealthController extends Controller
     {
         $services = [
             'database' => $this->checkDatabase(),
-            'mongodb'  => $this->checkMongodb(),
             'redis'    => $this->checkRedis(),
             'storage'  => $this->checkStorage(),
             'queue'    => $this->checkQueue(),
@@ -34,16 +33,6 @@ class HealthController extends Controller
     {
         try {
             DB::selectOne('SELECT 1');
-            return 'ok';
-        } catch (\Throwable) {
-            return 'error';
-        }
-    }
-
-    private function checkMongodb(): string
-    {
-        try {
-            DB::connection('mongodb')->command(['ping' => 1]);
             return 'ok';
         } catch (\Throwable) {
             return 'error';

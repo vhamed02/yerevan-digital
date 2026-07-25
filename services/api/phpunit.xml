@@ -28,10 +28,6 @@
         <env name="DB_URL" value="" force="true"/>
         <env name="MAIL_MAILER" value="array" force="true"/>
         <env name="QUEUE_CONNECTION" value="sync" force="true"/>
-        <!-- No Meilisearch in tests: models must not try to index, and the
-             storefront search falls back to SQL LIKE. -->
-        <env name="SCOUT_DRIVER" value="null" force="true"/>
-        <env name="SCOUT_QUEUE" value="false" force="true"/>
         <env name="SESSION_DRIVER" value="array" force="true"/>
         <env name="PULSE_ENABLED" value="false" force="true"/>
         <env name="TELESCOPE_ENABLED" value="false" force="true"/>

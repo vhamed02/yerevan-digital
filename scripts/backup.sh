@@ -6,9 +6,7 @@
 #   - storage : uploaded product images / logos / banners
 #
 # Deliberately NOT backed up:
-#   - meilisearch : a derived index. Rebuild with `scout:import` (see CLAUDE.md).
-#   - redis       : cache + queue. Losing it costs pending jobs, not records.
-#   - mongodb     : currently unused by the app.
+#   - redis : cache + queue. Losing it costs pending jobs, not records.
 #
 # Installed via scripts/install-backup-timer.sh (systemd timer, 03:20 daily).
 

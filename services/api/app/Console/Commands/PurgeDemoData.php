@@ -87,6 +87,7 @@ class PurgeDemoData extends Command
             DB::table('store_payment_gateways')->whereIn('store_id', $storeIds)->delete();
             DB::table('store_settings')->whereIn('store_id', $storeIds)->delete();
             DB::table('commission_invoices')->whereIn('store_id', $storeIds)->delete();
+            DB::table('store_template_configs')->whereIn('store_id', $storeIds)->delete();
             DB::table('stores')->whereIn('id', $storeIds)->delete();
             DB::table('notifications')
                 ->where('notifiable_type', User::class)
@@ -112,8 +113,6 @@ class PurgeDemoData extends Command
             DB::table('orders')->whereIn('customer_id', $userIds)->update(['customer_id' => null]);
             DB::table('users')->whereIn('id', $userIds)->delete();
         });
-
-        $this->purgeMongoTemplateConfigs($storeIds);
 
         Artisan::call('cache:clear');
         $this->info('Cache cleared.');
@@ -151,6 +150,7 @@ class PurgeDemoData extends Command
             'store_payment_gateways' => DB::table('store_payment_gateways')->whereIn('store_id', $storeIds)->count(),
             'store_settings'         => DB::table('store_settings')->whereIn('store_id', $storeIds)->count(),
             'commission_invoices'    => DB::table('commission_invoices')->whereIn('store_id', $storeIds)->count(),
+            'store_template_configs' => DB::table('store_template_configs')->whereIn('store_id', $storeIds)->count(),
             'stores'                 => $storeIds->count(),
             'notifications'          => DB::table('notifications')->where('notifiable_type', User::class)->whereIn('notifiable_id', $userIds)->count(),
             'personal_access_tokens' => DB::table('personal_access_tokens')->where('tokenable_type', User::class)->whereIn('tokenable_id', $userIds)->count(),
@@ -165,17 +165,5 @@ class PurgeDemoData extends Command
                 })->count(),
             'users'                  => $userIds->count(),
         ];
-    }
-
-    private function purgeMongoTemplateConfigs(Collection $storeIds): void
-    {
-        try {
-            DB::connection('mongodb')
-                ->table('store_template_configs')
-                ->whereIn('store_id', $storeIds->all())
-                ->delete();
-        } catch (\Throwable $e) {
-            $this->warn('MongoDB template-config cleanup skipped: ' . $e->getMessage());
-        }
     }
 }

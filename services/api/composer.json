@@ -12,10 +12,7 @@
         "intervention/image-laravel": "^4.0",
         "laravel/framework": "^13.7",
         "laravel/sanctum": "^4.3",
-        "laravel/scout": "^11.3",
         "laravel/tinker": "^3.0",
-        "meilisearch/meilisearch-php": "^1.16",
-        "mongodb/laravel-mongodb": "^5.7",
         "owen-it/laravel-auditing": "^14.0",
         "predis/predis": "^3.4",
         "spatie/laravel-medialibrary": "^11.22",
@@ -89,8 +86,7 @@
         "preferred-install": "dist",
         "sort-packages": true,
         "allow-plugins": {
-            "pestphp/pest-plugin": true,
-            "php-http/discovery": true
+            "pestphp/pest-plugin": true
         }
     },
     "minimum-stability": "stable",

@@ -44,8 +44,6 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
-      mongodb:
-        condition: service_started
       redis:
         condition: service_healthy
     healthcheck:
@@ -104,21 +102,6 @@ services:
       timeout: 5s
       retries: 5
 
-  mongodb:
-    image: mongo:7
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGODB_USERNAME}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_PASSWORD}
-      MONGO_INITDB_DATABASE: ${MONGODB_DATABASE}
-    volumes:
-      - mongodb_data:/data/db
-    networks:
-      - yerevan-digital-backend
-    restart: unless-stopped
-    mem_limit: 192m
-    mem_reservation: 48m
-    memswap_limit: 320m
-
   redis:
     image: redis:7-alpine
     command: redis-server --appendonly yes --appendfsync everysec --maxmemory 256mb --maxmemory-policy allkeys-lru
@@ -155,16 +138,6 @@ services:
     mem_reservation: 48m
     memswap_limit: 256m
 
-  meilisearch:
-    # Memory on this box is tight (swap already in use), so cap the indexer.
-    # The catalogue is small; Meilisearch only needs room for its index.
-    environment:
-      MEILI_MAX_INDEXING_MEMORY: 96Mb
-      MEILI_MAX_INDEXING_THREADS: "1"
-    mem_limit: 192m
-    mem_reservation: 64m
-    memswap_limit: 320m
-
   scheduler:
     <<: *api-common
     command: php artisan schedule:work
@@ -197,7 +170,5 @@ networks:
 
 volumes:
   mysql_data:
-  mongodb_data:
   redis_data:
   storage_data:
-  meilisearch_data:

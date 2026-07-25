@@ -9,12 +9,6 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class ProductRepository implements ProductRepositoryInterface
 {
-    /**
-     * Cap on ids pulled back from the search engine before SQL filters run.
-     * A storefront catalogue is small; this only bounds a pathological query.
-     */
-    private const SEARCH_ID_LIMIT = 500;
-
     public function paginateByStore(int $storeId, array $filters, string $sort, int $perPage): LengthAwarePaginator
     {
         $query = Product::where('store_id', $storeId)
@@ -90,16 +84,14 @@ class ProductRepository implements ProductRepositoryInterface
     public function paginatePublicByStore(int $storeId, array $filters, string $sort, int $perPage, int $page): LengthAwarePaginator
     {
         $searchTerm = $filters['search'] ?? null;
-        $matchedIds = $searchTerm ? $this->searchProductIds($storeId, (string) $searchTerm) : null;
 
         $query = Product::where('store_id', $storeId)
             ->where('status', ProductStatus::Active)
             ->with(['images', 'category'])
             ->when($filters['category'] ?? null, fn($q, $v) => $q->whereHas('category', fn($q) => $q->where('slug', $v)))
-            // Meilisearch narrows to matching ids; every other filter and the
-            // sort stay in SQL, so search composes with them unchanged.
-            ->when($matchedIds !== null, fn($q) => $q->whereIn('id', $matchedIds))
-            ->when($matchedIds === null && $searchTerm, fn($q) => $q->where(function ($q) use ($searchTerm) {
+            // Storefront search is SQL `LIKE` across all three name translations
+            // and the SKU; it composes with every other filter and the sort.
+            ->when($searchTerm, fn($q) => $q->where(function ($q) use ($searchTerm) {
                 $q->where('name->en', 'like', "%{$searchTerm}%")
                     ->orWhere('name->hy', 'like', "%{$searchTerm}%")
                     ->orWhere('name->ru', 'like', "%{$searchTerm}%")
@@ -121,36 +113,6 @@ class ProductRepository implements ProductRepositoryInterface
             'featured'   => $query->orderByDesc('is_featured')->latest(),
             default      => $query->latest(),
         })->paginate($perPage, ['*'], 'page', $page);
-    }
-
-    /**
-     * Product ids matching a storefront search, via Meilisearch.
-     *
-     * Returns null to mean "no search engine — use the SQL LIKE fallback",
-     * which is also what happens if Meilisearch is unreachable: a search outage
-     * degrades the results rather than 500ing the storefront.
-     *
-     * @return int[]|null
-     */
-    private function searchProductIds(int $storeId, string $term): ?array
-    {
-        if (config('scout.driver') !== 'meilisearch') {
-            return null;
-        }
-
-        try {
-            return Product::search($term)
-                ->where('store_id', $storeId)
-                ->where('status', ProductStatus::Active->value)
-                ->take(self::SEARCH_ID_LIMIT)
-                ->keys()
-                ->map(fn ($id) => (int) $id)
-                ->all();
-        } catch (\Throwable $e) {
-            report($e);
-
-            return null;
-        }
     }
 
     public function findPublicByStoreAndSlug(int $storeId, string $slug, array $with = []): Product

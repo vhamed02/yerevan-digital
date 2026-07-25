@@ -21,14 +21,14 @@ Yerevan Digital is a multi-tenant e-commerce platform built for Armenian busines
                                           │  └──────────────┘   │
                                           └──────────┬──────────┘
                                                      │
-                        ┌────────────────────────────┼───────────────────────┐
-                        │                            │                       │
-                 ┌──────▼──────┐          ┌──────────▼────┐        ┌────────▼──────┐
-                 │  MySQL 8.0  │          │  MongoDB 7.0  │        │   Redis 7.x   │
-                 │  users      │          │  template     │        │  Cache        │
-                 │  stores     │          │  configs      │        │  Queue jobs   │
-                 │  products   │          │               │        │  Rate limits  │
-                 │  orders     │          └───────────────┘        └───────────────┘
+                        ┌────────────────────────────┴───────────────────────┐
+                        │                                                    │
+                 ┌──────▼──────┐                                    ┌────────▼──────┐
+                 │  MySQL 8.0  │                                    │   Redis 7.x   │
+                 │  users      │                                    │  Cache        │
+                 │  stores     │                                    │  Queue jobs   │
+                 │  products   │                                    │  Rate limits  │
+                 │  orders     │                                    └───────────────┘
                  └─────────────┘
 ```
 
@@ -40,7 +40,6 @@ Yerevan Digital is a multi-tenant e-commerce platform built for Armenian busines
 | Runtime | PHP | 8.5 |
 | Frontend | Next.js | 16.2.6 (TypeScript) |
 | Primary DB | MySQL | 8.0 |
-| Document Store | MongoDB | 7.0 |
 | Cache & Queue | Redis | 7.x |
 | Web Server | Nginx | 1.25 |
 | Containers | Docker + Compose | Latest |
@@ -144,8 +143,6 @@ docker compose exec api php artisan storage:link
 | `DB_DATABASE` | MySQL database name | `vendora` |
 | `DB_USERNAME` | MySQL user | `vendora` |
 | `DB_PASSWORD` | MySQL password | `secret` |
-| `MONGODB_HOST` | MongoDB host | `mongodb` |
-| `MONGODB_DATABASE` | MongoDB database | `vendora_docs` |
 | `REDIS_HOST` | Redis host | `redis` |
 | `BREVO_API_KEY` | Brevo transactional email key | `xkeysib-...` |
 | `MAIL_FROM_ADDRESS` | Default sender email | `hello@yerevan.digital` |

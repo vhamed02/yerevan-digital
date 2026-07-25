@@ -100,7 +100,7 @@ work, not the email.
 | Delivered | Where |
 |-----------|-------|
 | Custom domains (TXT verification, Host→store routing, seller UI) | `app/Services/DomainService.php`, `proxy.ts`, `/seller/domain` |
-| Meilisearch product search (hy/en/ru + SKU, SQL fallback) | `config/scout.php`, `ProductRepository::searchProductIds()` |
+| Product search hy/en/ru + SKU (SQL `LIKE`; Meilisearch removed 2026-07-26) | `ProductRepository::paginatePublicByStore()` |
 | Real wishlist (per-account, login-gated) | `app/Models/WishlistItem.php`, `hooks/useWishlist.ts`, `/account/wishlist` |
 | Admin settings 422 fix | `UpdateSettingsRequest`, `SettingsAdminClient.tsx` |
 
@@ -137,7 +137,7 @@ Design notes in `CLAUDE.md` → "Commission billing".
 | Issue | Severity | Detail |
 |-------|----------|--------|
 | Unauth API returns 500 without `Accept` | 🟢 Cosmetic | With `Accept: application/json` it correctly returns 401. Bare requests hit a missing `login` named route. Affects every admin endpoint equally; no real client sends no Accept. |
-| **Memory pressure** | 🟠 Watch | 3.8 GB box with **swap already ~1.5/2 GB used** before Meilisearch was added. `web` runs at ~114/128 MB. Meilisearch is capped at 192 MB with a 96 MB indexing budget. If things get unstable, this is the first place to look. |
+| **Memory pressure** | 🟠 Watch | 3.8 GB box with **swap already ~1.5/2 GB used**. `web` runs at ~114/128 MB. Dropping `mongodb` + `meilisearch` on 2026-07-26 gave back ~40 MB live and 384 MB of `mem_limit` commitment. If things get unstable, this is still the first place to look. |
 | Admin sidebar says "Yerevan Digital" | 🟢 Cosmetic | `components/admin/AdminSidebar.tsx`. The 2026-07-14 rebrand was Yerevan Digital → Yerevan Digital; unclear if this internal label was intentional. |
 | Seller payments page fetches `/seller/payment-gateways` | 🟡 Unverified | Routes define `/seller/payments/{available,configured}`. Possible pre-existing 404 — **not investigated**. |
 
@@ -175,7 +175,7 @@ Match it. Both phases shipped with:
 - Live smoke test after deploy (`scheduler` up, tables created, endpoints answering)
 
 ### Traps that already bit once
-- `scripts/deploy.sh` **enumerates services** to build/start. Add any new container to **both** lines or it silently never runs. (Cost the scheduler once; nearly cost Meilisearch too.)
+- `scripts/deploy.sh` **enumerates services** to build/start. Add any new container to **both** lines or it silently never runs. (Cost the scheduler once.)
 - **Never write a payment gateway without the provider's real API docs.** A guessed protocol looks complete and passes self-written tests.
 - `/etc/nginx/sites-enabled/` is `include`d wholesale — never leave a `.bak` there or nginx loads it as a duplicate config.
 - `Store` route key is **slug**, not id.

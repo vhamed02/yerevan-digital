@@ -13,8 +13,7 @@ RUN install-php-extensions \
         intl \
         opcache \
         exif \
-        redis \
-        mongodb
+        redis
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 

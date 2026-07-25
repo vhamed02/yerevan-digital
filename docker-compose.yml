@@ -31,7 +31,6 @@ services:
       - yerevan-digital-frontend
     depends_on:
       - mysql
-      - mongodb
       - redis
     restart: unless-stopped
 
@@ -64,18 +63,6 @@ services:
       timeout: 5s
       retries: 5
 
-  mongodb:
-    image: mongo:7
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGODB_USERNAME:-vendora}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_PASSWORD:-secret}
-      MONGO_INITDB_DATABASE: ${MONGODB_DATABASE:-vendora_docs}
-    volumes:
-      - mongodb_data:/data/db
-    networks:
-      - yerevan-digital-backend
-    restart: unless-stopped
-
   redis:
     image: redis:7-alpine
     command: redis-server --appendonly yes
@@ -100,18 +87,6 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-
-  meilisearch:
-    image: getmeili/meilisearch:v1.11
-    environment:
-      MEILI_MASTER_KEY: ${MEILISEARCH_KEY}
-      MEILI_ENV: production
-      MEILI_NO_ANALYTICS: "true"
-    volumes:
-      - meilisearch_data:/meili_data
-    networks:
-      - yerevan-digital-backend
-    restart: unless-stopped
 
   scheduler:
     <<: *api-common
@@ -149,11 +124,7 @@ networks:
 volumes:
   mysql_data:
     name: yerevan-digital_mysql_data
-  mongodb_data:
-    name: yerevan-digital_mongodb_data
   redis_data:
     name: yerevan-digital_redis_data
   storage_data:
     name: yerevan-digital_storage_data
-  meilisearch_data:
-    name: yerevan-digital_meilisearch_data
