@@ -2,18 +2,20 @@
 
 namespace App\Services\PaymentGateway\Gateways;
 
-use App\Services\PaymentGateway\Contracts\PaymentGatewayInterface;
+use App\Services\PaymentGateway\Contracts\UnimplementedGateway;
 use App\Services\PaymentGateway\DTOs\PaymentInitiateResponse;
 use App\Services\PaymentGateway\DTOs\PaymentRefundResponse;
 use App\Services\PaymentGateway\DTOs\PaymentRequest;
 use App\Services\PaymentGateway\DTOs\PaymentVerifyResponse;
 use RuntimeException;
 
-class ConverseBankGateway implements PaymentGatewayInterface
+/** Placeholder only — see {@see UnimplementedGateway}. No Converse Bank docs yet. */
+class ConverseBankGateway implements UnimplementedGateway
 {
     public function getName(): string
     {
-        return 'converse_bank';
+        // Must match the seeded payment_gateways.name, which is 'converse'.
+        return 'converse';
     }
 
     public function initiate(PaymentRequest $request): PaymentInitiateResponse

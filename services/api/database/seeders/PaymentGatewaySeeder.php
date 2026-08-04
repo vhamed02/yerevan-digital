@@ -41,6 +41,9 @@ class PaymentGatewaySeeder extends Seeder
                 ],
                 'sort_order'           => 2,
             ],
+            // Placeholders. `is_active` stays false and the classes implement
+            // UnimplementedGateway, which blocks activation in the admin panel —
+            // neither has a real integration, or provider docs to build one from.
             [
                 'name'                 => 'ineco',
                 'display_name'         => ['hy' => 'Ինեկոբանկ', 'en' => 'Inecobank'],

@@ -2,18 +2,20 @@
 
 namespace App\Services\PaymentGateway\Gateways;
 
-use App\Services\PaymentGateway\Contracts\PaymentGatewayInterface;
+use App\Services\PaymentGateway\Contracts\UnimplementedGateway;
 use App\Services\PaymentGateway\DTOs\PaymentInitiateResponse;
 use App\Services\PaymentGateway\DTOs\PaymentRefundResponse;
 use App\Services\PaymentGateway\DTOs\PaymentRequest;
 use App\Services\PaymentGateway\DTOs\PaymentVerifyResponse;
 use RuntimeException;
 
-class InnecobankGateway implements PaymentGatewayInterface
+/** Placeholder only — see {@see UnimplementedGateway}. No Inecobank docs yet. */
+class InnecobankGateway implements UnimplementedGateway
 {
     public function getName(): string
     {
-        return 'innecobank';
+        // Must match the seeded payment_gateways.name, which is 'ineco'.
+        return 'ineco';
     }
 
     public function initiate(PaymentRequest $request): PaymentInitiateResponse

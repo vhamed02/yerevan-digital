@@ -58,6 +58,13 @@ class PaymentGatewayTest extends TestCase
         $this->assertStringContainsString('coming soon', $response->errorMessage);
     }
 
+    /** Names track the seeded DB rows, not the class names. */
+    public function test_stub_names_match_their_seeded_gateway_rows(): void
+    {
+        $this->assertSame('ineco', (new InnecobankGateway())->getName());
+        $this->assertSame('converse', (new ConverseBankGateway())->getName());
+    }
+
     public function test_registry_register_and_get(): void
     {
         $registry = new PaymentGatewayRegistry();
