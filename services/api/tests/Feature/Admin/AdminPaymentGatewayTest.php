@@ -143,6 +143,45 @@ class AdminPaymentGatewayTest extends TestCase
         $this->assertNotInstanceOf(UnimplementedGateway::class, $registry->get('telcell'));
     }
 
+    /**
+     * Deploys migrate but never seed, so a gateway that exists only in the
+     * seeder never reaches production. Telcell shipped complete on 2026-07-17
+     * but had no row on the live server until 2026-08-04 — silently, because a
+     * missing row does not error, the payment option simply never appears.
+     *
+     * Asserted against the migrated baseline with **no seeding**, which is
+     * exactly what a deploy produces.
+     */
+    public function test_telcell_row_comes_from_a_migration_not_only_the_seeder(): void
+    {
+        $telcell = PaymentGateway::where('name', 'telcell')->first();
+
+        $this->assertNotNull($telcell, 'no telcell row exists after migrating without seeding');
+        $this->assertTrue((bool) $telcell->is_active);
+    }
+
+    /**
+     * A flat array of strings renders zero inputs in the seller config UI, so
+     * the gateway silently becomes impossible to configure. Idram carried that
+     * shape until 2026-08-04.
+     */
+    public function test_live_gateway_rows_use_the_structured_required_fields_shape(): void
+    {
+        $this->seed(PaymentGatewaySeeder::class);
+
+        foreach (['idram', 'telcell'] as $name) {
+            $fields = PaymentGateway::where('name', $name)->value('required_fields');
+
+            $this->assertNotEmpty($fields, "'{$name}' has no required_fields");
+
+            foreach ($fields as $field) {
+                $this->assertIsArray($field, "'{$name}' uses the legacy flat required_fields shape");
+                $this->assertArrayHasKey('key', $field);
+                $this->assertArrayHasKey('label_en', $field);
+            }
+        }
+    }
+
     public function test_the_seeder_leaves_both_stubs_inactive(): void
     {
         $this->seed(PaymentGatewaySeeder::class);

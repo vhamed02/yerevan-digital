@@ -34,8 +34,8 @@ class SellerPaymentTest extends TestCase
 
     public function test_seller_can_list_available_gateways(): void
     {
-        PaymentGateway::factory()->count(3)->create(['is_active' => true]);
-        PaymentGateway::factory()->create(['is_active' => false]);
+        $active   = PaymentGateway::factory()->count(3)->create(['is_active' => true]);
+        $inactive = PaymentGateway::factory()->create(['is_active' => false]);
 
         $response = $this->actingAsSeller()
             ->getJson('/api/v1/seller/payments/available')
@@ -44,7 +44,15 @@ class SellerPaymentTest extends TestCase
                 'data' => [['id', 'name', 'display_name', 'required_fields', 'is_configured']],
             ]);
 
-        $this->assertCount(3, $response->json('data'));
+        // Scoped to the rows this test created — data migrations seed real
+        // gateway rows, so a global count here would be brittle.
+        $returned = collect($response->json('data'))->pluck('id');
+
+        foreach ($active as $gateway) {
+            $this->assertContains($gateway->id, $returned);
+        }
+
+        $this->assertNotContains($inactive->id, $returned);
     }
 
     public function test_available_gateways_show_configured_status(): void

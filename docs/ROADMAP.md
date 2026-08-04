@@ -13,7 +13,7 @@ Read `CLAUDE.md` first — it is loaded automatically and is not repeated here.
 | Fact | Value | How to re-check |
 |------|-------|-----------------|
 | Stores / products / orders | **0 / 0 / 0** — pre-launch, never had real traffic | `curl -s https://api.yerevan.digital/api/v1/stats` |
-| API tests | 525 passing | see `CLAUDE.md` → "Running tests" |
+| API tests | 527 passing | see `CLAUDE.md` → "Running tests" |
 | Web tests | 81 passing | `npm test` in a node container |
 | Business model | Free to launch, **per-sale commission** (default 5%) | `services/web/src/messages/en.json` → `pricing` |
 | Market | Armenia · AMD · trilingual hy/en/ru | — |
@@ -164,7 +164,7 @@ the order UUID specifically so that unauthenticated endpoint can't be used to en
 | Issue | Severity | Detail |
 |-------|----------|--------|
 | ~~Registry key ≠ seeder name for bank stubs~~ | ✅ Fixed 2026-08-04 | Registry keys aligned to `ineco` / `converse`, and both stubs now implement `UnimplementedGateway` so the admin panel refuses to activate them at all. A test asserts every seeded name resolves in the registry. |
-| **`telcell` row missing in production** | 🔴 Open | `PaymentGatewaySeeder` defines it but deploys only migrate, so the live DB has only `idram`, `ineco`, `converse`. **Telcell checkout has never worked on this server** — no seller can enable it and it never appears in a storefront. Commission-invoice payment via Telcell is unaffected (reads `config/telcell.php`, not the DB row). Fix is a data migration adding the row, same pattern as `2026_08_04_000001`. |
+| ~~`telcell` row missing in production~~ | ✅ Fixed 2026-08-04 | Telcell shipped complete on 2026-07-17 but its row lived only in the seeder, and deploys never seed — so Telcell checkout had never worked on this server. No error; the option simply never appeared. Added by `2026_08_04_000003`, verified against a clone of production. `AdminPaymentGatewayTest` now asserts it exists in the **migrated, unseeded** baseline. |
 | Unauth API returns 500 without `Accept` | 🟢 Cosmetic | With `Accept: application/json` it correctly returns 401. Bare requests hit a missing `login` named route. Affects every admin endpoint equally; no real client sends no Accept. |
 | **Memory pressure** | 🟠 Watch | 3.8 GB box with **swap already ~1.5/2 GB used**. `web` runs at ~114/128 MB. Dropping `mongodb` + `meilisearch` on 2026-07-26 gave back ~40 MB live and 384 MB of `mem_limit` commitment. If things get unstable, this is still the first place to look. |
 | Admin sidebar says "Yerevan Digital" | 🟢 Cosmetic | `components/admin/AdminSidebar.tsx`. The 2026-07-14 rebrand was Yerevan Digital → Yerevan Digital; unclear if this internal label was intentional. |
