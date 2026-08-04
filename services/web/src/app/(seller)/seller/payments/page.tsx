@@ -10,6 +10,6 @@ export const metadata: Metadata = {
 }
 
 export default async function SellerPaymentsPage() {
-  const gateways = await serverAuthGet<StoreGatewayConfig[]>('/seller/payment-gateways')
+  const gateways = await serverAuthGet<StoreGatewayConfig[]>('/seller/payments/available')
   return <PaymentsSellerClient initialGateways={gateways ?? []} />
 }

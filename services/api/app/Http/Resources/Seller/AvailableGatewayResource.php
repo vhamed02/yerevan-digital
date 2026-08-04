@@ -20,6 +20,13 @@ class AvailableGatewayResource extends JsonResource
             'instructions'         => $this->getTranslations('instructions'),
             'is_configured'        => (bool) ($this->storeGateway ?? false),
             'is_enabled'           => $this->storeGateway?->is_enabled ?? false,
+            // Reflected back so the config form doesn't silently reset a live
+            // gateway to sandbox (or vice versa) on an unrelated edit.
+            'is_sandbox'           => $this->storeGateway?->is_sandbox ?? false,
+            // Gateways whose callback/return addresses are registered with the
+            // provider by the seller rather than sent per payment (Idram) need
+            // to show those exact addresses for copying.
+            'integration_urls'     => $this->integrationUrls ?? null,
         ];
     }
 }

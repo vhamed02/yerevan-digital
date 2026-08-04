@@ -212,12 +212,15 @@ Route::prefix('v1')->middleware('throttle:api')->group(function () {
         Route::patch('payments/{gatewayId}/toggle', [Seller\PaymentController::class, 'toggle']);
 
         Route::get('invoices', [Seller\CommissionInvoiceController::class, 'index']);
+        // Must precede invoices/{uuid} or Laravel matches it as a uuid.
+        Route::get('invoices/payment-methods', [Seller\CommissionInvoiceController::class, 'paymentMethods']);
         Route::get('invoices/{uuid}', [Seller\CommissionInvoiceController::class, 'show']);
         Route::post('invoices/{uuid}/pay', [Seller\CommissionInvoiceController::class, 'pay']);
     });
 
     Route::post('store/payments/sandbox/complete', [Store\PaymentController::class, 'sandboxComplete']);
-    Route::post('invoices/callback/telcell', [InvoicePaymentController::class, 'callback']);
+    Route::post('invoices/callback/{gateway}', [InvoicePaymentController::class, 'callback'])
+        ->whereIn('gateway', ['idram', 'telcell']);
 
     Route::prefix('store')->middleware(ResolveStore::class)->group(function () {
         Route::get('{slug}/info', [Store\StoreController::class, 'info']);

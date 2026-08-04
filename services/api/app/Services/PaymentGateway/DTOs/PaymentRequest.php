@@ -16,5 +16,10 @@ readonly class PaymentRequest
         public array   $credentials,
         public bool    $sandbox,
         public ?string $sandboxUrl = null,
+        /**
+         * Gateway-specific switches that don't belong in the shared shape —
+         * e.g. Idram's `method` ('wallet' vs the VISA/MasterCard iframe).
+         */
+        public array   $options = [],
     ) {}
 }

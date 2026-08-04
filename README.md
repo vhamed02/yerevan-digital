@@ -1,6 +1,6 @@
 # Yerevan Digital — Armenian Store Builder Platform
 
-Yerevan Digital is a multi-tenant e-commerce platform built for Armenian businesses. Sellers register, create a branded online store, manage products and orders, and accept payments via Armenian payment gateways (Idram, with Inecobank and Converse Bank stubs ready to activate).
+Yerevan Digital is a multi-tenant e-commerce platform built for Armenian businesses. Sellers register, create a branded online store, manage products and orders, and accept payments via Armenian payment gateways (Idram — wallet and bank card — plus Telcell, with Inecobank and Converse Bank stubs ready to activate).
 
 ```
                        ┌──────────────────────────────────────────────┐
@@ -47,7 +47,7 @@ Yerevan Digital is a multi-tenant e-commerce platform built for Armenian busines
 | Permissions | Spatie Permission | Latest |
 | Image Processing | Intervention Image | 3.x |
 | Email | Brevo API v3 | — |
-| Payments | Idram (+ stubs) | — |
+| Payments | Idram (wallet + card), Telcell (+ stubs) | — |
 | Styling | Tailwind CSS 4 + Radix UI | Latest |
 | i18n | next-intl | Latest |
 | API Docs | Scramble | Latest |
@@ -119,11 +119,15 @@ docker compose exec api php artisan storage:link
 
 ## How to Add a New Payment Gateway
 
-1. Create `app/Services/PaymentGateway/Gateways/YourGateway.php` implementing `PaymentGatewayInterface` (see `IdramGateway` as reference)
-2. Add gateway record to `PaymentGatewaySeeder.php` with `required_fields`
-3. Register in `AppServiceProvider` inside `PaymentGatewayRegistry`: `$registry->register('your_key', new YourGateway())`
+> **Never write a payment gateway without the provider's real API documentation.** A guessed
+> protocol looks complete and passes self-written tests. Idram shipped that way and could not
+> have taken a single payment; it was rewritten from the official PDF on 2026-08-04.
+
+1. Create `app/Services/PaymentGateway/Gateways/YourGateway.php` implementing `PaymentGatewayInterface` (see `IdramGateway` or `TelcellGateway` as reference). Also implement `SupportsPrecheck` if the provider sends an authenticity request before moving money.
+2. Add gateway record to `PaymentGatewaySeeder.php`. `required_fields` **must** use the `[{key, label_hy, label_en}]` shape — a flat array of strings renders no inputs in the seller UI.
+3. Register in `PaymentServiceProvider` inside `PaymentGatewayRegistry`: `$registry->register('your_key', new YourGateway())`. **The registry key must equal the seeded DB `name`.**
 4. Handle the gateway-specific callback format in `PaymentController::callback()` if it differs from the JSON default
-5. Run `php artisan db:seed --class=PaymentGatewaySeeder` to add the gateway entry
+5. Run `php artisan db:seed --class=PaymentGatewaySeeder` locally. **On production, seeders never run** — `scripts/deploy.sh` only migrates, so shipping a row change needs a data migration.
 
 ## How to Add a New Store Template
 
@@ -147,6 +151,10 @@ docker compose exec api php artisan storage:link
 | `BREVO_API_KEY` | Brevo transactional email key | `xkeysib-...` |
 | `MAIL_FROM_ADDRESS` | Default sender email | `hello@yerevan.digital` |
 | `FRONTEND_URL` | Next.js public URL | `https://yerevan.digital` |
+| `IDRAM_PLATFORM_REC_ACCOUNT` | Platform Idram ID, for collecting commission invoices | `100000114` |
+| `IDRAM_PLATFORM_SECRET_KEY` | Platform Idram secret key | — |
+| `TELCELL_PLATFORM_ISSUER` | Platform Telcell shop email | `billing@yerevan.digital` |
+| `TELCELL_PLATFORM_SHOP_KEY` | Platform Telcell shop key | — |
 
 ## Useful Commands
 

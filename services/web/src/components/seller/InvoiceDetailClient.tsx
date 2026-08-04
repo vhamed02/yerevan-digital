@@ -1,25 +1,16 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useMutation } from '@tanstack/react-query'
-import { toast } from 'sonner'
 import { ArrowLeft, Printer } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { CurrencyDisplay } from '@/components/ui/CurrencyDisplay'
-import api from '@/lib/api'
-import { redirectToGateway } from '@/lib/payment'
+import InvoicePayButtons from './InvoicePayButtons'
 import type { SellerInvoice, SellerStore } from '@/types'
 
 interface InvoiceDetailClientProps {
   invoice: SellerInvoice
   store: SellerStore | null
-}
-
-interface PayResponse {
-  redirect_url: string
-  form_params?: Record<string, string> | null
-  invoice: string
 }
 
 function statusOf(status: SellerInvoice['status']): { label: string; variant: 'success' | 'warning' | 'secondary' } {
@@ -37,15 +28,6 @@ export default function InvoiceDetailClient({ invoice, store }: InvoiceDetailCli
   const storeName = store?.name.en || store?.name.hy || ''
   const status = statusOf(invoice.status)
 
-  const payMutation = useMutation({
-    mutationFn: async () => {
-      const res = await api.post<PayResponse>(`/seller/invoices/${invoice.uuid}/pay`)
-      return res.data
-    },
-    onSuccess: (data) => redirectToGateway(data.redirect_url, data.form_params),
-    onError: () => toast.error('Failed to start the payment'),
-  })
-
   return (
     <div className="mx-auto max-w-[55%] px-4 py-6 sm:px-6 lg:px-8 print:m-0 print:max-w-none print:p-0">
       <div className="mb-6 flex items-center justify-between print:hidden">
@@ -54,11 +36,7 @@ export default function InvoiceDetailClient({ invoice, store }: InvoiceDetailCli
           Back to invoices
         </Button>
         <div className="flex gap-2">
-          {invoice.is_payable && (
-            <Button loading={payMutation.isPending} onClick={() => payMutation.mutate()}>
-              Pay
-            </Button>
-          )}
+          {invoice.is_payable && <InvoicePayButtons uuid={invoice.uuid} />}
           <Button variant="outline" onClick={() => window.print()}>
             <Printer className="h-4 w-4" />
             Print

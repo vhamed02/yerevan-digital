@@ -12,16 +12,24 @@ import { useLocale, useTranslations } from 'next-intl'
 import { useStoreCart } from '@/stores/cart.store'
 import { useCheckoutTotals } from '@/hooks/useCheckoutTotals'
 import { CouponField } from '@/components/store/CouponField'
+import { CardPaymentFrame } from '@/components/store/CardPaymentFrame'
 import api from '@/lib/api'
-import { redirectToGateway } from '@/lib/payment'
+import {
+  checkoutSuccessUrl,
+  expandGatewayKeys,
+  redirectToGateway,
+  rememberPendingOrder,
+  type InitiateResponse,
+} from '@/lib/payment'
 import { pickLang } from '@/lib/i18n'
 import type { CheckoutFormProps } from '../types'
 
 const GATEWAY_META: Record<string, { label: string; badge: string; color: string }> = {
-  idram:     { label: 'iDram',    badge: 'iDRAM',  color: '#E8001C' },
-  inecobank: { label: 'Inecobank',badge: 'INECO',  color: '#004B87' },
-  telcell:   { label: 'Telcell',  badge: 'TCELL',  color: '#FF6B00' },
-  ameria:    { label: 'Ameria',   badge: 'AMERIA', color: '#003DA5' },
+  idram:      { label: 'iDram',    badge: 'iDRAM',  color: '#E8001C' },
+  idram_card: { label: 'iDram',    badge: 'VISA',   color: '#1A1F71' },
+  inecobank:  { label: 'Inecobank',badge: 'INECO',  color: '#004B87' },
+  telcell:    { label: 'Telcell',  badge: 'TCELL',  color: '#FF6B00' },
+  ameria:     { label: 'Ameria',   badge: 'AMERIA', color: '#003DA5' },
 }
 
 interface CheckoutData {
@@ -62,13 +70,14 @@ export function CheckoutForm({ storeSlug, store }: CheckoutFormProps) {
   const [mounted, setMounted] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [step, setStep] = useState<1 | 2>(1)
+  const [cardFrame, setCardFrame] = useState<{ url: string; orderUuid: string } | null>(null)
 
   useEffect(() => { setMounted(true) }, [])
 
   const { items: cartItems, getTotal, clearCart } = useStoreCart(storeSlug)
   const items = mounted ? cartItems : []
   const total = mounted ? getTotal() : 0
-  const gateways = store.payment_gateways ?? []
+  const gateways = expandGatewayKeys(store.payment_gateways ?? [])
 
   const t = useTranslations('storefront')
   const locale = useLocale()
@@ -125,9 +134,19 @@ export function CheckoutForm({ storeSlug, store }: CheckoutFormProps) {
         items: items.map((i) => ({ product_id: i.productId, variant_id: i.variantId ?? null, quantity: i.quantity })),
       })
       const uuid = orderRes.data.uuid
-      const payRes = await api.post<{ redirect_url: string; form_params?: Record<string, string> | null }>(`/store/${storeSlug}/payments/initiate`, {
+      const payRes = await api.post<InitiateResponse>(`/store/${storeSlug}/payments/initiate`, {
         order_uuid: uuid, payment_method: data.payment_method,
       })
+
+      // Idram's fixed, merchant-wide SUCCESS_URL can't carry the order id, so
+      // stash it before leaving and let the confirmation page read it back.
+      rememberPendingOrder(storeSlug, uuid)
+
+      if (payRes.data.mode === 'iframe') {
+        setCardFrame({ url: payRes.data.redirect_url, orderUuid: uuid })
+        return
+      }
+
       redirectToGateway(payRes.data.redirect_url, payRes.data.form_params)
     } catch (err: unknown) {
       const axiosErr = err as { response?: { data?: { message?: string; errors?: Record<string, string[]> } } }
@@ -271,7 +290,9 @@ export function CheckoutForm({ storeSlug, store }: CheckoutFormProps) {
                               {meta.badge}
                             </div>
                             <div className="flex-1 min-w-0">
-                              <p className="text-sm font-bold text-gray-900">{meta.label}</p>
+                              <p className="text-sm font-bold text-gray-900">
+                                {key === 'idram_card' ? t('checkout.payWithCard') : meta.label}
+                              </p>
                             </div>
                             <div className={`flex h-5 w-5 items-center justify-center rounded-full border-2 transition-all ${isSelected ? 'border-[var(--accent)]' : 'border-gray-200'}`}>
                               {isSelected && <div className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: 'var(--accent)' }} />}
@@ -416,6 +437,16 @@ export function CheckoutForm({ storeSlug, store }: CheckoutFormProps) {
           </div>
         </div>
       </form>
+
+      {cardFrame && (
+        <CardPaymentFrame
+          url={cardFrame.url}
+          storeSlug={storeSlug}
+          orderUuid={cardFrame.orderUuid}
+          successUrl={checkoutSuccessUrl(cardFrame.orderUuid)}
+          onCancel={() => setCardFrame(null)}
+        />
+      )}
     </div>
   )
 }

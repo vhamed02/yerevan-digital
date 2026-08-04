@@ -535,16 +535,28 @@ export interface SellerTemplate {
   is_active: boolean
 }
 
+/**
+ * A row from GET /seller/payments/available — every active platform gateway,
+ * annotated with whether this store has configured and enabled it.
+ */
 export interface StoreGatewayConfig {
   id: number
-  payment_gateway_id: number
-  key: string
-  name: MultiLang
+  name: string
+  display_name: MultiLang
+  description?: MultiLang
+  logo?: string | null
   instructions?: MultiLang
   required_fields?: Array<{ key: string; label_hy: string; label_en: string }>
-  is_active: boolean
+  is_sandbox_available: boolean
+  is_configured: boolean
+  is_enabled: boolean
   is_sandbox: boolean
-  config: Record<string, string>
+  /** Addresses the seller must register with the provider themselves (Idram). */
+  integration_urls?: {
+    result_url: string
+    success_url: string
+    fail_url: string
+  } | null
 }
 
 export interface StoreTemplateConfig {

@@ -225,12 +225,52 @@ Verified end-to-end on 2026-07-16 by restoring into a scratch database (37 table
 migrations). **Backups are local only** — a disk failure loses them with the site. Offsite copy
 is still an open decision.
 
-## Payment gateways (Telcell added 2026-07-17)
+## Payment gateways (Telcell added 2026-07-17, Idram rewritten 2026-08-04)
 
 - **Architecture:** each gateway is a `PaymentGatewayInterface` impl under `app/Services/PaymentGateway/Gateways/`, registered by key in `PaymentServiceProvider`, and seeded as a row in `payment_gateways` (`PaymentGatewaySeeder`). **The DB `name` must equal the registry key** — `Store\PaymentController` looks the store's gateway up by `name` and then fetches that same key from the registry. Sellers store per-store credentials on `store_payment_gateways`; the storefront (`StoreInfoResource`) exposes only enabled gateway names, and both checkout templates render them.
 - **`extractOrderReference($callbackData)`** on the interface returns our order UUID from a raw callback — each gateway names/encodes it differently (Idram `EDP_BILL_NO`; Telcell base64 `issuer_id`), so `Store\PaymentController::callback` is gateway-agnostic. Stubs return `null`.
-- **`required_fields` format:** the seller config UI (`GatewayConfigModal`) and `configure()`'s validation both read the **DB column**, which must be `[{key, label_hy, label_en}]` (Telcell does this). Idram's seeder row uses a flat `['account_id', ...]` array — that's the legacy/broken shape; don't copy it.
+- **`required_fields` format:** the seller config UI (`GatewayConfigModal`) and `configure()`'s validation both read the **DB column**, which must be `[{key, label_hy, label_en}]`. A flat `['account_id', ...]` array is the legacy shape — it renders *zero* inputs, so the gateway silently becomes unconfigurable. Idram carried that shape until 2026-08-04; `ineco` and `converse` still do (both inactive). **Seeder edits do not reach production** — `scripts/deploy.sh` runs `migrate --force` and never seeds, so a row fix needs a data migration (see `2026_08_04_000001_fix_idram_gateway_required_fields`).
+- **Precheck (`SupportsPrecheck`):** a gateway may ask "is this bill real?" *before* moving money. Both callback controllers branch on it before any state change. The precheck is **unsigned**, so its handler must stay strictly read-only and answer a literal `OK` only on a full match (order pending + recipient account + amount). See the Idram entry below.
 - **Telcell (WEB invoice flow):** live `initiate()` returns `redirectUrl = https://telcellmoney.am/invoices` plus `rawResponse` form fields; the frontend `redirectToGateway()` (`lib/payment.ts`) **POSTs** them (a plain GET redirect won't work — this also fixed Idram live mode). Request sig: `md5(shop_key + issuer + '֏' + price + product + issuer_id + valid_days)`; `product`/`issuer_id` are base64. Callback sig: `md5(shop_key + invoice + issuer_id + payment_id + currency + sum + time + status)`; `status` is `PAID`/`REJECTED`. Amounts are **whole AMD** (no minor unit). Callback acks with plain-text `OK` 200; a bad signature → 400, a correctly-signed `REJECTED` → 200 (don't make Telcell retry a real rejection). Credentials: `issuer` (shop email), `shop_key` (secret), `valid_days`. **Callback URL is configured in the Telcell merchant panel**, not passed per-invoice.
+
+### Idram (rewritten 2026-08-04 from the official merchant-interface PDF)
+
+The pre-2026-08-04 implementation was written from a spec, not from Idram's docs, and was
+wrong on nearly every point — invented request checksum, invented `EDP_SUCCESS_URL` /
+`EDP_FAILURE_URL` fields, wrong host, wrong confirmation checksum, and **no precheck handling
+at all**. It could never have completed a payment. Don't restore any of it.
+
+- **Two surfaces, one merchant account:** the wallet form (browser **POSTs** to
+  `https://banking.idram.am/Payment/GetPayment`) and the VISA/MasterCard iframe
+  (`https://money.idram.am/{AM|RU|EN}/ccepayMerchant.aspx?EDP_REC_ACCOUNT&EDP_AMOUNT&EDP_BILL_NO`).
+  Checkout offers them as `idram` and `idram_card`; `Store\PaymentController::resolveGateway()`
+  maps `idram_card` back onto the `idram` gateway + credentials via `PaymentRequest::$options`.
+- **The request is unsigned.** Idram authenticates the merchant by `EDP_REC_ACCOUNT` alone.
+  Fields are exactly `EDP_LANGUAGE` (AM/RU/EN), `EDP_REC_ACCOUNT`, `EDP_DESCRIPTION`,
+  `EDP_AMOUNT`, `EDP_BILL_NO`, optional `EDP_EMAIL`. Nothing else is part of the protocol.
+- **SUCCESS_URL / FAIL_URL / RESULT_URL are fixed per merchant by Idram staff** at agreement
+  time — they are *not* sent per payment. Consequences that bite:
+  - The seller must register them; `/seller/payments` shows the three exact URLs with copy
+    buttons (`AvailableGatewayResource::integration_urls`, custom-domain aware).
+  - **SUCCESS_URL cannot carry `?order=<uuid>`.** Checkout stashes the uuid in `sessionStorage`
+    (`rememberPendingOrder`) and `PendingOrderRedirect` puts it back on the confirmation page.
+- **Precheck is mandatory and unsigned.** Idram POSTs `EDP_PRECHECK=YES` with bill/recipient/
+  amount before debiting. Answer the literal `OK` or the payment is abandoned and the customer
+  is bounced to FAIL_URL. `handlePrecheck()` verifies pending order + recipient + amount
+  (`Money::compare`, so `15000` and `15000.00` both match) and **never mutates anything**.
+  Enumeration is contained by `EDP_BILL_NO` being the order **UUID** — don't switch it to
+  `order_number` or the id, which are guessable on an unauthenticated endpoint.
+- **Confirmation checksum:** `strtoupper(md5(rec : amount : SECRET_KEY : bill : payer : trans_id : trans_date))`,
+  compared with `hash_equals` case-insensitively. It is built from **our configured**
+  `rec_account`, not the payload's, so a callback naming another merchant can never validate.
+  Bad signature → `400`; success → plain-text `OK` 200.
+- **Credentials:** `rec_account` (Idram ID) + `secret_key`, optional `email`. Legacy `edp_id` /
+  `account_id` keys are still accepted on read (`recipientFromCredentials`) so pre-rewrite
+  configs keep working. Idram publishes **no sandbox host** — incomplete credentials fall back
+  to the platform's own simulated checkout.
+- **Card iframe completion:** the frame is cross-origin and unreadable, so `CardPaymentFrame`
+  polls `GET /store/{slug}/orders/{uuid}` (hence `payment_status` on `PublicOrderResource`)
+  until the server-side callback lands, then forwards to the confirmation page.
 
 ## Commission billing (added 2026-07-17)
 
@@ -254,19 +294,29 @@ that ledger balance into money the platform actually collects, weekly.
   emailing (it runs the real path inside a transaction and rolls it back).
 - **Email:** `CommissionInvoiceNotification` (queued on `emails`) links to `/seller/invoices`
   — no PDF, matching the rest of the notification system.
-- **Collection is online, via the platform's own Telcell merchant account** — money flows
-  seller → platform, the reverse direction from checkout. Credentials come from
+- **Collection is online, via the platform's own Idram *and* Telcell merchant accounts** —
+  money flows seller → platform, the reverse direction from checkout. Credentials come from
+  `config/idram.php` (`IDRAM_PLATFORM_REC_ACCOUNT` / `_SECRET_KEY` / `_EMAIL`) and
   `config/telcell.php` (`TELCELL_PLATFORM_ISSUER` / `_SHOP_KEY` / `_VALID_DAYS`), **not** from
-  a store's `store_payment_gateways` row. Empty credentials fall back to the shared internal
-  sandbox flow automatically (same `TelcellGateway` behavior as checkout).
-- **Seller pay flow:** `Seller\CommissionInvoiceController::pay()` builds a `PaymentRequest`
-  from the invoice and calls the existing `TelcellGateway` — reused as-is, no new gateway
-  code. Only a `pending` invoice is payable (`InvoiceStatus::allowedTransitions()`:
-  `pending → [paid, void]`).
-- **Callback:** `POST /api/v1/invoices/callback/telcell` (public, outside any auth group) →
-  `InvoicePaymentController::callback`, structured exactly like `Store\PaymentController`'s
-  Telcell branch — plain-text `OK` 200 on success or idempotent replay, `Invalid checksum` 400
-  on a bad signature, `OK` 200 on a correctly-signed rejection.
+  a store's `store_payment_gateways` row.
+- **`App\Support\PlatformGatewayCredentials`** is the single arbiter of which platform accounts
+  are live. It tests the **required keys per gateway**, never truthiness of the whole config
+  array — both gateways have optional settings with non-empty defaults (Telcell `valid_days`,
+  Idram `email`), so an array test reports an unconfigured account as live. With *no* account
+  configured it offers every gateway and each falls back to the internal sandbox, so dev can
+  still exercise the flow.
+- **Seller pay flow:** `Seller\CommissionInvoiceController::pay()` takes a `gateway` body param
+  (defaults to `telcell` for older clients), validates it against
+  `PlatformGatewayCredentials::available()`, and reuses the registry gateway as-is — no
+  invoice-specific gateway code. Only a `pending` invoice is payable
+  (`InvoiceStatus::allowedTransitions()`: `pending → [paid, void]`).
+  `GET /seller/invoices/payment-methods` feeds the buttons — it **must stay declared before
+  `invoices/{uuid}`** or Laravel matches it as a uuid.
+- **Callback:** `POST /api/v1/invoices/callback/{gateway}` (public, outside any auth group,
+  `whereIn` idram|telcell) → `InvoicePaymentController::callback`, structured exactly like
+  `Store\PaymentController` — Idram precheck handled first, then plain-text `OK` 200 on success
+  or idempotent replay, `Invalid checksum` 400 on a bad signature, `OK` 200 on a
+  correctly-signed rejection. The Idram bill number is the **invoice uuid**.
 - **Admin oversight:** `GET /admin/invoices`, `GET /admin/invoices/summary`,
   `POST /admin/invoices/{uuid}/void` (guards `pending` only).
 - **Purge ordering:** `PurgeDemoData` deletes `commission_invoices` before `stores` — the FK

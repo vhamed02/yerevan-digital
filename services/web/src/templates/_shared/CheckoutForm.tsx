@@ -9,15 +9,23 @@ import { useTranslations } from 'next-intl'
 import { useStoreCart } from '@/stores/cart.store'
 import { useCheckoutTotals } from '@/hooks/useCheckoutTotals'
 import { CouponField } from '@/components/store/CouponField'
+import { CardPaymentFrame } from '@/components/store/CardPaymentFrame'
 import api from '@/lib/api'
-import { redirectToGateway } from '@/lib/payment'
+import {
+  checkoutSuccessUrl,
+  expandGatewayKeys,
+  redirectToGateway,
+  rememberPendingOrder,
+  type InitiateResponse,
+} from '@/lib/payment'
 import type { CheckoutFormProps } from '../types'
 
 const GATEWAY_META: Record<string, { label: string; badge: string; color: string }> = {
-  idram:     { label: 'iDram',     badge: 'iDram',  color: '#E8001C' },
-  inecobank: { label: 'Inecobank', badge: 'Ineco',  color: '#004B87' },
-  telcell:   { label: 'Telcell',   badge: 'Tcell',  color: '#FF6B00' },
-  ameria:    { label: 'Ameria',    badge: 'Ameria', color: '#003DA5' },
+  idram:      { label: 'iDram',     badge: 'iDram',  color: '#E8001C' },
+  idram_card: { label: 'iDram',     badge: 'VISA',   color: '#1A1F71' },
+  inecobank:  { label: 'Inecobank', badge: 'Ineco',  color: '#004B87' },
+  telcell:    { label: 'Telcell',   badge: 'Tcell',  color: '#FF6B00' },
+  ameria:     { label: 'Ameria',    badge: 'Ameria', color: '#003DA5' },
 }
 
 interface CheckoutData {
@@ -35,6 +43,7 @@ interface CheckoutData {
 export function CheckoutForm({ storeSlug, store }: CheckoutFormProps) {
   const [mounted, setMounted] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
+  const [cardFrame, setCardFrame] = useState<{ url: string; orderUuid: string } | null>(null)
   const t = useTranslations('storefront')
 
   useEffect(() => { setMounted(true) }, [])
@@ -43,7 +52,7 @@ export function CheckoutForm({ storeSlug, store }: CheckoutFormProps) {
   const items = mounted ? cartItems : []
   const total = mounted ? getTotal() : 0
 
-  const gateways = store.payment_gateways ?? []
+  const gateways = expandGatewayKeys(store.payment_gateways ?? [])
 
   const schema = useMemo(() => z.object({
     full_name:      z.string().min(2, t('checkout.required')),
@@ -101,10 +110,19 @@ export function CheckoutForm({ storeSlug, store }: CheckoutFormProps) {
       )
       const uuid = orderRes.data.uuid
 
-      const payRes = await api.post<{ redirect_url: string; form_params?: Record<string, string> | null }>(
+      const payRes = await api.post<InitiateResponse>(
         `/store/${storeSlug}/payments/initiate`,
         { order_uuid: uuid, payment_method: data.payment_method }
       )
+
+      // Idram's fixed, merchant-wide SUCCESS_URL can't carry the order id, so
+      // stash it before leaving and let the confirmation page read it back.
+      rememberPendingOrder(storeSlug, uuid)
+
+      if (payRes.data.mode === 'iframe') {
+        setCardFrame({ url: payRes.data.redirect_url, orderUuid: uuid })
+        return
+      }
 
       redirectToGateway(payRes.data.redirect_url, payRes.data.form_params)
     } catch (err: unknown) {
@@ -227,7 +245,9 @@ export function CheckoutForm({ storeSlug, store }: CheckoutFormProps) {
                         >
                           {meta.badge}
                         </div>
-                        <span className="text-sm font-medium text-gray-900">{meta.label}</span>
+                        <span className="text-sm font-medium text-gray-900">
+                          {key === 'idram_card' ? t('checkout.payWithCard') : meta.label}
+                        </span>
                       </div>
                     </label>
                   )
@@ -329,6 +349,16 @@ export function CheckoutForm({ storeSlug, store }: CheckoutFormProps) {
           </div>
         </div>
       </form>
+
+      {cardFrame && (
+        <CardPaymentFrame
+          url={cardFrame.url}
+          storeSlug={storeSlug}
+          orderUuid={cardFrame.orderUuid}
+          successUrl={checkoutSuccessUrl(cardFrame.orderUuid)}
+          onCancel={() => setCardFrame(null)}
+        />
+      )}
     </div>
   )
 }

@@ -27,12 +27,38 @@ class PaymentController extends Controller
 
         $configured = $store->paymentGateways->keyBy('payment_gateway_id');
 
-        $all = $this->gateways->allActive()->map(function ($gateway) use ($configured) {
-            $gateway->storeGateway = $configured->get($gateway->id);
+        $all = $this->gateways->allActive()->map(function ($gateway) use ($configured, $store) {
+            $gateway->storeGateway    = $configured->get($gateway->id);
+            $gateway->integrationUrls = $this->integrationUrls($gateway->name, $store);
             return $gateway;
         });
 
         return $this->success(AvailableGatewayResource::collection($all));
+    }
+
+    /**
+     * The addresses a seller must hand to the provider themselves.
+     *
+     * Idram fixes SUCCESS_URL / FAIL_URL / RESULT_URL per merchant account at
+     * agreement time — they are not sent with each payment — so the seller has
+     * to register these three exactly. A store on a verified custom domain
+     * serves its storefront from that host, so the return addresses must use it.
+     */
+    private function integrationUrls(string $gatewayName, $store): ?array
+    {
+        if ($gatewayName !== 'idram') {
+            return null;
+        }
+
+        $storefront = $store->hasVerifiedDomain()
+            ? 'https://' . $store->custom_domain
+            : rtrim(config('app.frontend_url'), '/') . "/store/{$store->slug}";
+
+        return [
+            'result_url'  => url("/api/v1/store/{$store->slug}/payments/callback/idram"),
+            'success_url' => "{$storefront}/checkout/success",
+            'fail_url'    => "{$storefront}/checkout/failed",
+        ];
     }
 
     public function configured(Request $request): JsonResponse

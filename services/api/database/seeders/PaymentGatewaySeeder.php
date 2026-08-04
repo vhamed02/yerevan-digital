@@ -12,12 +12,19 @@ class PaymentGatewaySeeder extends Seeder
         $gateways = [
             [
                 'name'                 => 'idram',
-                'display_name'         => ['hy' => 'iDram', 'en' => 'iDram'],
-                'description'          => ['hy' => 'Վճարում iDram-ով', 'en' => 'Pay with iDram'],
-                'instructions'         => ['hy' => 'Ձեր iDram հաշիվը կօգտագործվի վճարման համար:', 'en' => 'Your iDram account will be used for payment.'],
+                'display_name'         => ['hy' => 'iDram', 'en' => 'iDram', 'ru' => 'iDram'],
+                'description'          => ['hy' => 'Վճարում iDram դրամապանակով կամ բանկային քարտով', 'en' => 'Pay with an iDram wallet or a bank card', 'ru' => 'Оплата кошельком iDram или банковской картой'],
+                'instructions'         => [
+                    'hy' => 'Կնքեք պայմանագիր Idram-ի հետ (developer@idram.am) և կստանաք ձեր Idram ID-ն ու գաղտնի բանալին։ Idram-ին պետք է հաղորդեք ներքևում նշված երեք հասցեները (RESULT, SUCCESS, FAIL) — առանց դրանց վճարումները չեն աշխատի։',
+                    'en' => 'Sign a merchant agreement with Idram (developer@idram.am) to receive your Idram ID and Secret Key. You must also give Idram the three URLs shown below (RESULT, SUCCESS, FAIL) — payments will not work until they are registered.',
+                    'ru' => 'Заключите договор с Idram (developer@idram.am), чтобы получить свой Idram ID и секретный ключ. Также передайте Idram три адреса, указанных ниже (RESULT, SUCCESS, FAIL) — без них платежи не заработают.',
+                ],
                 'is_active'            => true,
                 'is_sandbox_available' => true,
-                'required_fields'      => ['account_id', 'secret_key'],
+                'required_fields'      => [
+                    ['key' => 'rec_account', 'label_hy' => 'Idram ID (EDP_REC_ACCOUNT)', 'label_en' => 'Idram ID (EDP_REC_ACCOUNT)'],
+                    ['key' => 'secret_key',  'label_hy' => 'Գաղտնի բանալի',              'label_en' => 'Secret key'],
+                ],
                 'sort_order'           => 1,
             ],
             [

@@ -199,4 +199,58 @@ class SellerPaymentTest extends TestCase
     {
         $this->getJson('/api/v1/seller/payments/available')->assertStatus(401);
     }
+
+    /**
+     * Idram fixes SUCCESS_URL / FAIL_URL / RESULT_URL against the merchant
+     * account, so the seller has to hand them to Idram themselves — the config
+     * screen is where they read them off.
+     */
+    public function test_idram_exposes_the_urls_the_seller_must_register(): void
+    {
+        $gateway = PaymentGateway::factory()->create(['name' => 'idram', 'is_active' => true]);
+
+        $response = $this->actingAsSeller()
+            ->getJson('/api/v1/seller/payments/available')
+            ->assertOk();
+
+        $urls = collect($response->json('data'))->firstWhere('id', $gateway->id)['integration_urls'];
+
+        $this->assertStringEndsWith(
+            "/api/v1/store/{$this->store->slug}/payments/callback/idram",
+            $urls['result_url']
+        );
+        $this->assertStringEndsWith("/store/{$this->store->slug}/checkout/success", $urls['success_url']);
+        $this->assertStringEndsWith("/store/{$this->store->slug}/checkout/failed", $urls['fail_url']);
+    }
+
+    public function test_integration_urls_follow_a_verified_custom_domain(): void
+    {
+        $gateway = PaymentGateway::factory()->create(['name' => 'idram', 'is_active' => true]);
+
+        $this->store->update([
+            'custom_domain'             => 'shop.example.am',
+            'custom_domain_verified_at' => now(),
+        ]);
+
+        $response = $this->actingAsSeller()
+            ->getJson('/api/v1/seller/payments/available')
+            ->assertOk();
+
+        $urls = collect($response->json('data'))->firstWhere('id', $gateway->id)['integration_urls'];
+
+        $this->assertSame('https://shop.example.am/checkout/success', $urls['success_url']);
+        $this->assertSame('https://shop.example.am/checkout/failed', $urls['fail_url']);
+    }
+
+    public function test_gateways_without_fixed_urls_expose_none(): void
+    {
+        $gateway = PaymentGateway::factory()->create(['name' => 'telcell', 'is_active' => true]);
+
+        $response = $this->actingAsSeller()
+            ->getJson('/api/v1/seller/payments/available')
+            ->assertOk();
+
+        $found = collect($response->json('data'))->firstWhere('id', $gateway->id);
+        $this->assertNull($found['integration_urls']);
+    }
 }

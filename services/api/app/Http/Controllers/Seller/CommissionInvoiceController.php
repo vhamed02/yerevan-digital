@@ -7,12 +7,17 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\Seller\InvoiceResource;
 use App\Models\CommissionInvoice;
 use App\Services\PaymentGateway\DTOs\PaymentRequest;
-use App\Services\PaymentGateway\Gateways\TelcellGateway;
+use App\Services\PaymentGateway\PaymentGatewayRegistry;
+use App\Support\PlatformGatewayCredentials;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class CommissionInvoiceController extends Controller
 {
+    public function __construct(
+        private readonly PaymentGatewayRegistry $registry,
+    ) {}
+
     public function index(Request $request): JsonResponse
     {
         $store = $request->attributes->get('sellerStore');
@@ -30,6 +35,12 @@ class CommissionInvoiceController extends Controller
         return $this->success(new InvoiceResource($this->findOrFail($request, $uuid)));
     }
 
+    /** Which platform merchant accounts a seller can settle an invoice through. */
+    public function paymentMethods(): JsonResponse
+    {
+        return $this->success(PlatformGatewayCredentials::available());
+    }
+
     public function pay(Request $request, string $uuid): JsonResponse
     {
         $invoice = $this->findOrFail($request, $uuid);
@@ -38,11 +49,16 @@ class CommissionInvoiceController extends Controller
             return $this->error('Invoice is not payable.', 422);
         }
 
-        // `valid_days` always has a truthy config default, so checking issuer/shop_key
-        // specifically (not array_filter on the whole config) is what actually makes
-        // "credentials unset" fall back to sandbox mode.
-        $platform    = config('telcell.platform');
-        $credentials = empty($platform['issuer']) || empty($platform['shop_key']) ? [] : $platform;
+        // Telcell stays the default so an older client that posts no gateway
+        // keeps working.
+        $gatewayKey = $request->input('gateway', 'telcell');
+
+        if (! in_array($gatewayKey, PlatformGatewayCredentials::available(), true)) {
+            return $this->error('Unsupported payment gateway.', 422);
+        }
+
+        // Empty credentials fall the gateway back to the internal sandbox flow.
+        $credentials = PlatformGatewayCredentials::for($gatewayKey);
 
         $paymentRequest = new PaymentRequest(
             orderId: $invoice->uuid,
@@ -50,7 +66,7 @@ class CommissionInvoiceController extends Controller
             amount: (float) $invoice->amount,
             currency: $invoice->currency,
             description: "Yerevan Digital commission {$invoice->period_start->toDateString()}",
-            callbackUrl: url('/api/v1/invoices/callback/telcell'),
+            callbackUrl: url("/api/v1/invoices/callback/{$gatewayKey}"),
             successUrl: rtrim(config('app.frontend_url'), '/') . "/seller/invoices?paid={$invoice->uuid}",
             failureUrl: rtrim(config('app.frontend_url'), '/') . "/seller/invoices?failed={$invoice->uuid}",
             credentials: $credentials,
@@ -58,11 +74,13 @@ class CommissionInvoiceController extends Controller
             sandboxUrl: rtrim(config('app.frontend_url'), '/') . "/seller/invoices?sandbox={$invoice->uuid}",
         );
 
-        $response = app(TelcellGateway::class)->initiate($paymentRequest);
+        $response = $this->registry->get($gatewayKey)->initiate($paymentRequest);
 
         return $this->success([
             'redirect_url' => $response->redirectUrl,
             'form_params'  => $response->rawResponse ?: null,
+            'mode'         => $response->mode,
+            'gateway'      => $gatewayKey,
             'invoice'      => $invoice->uuid,
         ]);
     }

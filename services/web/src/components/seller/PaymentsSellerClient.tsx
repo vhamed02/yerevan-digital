@@ -17,7 +17,7 @@ export default function PaymentsSellerClient({ initialGateways }: PaymentsSeller
   const { data: gateways } = useQuery({
     queryKey: ['seller-gateways'],
     queryFn: async () => {
-      const res = await api.get<StoreGatewayConfig[]>('/seller/payment-gateways')
+      const res = await api.get<StoreGatewayConfig[]>('/seller/payments/available')
       return res.data
     },
     initialData: initialGateways,
@@ -26,7 +26,7 @@ export default function PaymentsSellerClient({ initialGateways }: PaymentsSeller
 
   return (
     <>
-      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 flex flex-col gap-6">
+      <div className="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
         <div>
           <h1 className="font-heading text-2xl font-bold text-content-primary">Payment Gateways</h1>
           <p className="mt-1 text-sm text-content-muted">Let your customers pay online</p>
@@ -45,7 +45,15 @@ export default function PaymentsSellerClient({ initialGateways }: PaymentsSeller
         </div>
       </div>
 
-      <GatewayConfigModal gateway={configTarget} onClose={() => setConfigTarget(null)} />
+      {/* Keyed and conditionally mounted so the form state is built from the
+          selected gateway rather than frozen at the first render. */}
+      {configTarget && (
+        <GatewayConfigModal
+          key={configTarget.id}
+          gateway={configTarget}
+          onClose={() => setConfigTarget(null)}
+        />
+      )}
     </>
   )
 }

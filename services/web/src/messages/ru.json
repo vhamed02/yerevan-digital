@@ -322,7 +322,11 @@
       "couponApply": "Применить",
       "couponRemove": "Удалить",
       "couponApplied": "Промокод применён",
-      "discount": "Скидка"
+      "discount": "Скидка",
+      "cardPaymentTitle": "Оплата картой",
+      "cardPaymentWaiting": "Завершите оплату ниже. Страница обновится сама — пожалуйста, не закрывайте её.",
+      "cardPaymentCancel": "Отменить оплату",
+      "payWithCard": "Банковская карта (Visa / Mastercard)"
     },
     "home": {
       "all": "Все",

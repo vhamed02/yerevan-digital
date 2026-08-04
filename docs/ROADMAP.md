@@ -1,6 +1,6 @@
 # Yerevan Digital — Roadmap & Status
 
-**Last updated:** 2026-07-16 · **HEAD when written:** `fc8d4d6`
+**Last updated:** 2026-08-04 · **HEAD when written:** `5e1707b`
 
 Companion to `CLAUDE.md` (which holds the how: deploy, architecture, pitfalls).
 This file holds the **what**: what is done, what is not, and what to pick up next.
@@ -13,8 +13,8 @@ Read `CLAUDE.md` first — it is loaded automatically and is not repeated here.
 | Fact | Value | How to re-check |
 |------|-------|-----------------|
 | Stores / products / orders | **0 / 0 / 0** — pre-launch, never had real traffic | `curl -s https://api.yerevan.digital/api/v1/stats` |
-| API tests | 429 passing | see `CLAUDE.md` → "Running tests" |
-| Web tests | 66 passing | `npm test` in a node container |
+| API tests | 510 passing | see `CLAUDE.md` → "Running tests" |
+| Web tests | 81 passing | `npm test` in a node container |
 | Business model | Free to launch, **per-sale commission** (default 5%) | `services/web/src/messages/en.json` → `pricing` |
 | Market | Armenia · AMD · trilingual hy/en/ru | — |
 
@@ -132,14 +132,42 @@ Design notes in `CLAUDE.md` → "Commission billing".
 
 ---
 
+## ✅ Idram payments (DONE, 2026-08-04)
+
+Idram had shipped since the first build but was written from a written spec rather than
+Idram's own documentation, and **could never have completed a payment**: it invented a
+request checksum and `EDP_SUCCESS_URL`/`EDP_FAILURE_URL` fields that don't exist, posted to
+the wrong host, computed the confirmation checksum from the wrong fields in the wrong order,
+and ignored the mandatory precheck entirely. Separately, the seller UI called
+`/seller/payment-gateways`, a route that has never existed — so nobody could enter credentials
+even in principle. Rewritten against the official merchant-interface PDF.
+
+| Delivered | Where |
+|-----------|-------|
+| Wallet form + card iframe, correct fields and hosts | `app/Services/PaymentGateway/Gateways/IdramGateway.php` |
+| Mandatory unsigned precheck, read-only, `OK`-gated | `SupportsPrecheck`, `Store\PaymentController::handlePrecheck` |
+| Correct confirmation checksum, bound to our own account | `IdramGateway::verify` |
+| Card iframe checkout + order polling | `components/store/CardPaymentFrame.tsx` |
+| SUCCESS_URL has no order id → sessionStorage handoff | `lib/payment.ts`, `PendingOrderRedirect.tsx` |
+| Seller config UI repaired + shows the 3 URLs to register | `/seller/payments`, `AvailableGatewayResource` |
+| Platform Idram account for commission invoices | `config/idram.php`, `PlatformGatewayCredentials` |
+| Live row repaired (deploys never seed) | `2026_08_04_000001_fix_idram_gateway_required_fields` |
+
+Protocol details and the traps in `CLAUDE.md` → "Payment gateways" → Idram. **The load-bearing
+rule:** the precheck is unsigned, so its handler stays strictly read-only, and `EDP_BILL_NO` is
+the order UUID specifically so that unauthenticated endpoint can't be used to enumerate orders.
+
+---
+
 ## Known open issues (not in any phase)
 
 | Issue | Severity | Detail |
 |-------|----------|--------|
+| Registry key ≠ seeder name for bank stubs | 🟡 Latent | `PaymentServiceProvider` registers `innecobank` / `converse_bank`; `PaymentGatewaySeeder` seeds `ineco` / `converse`. `Store\PaymentController` looks up by DB name then fetches that key from the registry, so activating either stub throws until the names are aligned. Both are `is_active: false`, so it is unreachable today. |
 | Unauth API returns 500 without `Accept` | 🟢 Cosmetic | With `Accept: application/json` it correctly returns 401. Bare requests hit a missing `login` named route. Affects every admin endpoint equally; no real client sends no Accept. |
 | **Memory pressure** | 🟠 Watch | 3.8 GB box with **swap already ~1.5/2 GB used**. `web` runs at ~114/128 MB. Dropping `mongodb` + `meilisearch` on 2026-07-26 gave back ~40 MB live and 384 MB of `mem_limit` commitment. If things get unstable, this is still the first place to look. |
 | Admin sidebar says "Yerevan Digital" | 🟢 Cosmetic | `components/admin/AdminSidebar.tsx`. The 2026-07-14 rebrand was Yerevan Digital → Yerevan Digital; unclear if this internal label was intentional. |
-| Seller payments page fetches `/seller/payment-gateways` | 🟡 Unverified | Routes define `/seller/payments/{available,configured}`. Possible pre-existing 404 — **not investigated**. |
+| ~~Seller payments page fetches `/seller/payment-gateways`~~ | ✅ Fixed 2026-08-04 | Confirmed real: the page and its modal both called routes that never existed, so **no seller could configure any gateway**. Repointed to `/seller/payments/{available,configure}` with the correct payload shape. |
 
 ---
 

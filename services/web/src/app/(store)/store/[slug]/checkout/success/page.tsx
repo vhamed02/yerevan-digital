@@ -3,6 +3,7 @@ import { serverGet } from '@/lib/server-api'
 import type { StorefrontOrder } from '@/types'
 import { OrderConfirmationClient } from '../../order/[uuid]/OrderConfirmationClient'
 import { CartClearer } from './CartClearer'
+import { PendingOrderRedirect } from './PendingOrderRedirect'
 
 export const dynamic = 'force-dynamic'
 
@@ -27,6 +28,7 @@ export default async function CheckoutSuccessPage({
   return (
     <>
       <CartClearer storeSlug={slug} />
+      <PendingOrderRedirect storeSlug={slug} hasOrderParam={!!orderUuid} />
       <OrderConfirmationClient order={order} storeSlug={slug} isNew />
     </>
   )

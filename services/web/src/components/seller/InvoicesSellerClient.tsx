@@ -3,25 +3,18 @@
 import { useEffect } from 'react'
 import Link from 'next/link'
 import { useSearchParams, useRouter, usePathname } from 'next/navigation'
-import { useQuery, useMutation } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { Receipt } from 'lucide-react'
-import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { CurrencyDisplay } from '@/components/ui/CurrencyDisplay'
 import { EmptyState } from '@/components/ui/EmptyState'
+import InvoicePayButtons from './InvoicePayButtons'
 import api from '@/lib/api'
-import { redirectToGateway } from '@/lib/payment'
 import type { InvoiceStatus, PaginatedResponse, SellerInvoice } from '@/types'
 
 interface InvoicesSellerClientProps {
   initialInvoices: SellerInvoice[]
-}
-
-interface PayResponse {
-  redirect_url: string
-  form_params?: Record<string, string> | null
-  invoice: string
 }
 
 function statusOf(status: InvoiceStatus): { label: string; variant: 'success' | 'warning' | 'secondary' } {
@@ -58,15 +51,6 @@ export default function InvoicesSellerClient({ initialInvoices }: InvoicesSeller
     },
     initialData: initialInvoices,
     staleTime: 30000,
-  })
-
-  const payMutation = useMutation({
-    mutationFn: async (uuid: string) => {
-      const res = await api.post<PayResponse>(`/seller/invoices/${uuid}/pay`)
-      return res.data
-    },
-    onSuccess: (data) => redirectToGateway(data.redirect_url, data.form_params),
-    onError: () => toast.error('Failed to start the payment'),
   })
 
   return (
@@ -123,13 +107,9 @@ export default function InvoicesSellerClient({ initialInvoices }: InvoicesSeller
                     </td>
                     <td className="px-4 py-3">
                       {invoice.is_payable && (
-                        <Button
-                          size="sm"
-                          loading={payMutation.isPending && payMutation.variables === invoice.uuid}
-                          onClick={() => payMutation.mutate(invoice.uuid)}
-                        >
-                          Pay
-                        </Button>
+                        <div className="flex justify-end gap-2">
+                          <InvoicePayButtons uuid={invoice.uuid} size="sm" />
+                        </div>
                       )}
                     </td>
                   </tr>

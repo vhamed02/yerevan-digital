@@ -322,7 +322,11 @@
       "couponApply": "Կիրառել",
       "couponRemove": "Հեռացնել",
       "couponApplied": "Կուպոնը կիրառված է",
-      "discount": "Զեղչ"
+      "discount": "Զեղչ",
+      "cardPaymentTitle": "Վճարել քարտով",
+      "cardPaymentWaiting": "Ավարտեք վճարումը ներքևում։ Էջը կթարմացվի ինքնաշխատ — խնդրում ենք չփակել այն։",
+      "cardPaymentCancel": "Չեղարկել վճարումը",
+      "payWithCard": "Բանկային քարտ (Visa / Mastercard)"
     },
     "home": {
       "all": "Բոլոր",

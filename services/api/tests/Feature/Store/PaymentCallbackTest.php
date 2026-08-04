@@ -60,7 +60,7 @@ class PaymentCallbackTest extends TestCase
             'payment_gateway_id' => $this->gateway->id,
             'is_enabled'         => true,
             'is_sandbox'         => false,
-            'credentials'        => ['secret_key' => $this->secretKey, 'edp_id' => $this->edpId],
+            'credentials'        => ['secret_key' => $this->secretKey, 'rec_account' => $this->edpId],
         ]);
 
         $this->order = Order::create([
@@ -89,25 +89,41 @@ class PaymentCallbackTest extends TestCase
         ]);
     }
 
-    private function buildIdramChecksum(string $amount, string $orderUuid, string $transId): string
+    /** Documented order: rec : amount : secret : bill : payer : trans_id : trans_date. */
+    private function buildIdramChecksum(array $fields): string
     {
-        return strtoupper(md5(
-            $this->secretKey . ':' . $this->edpId . ':' . $amount . ':' . $orderUuid . ':' . $transId
-        ));
+        return strtoupper(md5(implode(':', [
+            $fields['EDP_REC_ACCOUNT'],
+            $fields['EDP_AMOUNT'],
+            $this->secretKey,
+            $fields['EDP_BILL_NO'],
+            $fields['EDP_PAYER_ACCOUNT'],
+            $fields['EDP_TRANS_ID'],
+            $fields['EDP_TRANS_DATE'],
+        ])));
     }
 
     private function idramCallbackPayload(array $overrides = []): array
     {
-        $transId  = 'TXN-' . rand(1000, 9999);
-        $amount   = '15000.00';
-        $checksum = $this->buildIdramChecksum($amount, $this->order->uuid, $transId);
+        $fields = array_merge([
+            'EDP_BILL_NO'       => $this->order->uuid,
+            'EDP_REC_ACCOUNT'   => $this->edpId,
+            'EDP_AMOUNT'        => '15000.00',
+            'EDP_PAYER_ACCOUNT' => '200000456',
+            'EDP_TRANS_ID'      => (string) rand(10000000000000, 99999999999999),
+            'EDP_TRANS_DATE'    => '04/08/2026',
+        ], $overrides);
 
+        return $fields + ['EDP_CHECKSUM' => $this->buildIdramChecksum($fields)];
+    }
+
+    private function precheckPayload(array $overrides = []): array
+    {
         return array_merge([
+            'EDP_PRECHECK'    => 'YES',
             'EDP_BILL_NO'     => $this->order->uuid,
             'EDP_REC_ACCOUNT' => $this->edpId,
-            'EDP_AMOUNT'      => $amount,
-            'EDP_TRANS_ID'    => $transId,
-            'EDP_CHECKSUM'    => $checksum,
+            'EDP_AMOUNT'      => '15000.00',
         ], $overrides);
     }
 
@@ -197,5 +213,136 @@ class PaymentCallbackTest extends TestCase
             "/api/v1/store/{$this->store->slug}/payments/callback/unknown_gateway",
             $this->idramCallbackPayload()
         )->assertStatus(404);
+    }
+
+    // ---------------------------------------------------------------- precheck
+    //
+    // Idram asks "is this bill real?" before debiting the customer. Anything but
+    // a literal OK aborts the payment, so a false negative here means no store
+    // can ever take money.
+
+    public function test_precheck_for_a_valid_pending_order_answers_ok(): void
+    {
+        $response = $this->post(
+            "/api/v1/store/{$this->store->slug}/payments/callback/idram",
+            $this->precheckPayload()
+        );
+
+        $response->assertOk();
+        $this->assertSame('OK', $response->getContent());
+    }
+
+    public function test_precheck_does_not_touch_the_order_or_transaction(): void
+    {
+        $this->post(
+            "/api/v1/store/{$this->store->slug}/payments/callback/idram",
+            $this->precheckPayload()
+        )->assertOk();
+
+        $this->assertEquals(PaymentStatus::Pending, $this->order->fresh()->payment_status);
+        $this->assertEquals(OrderStatus::Pending, $this->order->fresh()->status);
+        $this->assertEquals(TransactionStatus::Pending, $this->transaction->fresh()->status);
+        $this->assertNull($this->order->fresh()->paid_at);
+    }
+
+    public function test_precheck_is_refused_for_an_unknown_bill_number(): void
+    {
+        $response = $this->post(
+            "/api/v1/store/{$this->store->slug}/payments/callback/idram",
+            $this->precheckPayload(['EDP_BILL_NO' => '550e8400-e29b-41d4-a716-000000000000'])
+        );
+
+        $response->assertOk();
+        $this->assertNotSame('OK', $response->getContent());
+    }
+
+    public function test_precheck_is_refused_when_the_amount_does_not_match(): void
+    {
+        $response = $this->post(
+            "/api/v1/store/{$this->store->slug}/payments/callback/idram",
+            $this->precheckPayload(['EDP_AMOUNT' => '1.00'])
+        );
+
+        $response->assertOk();
+        $this->assertNotSame('OK', $response->getContent());
+    }
+
+    /** Trailing zeros differ, value does not — this must still authorise. */
+    public function test_precheck_compares_amounts_numerically(): void
+    {
+        $response = $this->post(
+            "/api/v1/store/{$this->store->slug}/payments/callback/idram",
+            $this->precheckPayload(['EDP_AMOUNT' => '15000'])
+        );
+
+        $response->assertOk();
+        $this->assertSame('OK', $response->getContent());
+    }
+
+    public function test_precheck_is_refused_for_another_merchants_account(): void
+    {
+        $response = $this->post(
+            "/api/v1/store/{$this->store->slug}/payments/callback/idram",
+            $this->precheckPayload(['EDP_REC_ACCOUNT' => '999999999'])
+        );
+
+        $response->assertOk();
+        $this->assertNotSame('OK', $response->getContent());
+    }
+
+    public function test_precheck_is_refused_for_an_already_paid_order(): void
+    {
+        $this->order->update([
+            'payment_status' => PaymentStatus::Paid,
+            'status'         => OrderStatus::Processing,
+            'paid_at'        => now(),
+        ]);
+
+        $response = $this->post(
+            "/api/v1/store/{$this->store->slug}/payments/callback/idram",
+            $this->precheckPayload()
+        );
+
+        $response->assertOk();
+        $this->assertNotSame('OK', $response->getContent());
+    }
+
+    public function test_precheck_is_refused_when_the_gateway_is_disabled(): void
+    {
+        StorePaymentGateway::where('store_id', $this->store->id)->update(['is_enabled' => false]);
+
+        $response = $this->post(
+            "/api/v1/store/{$this->store->slug}/payments/callback/idram",
+            $this->precheckPayload()
+        );
+
+        $response->assertOk();
+        $this->assertNotSame('OK', $response->getContent());
+    }
+
+    public function test_precheck_is_refused_for_an_order_belonging_to_another_store(): void
+    {
+        $otherSeller = User::factory()->seller()->create();
+        $otherStore  = Store::factory()->create([
+            'user_id' => $otherSeller->id,
+            'status'  => StoreStatus::Active,
+        ]);
+
+        StorePaymentGateway::create([
+            'store_id'           => $otherStore->id,
+            'payment_gateway_id' => $this->gateway->id,
+            'is_enabled'         => true,
+            'is_sandbox'         => false,
+            'credentials'        => ['secret_key' => 'other', 'rec_account' => $this->edpId],
+        ]);
+
+        // Our order's bill number, presented on someone else's storefront.
+        $response = $this->post(
+            "/api/v1/store/{$otherStore->slug}/payments/callback/idram",
+            $this->precheckPayload()
+        );
+
+        $response->assertOk();
+        $this->assertNotSame('OK', $response->getContent());
     }
 }

@@ -322,7 +322,11 @@
       "couponApply": "Apply",
       "couponRemove": "Remove",
       "couponApplied": "Coupon applied",
-      "discount": "Discount"
+      "discount": "Discount",
+      "cardPaymentTitle": "Pay by card",
+      "cardPaymentWaiting": "Complete the payment below. This page updates on its own — please don't close it.",
+      "cardPaymentCancel": "Cancel payment",
+      "payWithCard": "Bank card (Visa / Mastercard)"
     },
     "home": {
       "all": "All",
